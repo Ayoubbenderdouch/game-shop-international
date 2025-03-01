@@ -1,0 +1,116 @@
+services:
+  # Geo Server Fastify Application
+  geo-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: geo-server
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=P@ssw0rd_Redis_Complex!23
+      - POSTGRES_HOST=postgis
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=geouser
+      - POSTGRES_PASSWORD=P@ssw0rd_PostgreSQL_Complex!23
+      - POSTGRES_DB=geolocations
+      - PGBOUNCER_HOST=pgbouncer
+      - PGBOUNCER_PORT=6432
+      - PGBOUNCER_USER=geouser
+      - PGBOUNCER_PASSWORD=P@ssw0rd_PostgreSQL_Complex!23  # Using same password as PostgreSQL
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      pgbouncer:
+        condition: service_started
+    networks:
+      - geo-network
+    command: npm run dev
+
+  # Redis with GEO support for active locations
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis-geo
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --protected-mode no --requirepass "P@ssw0rd_Redis_Complex!23"
+    networks:
+      - geo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "P@ssw0rd_Redis_Complex!23", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL with PostGIS extension for historical location data
+  postgis:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: postgis
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: geouser
+      POSTGRES_PASSWORD: P@ssw0rd_PostgreSQL_Complex!23
+      POSTGRES_DB: geolocations
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+      - ./scripts/init-postgis.sql:/docker-entrypoint-initdb.d/init-postgis.sql
+    networks:
+      - geo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geouser -d geolocations"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # PgBouncer for connection pooling
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    container_name: pgbouncer
+    restart: unless-stopped
+    ports:
+      - "6432:6432"
+    environment:
+      # PostgreSQL backend configuration
+      POSTGRESQL_HOST: postgis
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: geouser
+      POSTGRESQL_PASSWORD: P@ssw0rd_PostgreSQL_Complex!23
+      POSTGRESQL_DATABASE: geolocations
+      # PgBouncer configuration
+      PGBOUNCER_PORT: 6432
+      PGBOUNCER_AUTH_TYPE: md5
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 100
+      PGBOUNCER_DATABASES: "geolocations=host=postgis port=5432 dbname=geolocations"
+      PGBOUNCER_AUTH_USERS: geouser
+    depends_on:
+      postgis:
+        condition: service_healthy
+    networks:
+      - geo-network
+
+volumes:
+  redis-data:
+  postgis-data:
+
+networks:
+  geo-network:
+    driver: bridge
