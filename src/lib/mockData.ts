@@ -99,7 +99,7 @@ export const products: Product[] = [
     description: "تي شيرت رياضي مصنوع من مواد تمتص العرق لتجربة تدريب مريحة.",
     price: 129.99,
     sale_price: 99.99,
-    images: ["/products/11.jpg", "/products/12.jpg"],
+    images: ["/products/11.jpg", "/products/11.jpg"],
     category_id: "4",
     rating: {
       average: 4.3,
