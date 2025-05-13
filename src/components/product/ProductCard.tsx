@@ -178,16 +178,16 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.sale_price ? (
                 <>
                   <span className="text-primary font-semibold">
-                    {product.sale_price.toFixed(2)} ر.س
+                    {product.sale_price.toFixed(2)} ع.د
                   </span>
                   <span className="text-gray-400 line-through text-sm">
-                    {product.price.toFixed(2)} ر.س
+                    {product.price.toFixed(2)} ع.د
                   </span>
                 </>
               ) : (
                 <>
                   <span className="text-primary font-semibold">
-                    {product.price.toFixed(2)} ر.س
+                    {product.price.toFixed(2)} ع.د
                   </span>
                   <span className="opacity-0 text-sm">&nbsp;</span>
                 </>

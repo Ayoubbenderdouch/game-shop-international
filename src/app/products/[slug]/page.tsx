@@ -46,7 +46,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const { data: relatedProducts } = useMockApi<Product[]>({
     endpoint: "/api/products",
     params: {
-      category_id: product?.category_id,
+      category_id: product?.category_id || "",
       limit: "4",
     },
   });
