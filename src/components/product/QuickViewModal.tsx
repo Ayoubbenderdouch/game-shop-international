@@ -20,12 +20,22 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
 
-  // Get product details
-  const { data: product, isLoading, error } = useMockApi<Product>({
-    endpoint: productId ? `/api/products/${productId}` : '',
-    params: {}
+  // Get all products
+  const { data: products, isLoading, error } = useMockApi<Product[]>({
+    endpoint: '/api/products',
   });
+
+  // Find the product with matching ID
+  useEffect(() => {
+    if (isOpen && productId && products && products.length > 0) {
+      const foundProduct = products.find(p => p.id === productId);
+      if (foundProduct) {
+        setProduct(foundProduct);
+      }
+    }
+  }, [isOpen, productId, products]);
 
   // Reset state when modal opens with a new product
   useEffect(() => {
@@ -111,18 +121,18 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
   if (!isOpen || !productId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm">
       <div 
         ref={modalRef}
-        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-dark rounded-lg shadow-xl m-4"
+        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-dark rounded-lg shadow-2xl m-4 border border-dark-lighter"
         style={{ animation: 'fadeIn 0.3s forwards' }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-text-light focus:outline-none z-10"
+          className="absolute top-4 right-4 text-gray-400 hover:text-text-light focus:outline-none z-10 bg-dark-card p-2 rounded-full shadow-lg hover:bg-primary hover:text-white transition-all duration-300"
         >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -133,24 +143,27 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
           </div>
         ) : error || !product ? (
           <div className="p-16 text-center">
-            <h2 className="text-2xl font-bold text-red-500 mb-4">حدث خطأ</h2>
+            <svg className="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h2 className="text-2xl font-bold text-red-500 mb-4 mt-4">حدث خطأ</h2>
             <p className="text-text-light mb-6">{error || 'لم يتم العثور على المنتج'}</p>
-            <Button variant="primary" onClick={onClose}>إغلاق</Button>
+            <Button variant="primary" onClick={onClose} className="shadow-lg">إغلاق</Button>
           </div>
         ) : (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Product Gallery */}
               <div>
-                <div className="relative h-80 w-full overflow-hidden bg-dark-card rounded-lg mb-4">
+                <div className="relative h-96 w-full overflow-hidden bg-dark-card rounded-lg mb-4 border border-dark-lighter shadow-lg">
                   <Image
                     src={product.images[activeImageIndex] || '/images/product-placeholder.png'}
                     alt={product.name}
                     fill
-                    className="object-contain"
+                    className="object-contain p-4"
                   />
                   {product.is_on_sale && (
-                    <div className="absolute top-4 right-4 bg-secondary text-white text-sm font-semibold px-3 py-1 rounded-full z-10">
+                    <div className="absolute top-4 right-4 bg-secondary text-white text-sm font-semibold px-3 py-1.5 rounded-full z-10 shadow-md">
                       خصم {discountPercentage}%
                     </div>
                   )}
@@ -158,12 +171,12 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
 
                 {/* Thumbnails */}
                 {product.images.length > 1 && (
-                  <div className="flex overflow-x-auto space-x-2">
+                  <div className="flex overflow-x-auto space-x-2 py-2">
                     {product.images.map((image, index) => (
                       <div 
                         key={index}
-                        className={`h-16 w-16 relative flex-shrink-0 rounded-md overflow-hidden cursor-pointer
-                                ${activeImageIndex === index ? 'ring-2 ring-primary' : 'opacity-70'}`}
+                        className={`h-20 w-20 relative flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105
+                                ${activeImageIndex === index ? 'ring-2 ring-primary shadow-md' : 'opacity-70 hover:opacity-100'}`}
                         onClick={() => setActiveImageIndex(index)}
                       >
                         <Image 
@@ -179,12 +192,12 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
               </div>
 
               {/* Product Info */}
-              <div>
-                <h2 className="text-2xl font-bold text-text-light mb-4">{product.name}</h2>
+              <div className="bg-dark-card rounded-lg p-6 border border-dark-lighter shadow-lg">
+                <h2 className="text-2xl font-bold text-text-light mb-4 border-r-4 border-primary pr-3">{product.name}</h2>
                 
                 {/* Rating */}
                 {product.rating && (
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-4 bg-dark inline-block px-4 py-2 rounded-lg">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
                         <svg
@@ -203,19 +216,19 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
                         </svg>
                       ))}
                     </div>
-                    <span className="text-gray-400 text-sm mr-2">
+                    <span className="text-gray-400 text-sm mr-2 font-medium">
                       ({product.rating.count} تقييم)
                     </span>
                   </div>
                 )}
 
                 {/* Price */}
-                <div className="mb-4">
+                <div className="mb-6 bg-dark-lighter/30 p-4 rounded-lg">
                   {product.sale_price ? (
                     <div className="flex items-center">
                       <span className="text-primary text-2xl font-bold">{product.sale_price.toFixed(2)} ر.س</span>
                       <span className="text-gray-400 line-through mr-2">{product.price.toFixed(2)} ر.س</span>
-                      <span className="bg-secondary/20 text-secondary text-sm px-2 py-1 rounded mr-2">
+                      <span className="bg-secondary/20 text-secondary text-sm px-3 py-1.5 rounded-full mr-2 shadow-sm">
                         وفرت {discountPercentage}%
                       </span>
                     </div>
@@ -288,7 +301,6 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
                       onClick={handleAddToCart}
                       className="flex-1"
                     >
-                      <i className="fi-rs-shopping-cart mr-2"></i>
                       إضافة إلى السلة
                     </Button>
                   )}
@@ -307,4 +319,3 @@ export function QuickViewModal({ isOpen, onClose, productId }: QuickViewModalPro
     </div>
   );
 }
-
