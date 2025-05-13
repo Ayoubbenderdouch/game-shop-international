@@ -1,0 +1,265 @@
+import { Category, Offer, Product, WebsiteReview } from "./types";
+
+export const categories: Category[] = [
+  {
+    id: "1",
+    name: "بروتين",
+    slug: "protein",
+    image: "/category/protein.webp",
+  },
+  {
+    id: "2",
+    name: "مكملات غذائية",
+    slug: "supplements",
+    image: "/category/complement.jpg",
+  },
+  {
+    id: "3",
+    name: "وجبات صحية",
+    slug: "healthy-snacks",
+    image: "/category/haelth.webp",
+  },
+  {
+    id: "4",
+    name: "ملابس رياضية",
+    slug: "sportswear",
+    image: "/category/clothes.avif",
+  },
+  {
+    id: "5",
+    name: "أكسسوارات",
+    slug: "accessories",
+    image: "/category/haelth.webp",
+  },
+];
+
+export const products: Product[] = [
+  {
+    id: "1",
+    name: "بروتين مصل اللبن ألتيمت",
+    slug: "ultimate-whey-protein",
+    description:
+      "بروتين مصل اللبن عالي النقاء مع 25 جرام من البروتين لكل وجبة. مثالي لبناء العضلات والتعافي.",
+    price: 259.99,
+    sale_price: 229.99,
+    images: ["/products/2.jpg", "/products/1.jpg"],
+    category_id: "1",
+    rating: {
+      average: 4.8,
+      count: 125,
+    },
+    is_on_sale: true,
+    discount_percentage: 12,
+    quantity: 100,
+    is_infinite: false,
+    structure: "standalone",
+  },
+  {
+    id: "2",
+    name: "كرياتين مونوهيدرات نقي",
+    slug: "pure-creatine-monohydrate",
+    description:
+      "كرياتين مونوهيدرات عالي النقاء لزيادة القوة وتحسين الأداء الرياضي.",
+    price: 119.99,
+    sale_price: 99.99,
+    images: ["/products/4.jpg", "/products/3.jpg"],
+    category_id: "2",
+    rating: {
+      average: 4.9,
+      count: 87,
+    },
+    is_on_sale: true,
+    discount_percentage: 17,
+    quantity: 75,
+    is_infinite: false,
+    structure: "standalone",
+  },
+  {
+    id: "3",
+    name: "بروتين بار بالشوكولاتة",
+    slug: "chocolate-protein-bar",
+    description:
+      "بروتين بار بالشوكولاتة مع 20 جرام من البروتين ونسبة منخفضة من السكر. مثالي كوجبة خفيفة صحية.",
+    price: 89.99,
+    images: ["/products/9.jpg", "/products/10.jpg"],
+    category_id: "3",
+    rating: {
+      average: 4.5,
+      count: 42,
+    },
+    is_on_sale: false,
+    quantity: 120,
+    is_infinite: true,
+    structure: "standalone",
+  },
+  {
+    id: "4",
+    name: "تي شيرت رياضي للرجال",
+    slug: "mens-athletic-t-shirt",
+    description: "تي شيرت رياضي مصنوع من مواد تمتص العرق لتجربة تدريب مريحة.",
+    price: 129.99,
+    sale_price: 99.99,
+    images: ["/products/11.jpg", "/products/12.jpg"],
+    category_id: "4",
+    rating: {
+      average: 4.3,
+      count: 28,
+    },
+    is_on_sale: true,
+    discount_percentage: 23,
+    quantity: 50,
+    is_infinite: false,
+    structure: "configurable",
+  },
+  {
+    id: "5",
+    name: "أحزمة رفع الأثقال",
+    slug: "weight-lifting-belts",
+    description: "أحزمة رفع أثقال متينة مع دعم للظهر لتمارين أكثر أمانًا.",
+    price: 179.99,
+    images: ["/products/6.jpg", "/products/5.jpeg"],
+    category_id: "5",
+    rating: {
+      average: 4.7,
+      count: 35,
+    },
+    is_on_sale: false,
+    quantity: 30,
+    is_infinite: false,
+    structure: "standalone",
+  },
+  {
+    id: "6",
+    name: "شيكر بروتين",
+    slug: "protein-shaker",
+    description:
+      "شيكر بروتين بسعة 700 مل مع كرة خلط للحصول على مشروبات سلسة بدون تكتلات.",
+    price: 49.99,
+    sale_price: 39.99,
+    images: ["/products/7.jpg", "/products/8.jpg"],
+    category_id: "5",
+    rating: {
+      average: 4.6,
+      count: 52,
+    },
+    is_on_sale: true,
+    discount_percentage: 20,
+    quantity: 100,
+    is_infinite: true,
+    structure: "standalone",
+  },
+  {
+    id: "7",
+    name: "بروتين كيتو",
+    slug: "keto-protein",
+    description:
+      "بروتين متوافق مع نظام الكيتو الغذائي، منخفض الكربوهيدرات وغني بالدهون الصحية.",
+    price: 299.99,
+    images: [
+      "/products/12.webp",
+      "/products/14.jpeg",
+    ],
+    category_id: "6",
+    rating: {
+      average: 4.4,
+      count: 22,
+    },
+    is_on_sale: false,
+    quantity: 40,
+    is_infinite: false,
+    structure: "standalone",
+  },
+  {
+    id: "8",
+    name: "بروتين نباتي",
+    slug: "vegan-protein",
+    description:
+      "بروتين نباتي مصنوع من البازلاء والأرز البني. مناسب للنباتيين والنباتيين بالكامل.",
+    price: 279.99,
+    sale_price: 249.99,
+    images: [
+      "/products/5.jpg",
+    ],
+    category_id: "6",
+    rating: {
+      average: 4.2,
+      count: 19,
+    },
+    is_on_sale: true,
+    discount_percentage: 11,
+    quantity: 35,
+    is_infinite: false,
+    structure: "standalone",
+  },
+];
+
+export const offers: Offer[] = [
+  {
+    id: "1",
+    title: "المكملات الغذائية الصحية",
+    description: "تنوع | جودة | ثقة",
+    image: "/images/banner2.jpg",
+    image_mobile: "/images/banner.jpg",
+    link: "/products?category=supplements",
+    button_text: "تسوق الآن",
+  },
+  {
+    id: "2",
+    title: "خصم 15% على البروتينات",
+    description: "عروض حصرية على بروتينات مصل اللبن",
+    image: "/images/banner1.png",
+    image_mobile: "/images/banner.jpg",
+    link: "/products?category=protein",
+    button_text: "اكتشف العروض",
+    expires_at: "2025-12-31T23:59:59Z",
+  },
+  {
+    id: "3",
+    title: "الشحن مجاني",
+    description: "للطلبات فوق 400 دينار",
+    image: "/images/banner.jpg",
+    image_mobile: "/images/banner2.jpg",
+    link: "/products",
+    button_text: "تسوق الآن",
+  },
+];
+
+export const websiteReviews: WebsiteReview[] = [
+  {
+    id: "1",
+    name: "أحمد محمد",
+    rating: 5,
+    comment: "موقع رائع وسريع! المنتجات وصلت بسرعة وبحالة ممتازة.",
+    created_at: "2023-09-15T09:24:00Z",
+  },
+  {
+    id: "2",
+    name: "سارة علي",
+    rating: 4,
+    comment:
+      "تجربة تسوق سهلة وممتعة. المنتجات ذات جودة عالية ولكن الشحن استغرق وقتًا أطول قليلاً من المتوقع.",
+    created_at: "2023-09-10T14:35:00Z",
+  },
+  {
+    id: "3",
+    name: "خالد العتيبي",
+    rating: 5,
+    comment: "أسعار تنافسية ومنتجات ممتازة! سأعود للتسوق مرة أخرى بالتأكيد.",
+    created_at: "2023-09-05T18:12:00Z",
+  },
+  {
+    id: "4",
+    name: "ليلى إبراهيم",
+    rating: 4,
+    comment: "خيارات متنوعة من المنتجات ودعم عملاء رائع.",
+    created_at: "2023-08-28T11:47:00Z",
+  },
+  {
+    id: "5",
+    name: "عمر عبدالله",
+    rating: 5,
+    comment:
+      "أفضل موقع للمكملات الغذائية! توفر جميع المنتجات التي أحتاجها بأسعار معقولة.",
+    created_at: "2023-08-20T15:30:00Z",
+  },
+];
