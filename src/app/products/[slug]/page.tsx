@@ -8,15 +8,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useParams } from "next/navigation";
 
-interface ProductPageProps {
-  params: {
-    slug: string;
-  };
-}
+export default function ProductPage() {
+  // Use the useParams hook to get the parameters
+  const params = useParams();
+  const slug = params.slug as string;
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { slug } = params;
   const { addToCart } = useCartContext();
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
