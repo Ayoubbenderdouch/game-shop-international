@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useMockApi } from "@/hooks/useMockApi";
 import { Product, Category } from "@/lib/types";
 import { ProductGrid } from "@/components/product/ProductGrid";
@@ -112,21 +112,37 @@ const EnhancedCheckbox: React.FC<EnhancedCheckboxProps> = ({
   );
 };
 
-export default function ProductsPage() {
+// SearchParamsHandler component to handle useSearchParams
+function SearchParamsHandler({
+  onParamsChange,
+}: {
+  onParamsChange: (
+    categoryId: string | null,
+    query: string | null,
+    onSale: boolean
+  ) => void;
+}) {
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const categoryId = searchParams.get("category_id");
+    const query = searchParams.get("query");
+    const onSale = searchParams.get("on_sale") === "true";
+
+    onParamsChange(categoryId, query, onSale);
+  }, [searchParams, onParamsChange]);
+
+  return null;
+}
+
+export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    searchParams.get("category_id")
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortBy, setSortBy] = useState("popularity_order");
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("query") || ""
-  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [onlyOnSale, setOnlyOnSale] = useState(
-    searchParams.get("on_sale") === "true"
-  );
+  const [onlyOnSale, setOnlyOnSale] = useState(false);
 
   // Get categories
   const { data: categories, isLoading: categoriesLoading } = useMockApi<
@@ -153,6 +169,16 @@ export default function ProductsPage() {
       page: currentPage.toString(),
     },
   });
+
+  const handleSearchParamsChange = (
+    categoryId: string | null,
+    query: string | null,
+    onSale: boolean
+  ) => {
+    if (categoryId) setSelectedCategory(categoryId);
+    if (query) setSearchQuery(query);
+    setOnlyOnSale(onSale);
+  };
 
   const toggleFilters = () => {
     setShowFilters(!showFilters);
@@ -201,6 +227,11 @@ export default function ProductsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Wrap the search params handler in Suspense */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler onParamsChange={handleSearchParamsChange} />
+      </Suspense>
+
       {/* Page Header */}
       <div className="mb-8 bg-gradient-to-l from-dark-card to-dark-lighter p-6 rounded-lg shadow-lg">
         <div className="text-sm breadcrumbs mb-4">
@@ -411,7 +442,7 @@ export default function ProductsPage() {
                 <EnhancedCheckbox
                   id="on_sale"
                   checked={onlyOnSale}
-                  onChange={() => setOnlyOnSale(!onlyOnSale)}
+                  onChange={handleOnSaleChange}
                   color="secondary"
                   size="md"
                 />

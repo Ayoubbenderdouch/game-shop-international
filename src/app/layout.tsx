@@ -2,7 +2,7 @@ import { CartProvider } from '@/providers/CartProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Almarai } from 'next/font/google';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 // Add import for service worker registration
@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: "متجر التغذية الرياضية | منتجات صحية ومكملات غذائية",
   description:
     "متجر متخصص في التغذية الرياضية والمكملات الغذائية، نقدم أفضل المنتجات بأسعار تنافسية مع شحن سريع في العراق.",
-  viewport: "width=device-width, initial-scale=1",
   openGraph: {
     title: "متجر التغذية الرياضية | منتجات صحية ومكملات غذائية",
     description:
@@ -30,13 +29,7 @@ export const metadata: Metadata = {
   },
   // Add manifest for PWA
   manifest: "/manifest.json",
-  // Add other PWA related metadata
-  themeColor: "#599b79",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "متجر التغذية الرياضية",
-  },
+  // Remove viewport and themeColor from here - moved to viewport export
   formatDetection: {
     telephone: true,
     date: true,
@@ -45,6 +38,13 @@ export const metadata: Metadata = {
     url: true,
   },
 };
+
+// Move viewport and themeColor to viewport export
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#599b79",
+}
 
 export default function RootLayout({
   children,
