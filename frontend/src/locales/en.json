@@ -1,0 +1,120 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "inStock": "In Stock"
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "cart": "Cart",
+    "orders": "Orders",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "admin": "Admin",
+    "profile": "Profile"
+  },
+  "home": {
+    "hero": {
+      "title": "Level Up Your Gaming",
+      "subtitle": "Get instant access to game cards, gift cards, and subscriptions",
+      "cta": "Shop Now"
+    },
+    "featured": "Featured Categories"
+  },
+  "shop": {
+    "title": "Shop",
+    "filters": {
+      "category": "Category",
+      "priceRange": "Price Range",
+      "platform": "Platform",
+      "all": "All Categories"
+    },
+    "sort": {
+      "latest": "Latest",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "popular": "Most Popular"
+    }
+  },
+  "product": {
+    "reviews": "Reviews",
+    "writeReview": "Write a Review",
+    "description": "Description",
+    "availability": "Available in",
+    "stock": "Stock",
+    "price": "Price"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "quantity": "Quantity",
+    "remove": "Remove"
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": "No orders yet",
+    "orderNumber": "Order #",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "viewDetails": "View Details",
+    "revealCode": "Reveal Code",
+    "codeRevealed": "Code revealed! This is a one-time view."
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Create Account",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "totalRevenue": "Total Revenue",
+      "totalOrders": "Total Orders",
+      "totalProducts": "Total Products",
+      "lowStock": "Low Stock Items"
+    },
+    "products": {
+      "title": "Product Management",
+      "addProduct": "Add Product",
+      "editProduct": "Edit Product"
+    },
+    "stock": {
+      "title": "Stock Management",
+      "uploadCodes": "Upload Codes",
+      "addSingle": "Add Single Code",
+      "bulkUpload": "Bulk Upload"
+    }
+  }
+}
