@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, UserPlus } from 'lucide-react';
+import { Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
@@ -11,17 +11,32 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [registerError, setRegisterError] = useState('');
   
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const password = watch('password');
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    const result = await registerUser(data.email, data.password);
-    setLoading(false);
-    
-    if (result.success) {
-      navigate('/');
+    try {
+      setLoading(true);
+      setRegisterError(''); // Clear any previous errors
+      
+      const result = await registerUser(data.email, data.password);
+      
+      if (result.success) {
+        // Small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
+      } else {
+        // Show the error message
+        setRegisterError(result.error || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setRegisterError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,6 +51,18 @@ const RegisterPage = () => {
           <UserPlus className="w-12 h-12 mx-auto mb-4 text-neon-purple" />
           <h1 className="text-3xl font-bold glow-text">{t('auth.register.title')}</h1>
         </div>
+
+        {/* Show registration error if any */}
+        {registerError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-500">{registerError}</p>
+          </motion.div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
@@ -110,9 +137,9 @@ const RegisterPage = () => {
           <motion.button
             type="submit"
             disabled={loading}
-            className="w-full neon-button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            className="w-full neon-button disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={!loading ? { scale: 1.02 } : {}}
+            whileTap={!loading ? { scale: 0.98 } : {}}
           >
             {loading ? 'Creating account...' : t('auth.register.submit')}
           </motion.button>

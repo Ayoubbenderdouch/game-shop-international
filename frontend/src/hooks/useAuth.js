@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../services/supabase';
 import { authAPI } from '../services/api';
 import useStore from '../store/useStore';
@@ -8,54 +8,94 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const { user, setUser, clearUser, isAdmin } = useStore();
 
-  useEffect(() => {
-    checkUser();
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const { data } = await authAPI.getProfile();
+      setUser(data);
+      return true;
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      // Don't clear user here - let the error interceptor handle it
+      return false;
+    }
+  }, [setUser]);
+
+  const checkUser = useCallback(async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         await fetchUserProfile();
       } else {
         clearUser();
       }
+    } catch (error) {
+      console.error('Error checking user:', error);
+      clearUser();
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchUserProfile, clearUser]);
+
+  useEffect(() => {
+    // Initial check
+    checkUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        // User signed in
+        await fetchUserProfile();
+      } else if (event === 'SIGNED_OUT') {
+        // User signed out
+        clearUser();
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        // Token was refreshed, update profile if needed
+        await fetchUserProfile();
+      } else if (event === 'USER_UPDATED' && session?.user) {
+        // User data was updated
+        await fetchUserProfile();
+      }
+      
       setLoading(false);
     });
 
     return () => {
-      authListener?.subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
-
-  const checkUser = async () => {
-    try {
-      const session = await supabase.auth.getSession();
-      if (session?.data?.session?.user) {
-        await fetchUserProfile();
-      }
-    } catch (error) {
-      console.error('Error checking user:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserProfile = async () => {
-    try {
-      const { data } = await authAPI.getProfile();
-      setUser(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
 
   const login = async (email, password) => {
     try {
       setLoading(true);
+      
+      // First, sign in with Supabase
+      const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (supabaseError) {
+        return { success: false, error: supabaseError.message };
+      }
+      
+      // Then call our backend login endpoint
       const { data } = await authAPI.login({ email, password });
       setUser(data.user);
       toast.success('Welcome back!');
+      
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'Login failed' };
+      console.error('Login error:', error);
+      
+      // Sign out from Supabase if backend login fails
+      await supabase.auth.signOut();
+      
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Login failed' 
+      };
     } finally {
       setLoading(false);
     }
@@ -64,12 +104,19 @@ export const useAuth = () => {
   const register = async (email, password) => {
     try {
       setLoading(true);
+      
+      // Call our backend register endpoint (which handles Supabase signup)
       const { data } = await authAPI.register({ email, password });
       setUser(data.user);
       toast.success('Account created successfully!');
+      
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'Registration failed' };
+      console.error('Registration error:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Registration failed' 
+      };
     } finally {
       setLoading(false);
     }
@@ -77,12 +124,27 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await authAPI.logout();
+      setLoading(true);
+      
+      // Call backend logout first
+      try {
+        await authAPI.logout();
+      } catch (error) {
+        console.error('Backend logout error:', error);
+      }
+      
+      // Then sign out from Supabase
       await supabase.auth.signOut();
+      
+      // Clear local user state
       clearUser();
+      
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error('Error logging out');
+    } finally {
+      setLoading(false);
     }
   };
 

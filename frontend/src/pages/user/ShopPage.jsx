@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { productAPI } from '../../services/api';
-import ProductCard from '../../components/common/ProductCard';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Filter, Search, X } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { productAPI } from "../../services/api";
+import ProductCard from "../../components/common/ProductCard";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ShopPage = () => {
   const { t } = useTranslation();
@@ -14,13 +14,13 @@ const ShopPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  
+
   const [filters, setFilters] = useState({
-    category: searchParams.get('category') || '',
-    minPrice: searchParams.get('minPrice') || '',
-    maxPrice: searchParams.get('maxPrice') || '',
-    search: searchParams.get('search') || '',
-    sort: searchParams.get('sort') || 'latest',
+    category: searchParams.get("category") || "",
+    minPrice: searchParams.get("minPrice") || "",
+    maxPrice: searchParams.get("maxPrice") || "",
+    search: searchParams.get("search") || "",
+    sort: searchParams.get("sort") || "latest",
   });
 
   const [pagination, setPagination] = useState({
@@ -40,10 +40,12 @@ const ShopPage = () => {
 
   const fetchCategories = async () => {
     try {
+      console.log("Fetching categories...");
       const { data } = await productAPI.getCategories();
+      console.log("Fetched categories:", data);
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -55,21 +57,22 @@ const ShopPage = () => {
         limit: pagination.limit,
         ...filters,
       };
-      
+
       const { data } = await productAPI.getAll(params);
+      console.log("Fetched products:", data);
       setProducts(data.products);
       setPagination(data.pagination);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const updateFilter = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination(prev => ({ ...prev, page: 1 }));
-    
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
+
     if (value) {
       searchParams.set(key, value);
     } else {
@@ -80,11 +83,11 @@ const ShopPage = () => {
 
   const clearFilters = () => {
     setFilters({
-      category: '',
-      minPrice: '',
-      maxPrice: '',
-      search: '',
-      sort: 'latest',
+      category: "",
+      minPrice: "",
+      maxPrice: "",
+      search: "",
+      sort: "latest",
     });
     setSearchParams({});
   };
@@ -93,13 +96,15 @@ const ShopPage = () => {
     <div className="space-y-6">
       {/* Search */}
       <div>
-        <label className="block text-sm font-medium mb-2">{t('common.search')}</label>
+        <label className="block text-sm font-medium mb-2">
+          {t("common.search")}
+        </label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
             value={filters.search}
-            onChange={(e) => updateFilter('search', e.target.value)}
+            onChange={(e) => updateFilter("search", e.target.value)}
             placeholder="Search products..."
             className="w-full pl-10 pr-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
           />
@@ -108,34 +113,40 @@ const ShopPage = () => {
 
       {/* Categories */}
       <div>
-        <label className="block text-sm font-medium mb-2">{t('shop.filters.category')}</label>
+        <label className="block text-sm font-medium mb-2">
+          {t("shop.filters.category")}
+        </label>
         <select
           value={filters.category}
-          onChange={(e) => updateFilter('category', e.target.value)}
+          onChange={(e) => updateFilter("category", e.target.value)}
           className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
         >
-          <option value="">{t('shop.filters.all')}</option>
-          {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          <option value="">{t("shop.filters.all")}</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
           ))}
         </select>
       </div>
 
       {/* Price Range */}
       <div>
-        <label className="block text-sm font-medium mb-2">{t('shop.filters.priceRange')}</label>
+        <label className="block text-sm font-medium mb-2">
+          {t("shop.filters.priceRange")}
+        </label>
         <div className="flex space-x-2">
           <input
             type="number"
             value={filters.minPrice}
-            onChange={(e) => updateFilter('minPrice', e.target.value)}
+            onChange={(e) => updateFilter("minPrice", e.target.value)}
             placeholder="Min"
             className="w-1/2 px-3 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
           />
           <input
             type="number"
             value={filters.maxPrice}
-            onChange={(e) => updateFilter('maxPrice', e.target.value)}
+            onChange={(e) => updateFilter("maxPrice", e.target.value)}
             placeholder="Max"
             className="w-1/2 px-3 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
           />
@@ -144,16 +155,18 @@ const ShopPage = () => {
 
       {/* Sort */}
       <div>
-        <label className="block text-sm font-medium mb-2">{t('common.sort')}</label>
+        <label className="block text-sm font-medium mb-2">
+          {t("common.sort")}
+        </label>
         <select
           value={filters.sort}
-          onChange={(e) => updateFilter('sort', e.target.value)}
+          onChange={(e) => updateFilter("sort", e.target.value)}
           className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
         >
-          <option value="latest">{t('shop.sort.latest')}</option>
-          <option value="priceLow">{t('shop.sort.priceLow')}</option>
-          <option value="priceHigh">{t('shop.sort.priceHigh')}</option>
-          <option value="popular">{t('shop.sort.popular')}</option>
+          <option value="latest">{t("shop.sort.latest")}</option>
+          <option value="priceLow">{t("shop.sort.priceLow")}</option>
+          <option value="priceHigh">{t("shop.sort.priceHigh")}</option>
+          <option value="popular">{t("shop.sort.popular")}</option>
         </select>
       </div>
 
@@ -169,8 +182,8 @@ const ShopPage = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8 glow-text">{t('shop.title')}</h1>
-      
+      <h1 className="text-4xl font-bold mb-8 glow-text">{t("shop.title")}</h1>
+
       <div className="flex gap-8">
         {/* Desktop Filters */}
         <aside className="hidden lg:block w-64 flex-shrink-0">
@@ -217,11 +230,13 @@ const ShopPage = () => {
                   {[...Array(pagination.totalPages)].map((_, i) => (
                     <motion.button
                       key={i}
-                      onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+                      onClick={() =>
+                        setPagination((prev) => ({ ...prev, page: i + 1 }))
+                      }
                       className={`px-4 py-2 rounded-lg ${
                         pagination.page === i + 1
-                          ? 'bg-neon-purple text-white'
-                          : 'bg-dark-card hover:bg-dark-hover'
+                          ? "bg-neon-purple text-white"
+                          : "bg-dark-card hover:bg-dark-hover"
                       }`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -247,10 +262,10 @@ const ShopPage = () => {
             onClick={() => setMobileFiltersOpen(false)}
           >
             <motion.div
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'tween' }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween" }}
               className="absolute left-0 top-0 h-full w-80 bg-dark-card p-6 overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >

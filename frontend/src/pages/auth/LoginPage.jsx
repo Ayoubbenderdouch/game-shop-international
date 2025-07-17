@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
@@ -12,17 +12,32 @@ const LoginPage = () => {
   const location = useLocation();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   
   const { register, handleSubmit, formState: { errors } } = useForm();
   const from = location.state?.from?.pathname || '/';
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    const result = await login(data.email, data.password);
-    setLoading(false);
-    
-    if (result.success) {
-      navigate(from, { replace: true });
+    try {
+      setLoading(true);
+      setLoginError(''); // Clear any previous errors
+      
+      const result = await login(data.email, data.password);
+      
+      if (result.success) {
+        // Small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 100);
+      } else {
+        // Show the error message
+        setLoginError(result.error || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoginError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,6 +52,18 @@ const LoginPage = () => {
           <LogIn className="w-12 h-12 mx-auto mb-4 text-neon-purple" />
           <h1 className="text-3xl font-bold glow-text">{t('auth.login.title')}</h1>
         </div>
+
+        {/* Show login error if any */}
+        {loginError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-500">{loginError}</p>
+          </motion.div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
@@ -90,9 +117,9 @@ const LoginPage = () => {
           <motion.button
             type="submit"
             disabled={loading}
-            className="w-full neon-button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            className="w-full neon-button disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={!loading ? { scale: 1.02 } : {}}
+            whileTap={!loading ? { scale: 0.98 } : {}}
           >
             {loading ? 'Logging in...' : t('auth.login.submit')}
           </motion.button>

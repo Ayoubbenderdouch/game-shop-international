@@ -24,11 +24,34 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const message = error.response?.data?.error || "Something went wrong";
-    toast.error(message);
-    if (error.response?.status === 401) {
-      supabase.auth.signOut();
-      window.location.href = "/login";
+
+    // Only show toast for non-401 errors or specific login failures
+    if (
+      error.response?.status !== 401 ||
+      error.config.url.includes("/auth/login")
+    ) {
+      toast.error(message);
     }
+
+    // Only redirect to login if:
+    // 1. It's a 401 error
+    // 2. NOT from the login endpoint itself
+    // 3. User is actually logged in (to prevent redirect loops)
+    if (
+      error.response?.status === 401 &&
+      !error.config.url.includes("/auth/login") &&
+      !error.config.url.includes("/auth/register")
+    ) {
+      // Check if we actually have a session before signing out
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          supabase.auth.signOut();
+          window.location.href = "/login";
+          toast.error("Session expired. Please login again.");
+        }
+      });
+    }
+
     return Promise.reject(error);
   }
 );
@@ -72,31 +95,35 @@ export const reviewAPI = {
 export const adminAPI = {
   getDashboard: () => api.get("/admin/dashboard"),
   getUsers: (params) => api.get("/admin/users", { params }),
-  getAllOrders: (params) => api.get("/admin/orders", { params }),
-  getAuditLogs: (params) => api.get("/admin/audit-logs", { params }),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+
   createProduct: (data) => api.post("/admin/products", data),
   updateProduct: (id, data) => api.put(`/admin/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/admin/products/${id}`),
+  toggleProductStatus: (id) => api.patch(`/admin/products/${id}/toggle-status`),
+
   createCategory: (data) => api.post("/admin/categories", data),
-  deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+  updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
+
+  getOrders: (params) => api.get("/admin/orders", { params }),
+  updateOrderStatus: (id, status) =>
+    api.patch(`/admin/orders/${id}/status`, { status }),
 };
 
 // Stock endpoints
 export const stockAPI = {
-  addSingleCode: (data) => api.post("/stock/codes/single", data),
+  getProductStock: (productId, params) =>
+    api.get(`/admin/stock/${productId}`, { params }),
+  addSingleCode: (data) => api.post("/admin/stock/single", data),
   bulkAddCodes: (formData) =>
-    api.post("/stock/codes/bulk", formData, {
+    api.post("/admin/stock/bulk", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
-  getProductStock: (productId, params) =>
-    api.get(`/stock/product/${productId}`, { params }),
-  deleteCode: (id) => api.delete(`/stock/codes/${id}`),
-  setStockAlert: (data) => api.post("/stock/alerts", data),
+  deleteCode: (id) => api.delete(`/admin/stock/${id}`),
+  exportCodes: (productId) =>
+    api.get(`/admin/stock/${productId}/export`, {
+      responseType: "blob",
+    }),
 };
-
-// Stripe endpoints
-export const stripeAPI = {
-  getCheckoutSession: (sessionId) => api.get(`/stripe/session/${sessionId}`),
-};
-
-export default api;
