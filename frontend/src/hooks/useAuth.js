@@ -55,20 +55,35 @@ export const useAuth = () => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event);
 
+      // Skip handling during email verification (when on /auth/confirm path)
+      if (
+        window.location.pathname.includes("/auth/confirm") &&
+        (event === "SIGNED_IN" || event === "INITIAL_SESSION")
+      ) {
+        console.log("Skipping auth state change during email verification");
+        return;
+      }
+
       if (event === "SIGNED_IN" && session?.user) {
-        // User signed in
-        await fetchUserProfile();
-        startSessionRefresh();
+        // User signed in - only fetch profile if email is confirmed
+        if (session.user.confirmed_at) {
+          await fetchUserProfile();
+          startSessionRefresh();
+        }
       } else if (event === "SIGNED_OUT") {
         // User signed out
         clearUser();
         stopSessionRefresh();
       } else if (event === "TOKEN_REFRESHED" && session?.user) {
         // Token was refreshed, update profile if needed
-        await fetchUserProfile();
+        if (session.user.confirmed_at) {
+          await fetchUserProfile();
+        }
       } else if (event === "USER_UPDATED" && session?.user) {
         // User data was updated
-        await fetchUserProfile();
+        if (session.user.confirmed_at) {
+          await fetchUserProfile();
+        }
       }
 
       setLoading(false);

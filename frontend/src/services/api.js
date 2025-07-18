@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from "../config/api";
 import { supabase } from "./supabase";
 import toast from "react-hot-toast";
-import { useStore } from "zustand";
+import useStore from "../store/useStore";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -43,19 +43,22 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       !error.config.url.includes("/auth/") &&
       !error.config.url.includes("/products") &&
-      !error.config.url.includes("/reviews/product/")
+      !error.config.url.includes("/reviews/product/") &&
+      !error.config.url.includes("/categories")
     ) {
       // Check if we actually have a session before signing out
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (session) {
         // Only sign out if we have an actual session
         await supabase.auth.signOut();
-        
+
         // Use store to clear user state
         const store = useStore.getState();
         store.clearUser();
-        
+
         // Redirect to login
         window.location.href = "/login";
         toast.error("Session expired. Please login again.");
@@ -141,3 +144,5 @@ export const stockAPI = {
       responseType: "blob",
     }),
 };
+
+export default api;

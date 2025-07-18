@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, CheckCircle, XCircle, Loader } from "lucide-react";
@@ -13,13 +13,22 @@ const EmailVerificationPage = () => {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
 
+  // Use ref to prevent duplicate verification attempts
+  const verificationAttempted = useRef(false);
+
   // Get email from location state (when coming from registration)
   const email = location.state?.email;
 
   useEffect(() => {
+    // Function to handle the email confirmation
     const handleEmailConfirmation = async () => {
+      // Prevent duplicate verification attempts
+      if (verificationAttempted.current) {
+        return;
+      }
+      verificationAttempted.current = true;
+
       try {
-        // Parse the hash fragment
         const hashParams = new URLSearchParams(
           window.location.hash.substring(1)
         );
@@ -29,16 +38,13 @@ const EmailVerificationPage = () => {
 
         console.log("Confirmation params:", {
           accessToken: !!accessToken,
+          refreshToken: !!refreshToken,
           type,
         });
 
-        // Check if this is a signup confirmation
-        if (accessToken && type === "signup") {
+        if (accessToken && refreshToken && type === "signup") {
           // Set the session manually since we have the tokens
-          const {
-            data: { user },
-            error: sessionError,
-          } = await supabase.auth.setSession({
+          const { data, error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
@@ -48,40 +54,38 @@ const EmailVerificationPage = () => {
             throw sessionError;
           }
 
+          // Get the user from the session data
+          const user = data?.user;
+          console.log("User after confirmation:", user);
+
           if (user && user.confirmed_at) {
             console.log("Email confirmed for user:", user.email);
 
-            // Now create the user profile in the backend
             try {
+              // Small delay to ensure session is properly set
+              await new Promise((resolve) => setTimeout(resolve, 500));
+
               // Call the backend to create/get user profile
               const { data: profile } = await authAPI.getProfile();
               console.log("User profile created/fetched:", profile);
 
               setVerified(true);
-              setVerifying(false); // ADD THIS LINE
               toast.success("Email verified successfully!");
-
-              // Sign out the user so they can login properly
-              await supabase.auth.signOut();
-
-              // Redirect to login after 2 seconds
-              setTimeout(() => {
-                navigate("/login", {
-                  state: {
-                    message: "Email verified! Please login to continue.",
-                  },
-                  replace: true,
-                });
-              }, 2000);
             } catch (profileError) {
               console.error("Profile creation error:", profileError);
               // Even if profile creation fails, the email is verified
               setVerified(true);
-              setVerifying(false); // ADD THIS LINE
 
-              // Sign out and redirect to login
+              // Still show success since email is verified
+              toast.success("Email verified! Please login to continue.");
+            } finally {
+              // Always sign out the user so they can login properly
               await supabase.auth.signOut();
 
+              // Always set verifying to false
+              setVerifying(false);
+
+              // Redirect to login after a delay
               setTimeout(() => {
                 navigate("/login", {
                   state: {
@@ -92,7 +96,7 @@ const EmailVerificationPage = () => {
               }, 2000);
             }
           } else {
-            throw new Error("Email verification failed");
+            throw new Error("Email verification failed - user not confirmed");
           }
         } else if (!accessToken && !email) {
           // No token and no email in state - probably accessed directly
@@ -101,22 +105,29 @@ const EmailVerificationPage = () => {
         } else if (email && !accessToken) {
           // Coming from registration, show the "check email" message
           setVerifying(false);
+        } else {
+          // Invalid verification parameters
+          throw new Error("Invalid verification parameters");
         }
       } catch (error) {
         console.error("Verification error:", error);
-        setError("Failed to verify email. The link may be expired or invalid.");
+        setError(
+          error.message ||
+            "Failed to verify email. The link may be expired or invalid."
+        );
         setVerifying(false);
+        verificationAttempted.current = false; // Reset on error
       }
     };
 
     // Only run verification if we're on the confirmation URL with hash params
-    if (window.location.hash) {
+    if (window.location.hash && window.location.hash.includes("access_token")) {
       handleEmailConfirmation();
     } else {
-      // No hash params, just show the email verification message
+      // No hash params or no access token, just show the email verification message
       setVerifying(false);
     }
-  }, [navigate]);
+  }, []); // Remove navigate from dependencies to prevent re-runs
 
   const resendVerificationEmail = async () => {
     if (!email) {
@@ -135,7 +146,7 @@ const EmailVerificationPage = () => {
 
       if (error) throw error;
 
-      toast.success("Verification email sent!");
+      toast.success("Verification email sent! Check your inbox.");
     } catch (error) {
       console.error("Resend error:", error);
       toast.error("Failed to resend verification email");
