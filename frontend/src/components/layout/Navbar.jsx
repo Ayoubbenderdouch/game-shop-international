@@ -24,14 +24,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <motion.div
-              className="text-2xl font-bold glow-text"
-              whileHover={{ scale: 1.05 }}
+          <Link to="/" className="flex items-center">
+            <motion.img
+              src="/favi.png" 
+              alt="Reload X" 
+              className="h-40 w-40 object-contain"
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-            >
-              GameGift
-            </motion.div>
+            />
           </Link>
 
           {/* Desktop Menu */}

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Package, Eye, EyeOff, Copy, Check, Star } from "lucide-react";
+import { Package, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { orderAPI } from "../../services/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import GiftCardReveal from "../../components/cart/GiftCardReveal";
 import toast from "react-hot-toast";
 
 const OrdersPage = () => {
@@ -13,8 +14,6 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
-  const [revealedCodes, setRevealedCodes] = useState(new Set());
-  const [copiedCodes, setCopiedCodes] = useState(new Set());
 
   useEffect(() => {
     fetchOrders();
@@ -34,37 +33,6 @@ const OrdersPage = () => {
 
   const toggleOrderExpand = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
-  };
-
-  const toggleCodeVisibility = (itemId) => {
-    if (revealedCodes.has(itemId)) {
-      setRevealedCodes((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(itemId);
-        return newSet;
-      });
-    } else {
-      setRevealedCodes((prev) => new Set([...prev, itemId]));
-      toast.success("Gift card code revealed!");
-    }
-  };
-
-  const copyCode = async (code, itemId) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedCodes(new Set([...copiedCodes, itemId]));
-      toast.success("Code copied to clipboard!");
-
-      setTimeout(() => {
-        setCopiedCodes((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(itemId);
-          return newSet;
-        });
-      }, 2000);
-    } catch (error) {
-      toast.error("Failed to copy code");
-    }
   };
 
   const getStatusColor = (status) => {
@@ -95,7 +63,12 @@ const OrdersPage = () => {
       <div className="text-center py-16">
         <Package className="w-24 h-24 mx-auto text-gray-600 mb-4" />
         <h2 className="text-2xl font-bold mb-2">{t("orders.empty")}</h2>
-        <p className="text-gray-400">Start shopping to see your orders here</p>
+        <p className="text-gray-400 mb-6">
+          Start shopping to see your orders here
+        </p>
+        <button onClick={() => navigate("/shop")} className="neon-button">
+          Browse Products
+        </button>
       </div>
     );
   }
@@ -118,24 +91,36 @@ const OrdersPage = () => {
               className="flex items-center justify-between cursor-pointer"
               onClick={() => toggleOrderExpand(order.id)}
             >
-              <div>
-                <h3 className="font-semibold">
-                  {t("orders.orderNumber")}
-                  {order.id.slice(0, 8)}
-                </h3>
-                <p className="text-sm text-gray-400">
-                  {new Date(order.created_at).toLocaleDateString()} •
-                  <span className={`ml-2 ${getStatusColor(order.status)}`}>
-                    {order.status}
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-4 mb-2">
+                  <span className="text-sm text-gray-400">
+                    {t("orders.orderNumber")}
+                    {order.id.slice(0, 8)}
                   </span>
-                </p>
+                  <span
+                    className={`text-sm font-medium ${getStatusColor(
+                      order.status
+                    )}`}
+                  >
+                    {order.status.toUpperCase()}
+                  </span>
+                  <span className="text-sm text-gray-400">
+                    {new Date(order.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="text-lg font-semibold">${order.total_amount}</p>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">${order.total_amount}</p>
-                <p className="text-sm text-gray-400">
-                  {order.order_items.length} items
-                </p>
-              </div>
+
+              <motion.div
+                animate={{ rotate: expandedOrder === order.id ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {expandedOrder === order.id ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </motion.div>
             </div>
 
             {/* Order Details */}
@@ -143,109 +128,57 @@ const OrdersPage = () => {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-6 space-y-4 border-t border-dark-border pt-4"
+                className="mt-6 pt-6 border-t border-dark-border"
               >
                 {order.order_items.map((item) => (
-                  <div key={item.id} className="flex items-start space-x-4">
-                    <img
-                      src={item.product?.image_url || "/images/placeholder.jpg"}
-                      alt={item.product?.title}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
+                  <div key={item.id} className="mb-6 last:mb-0">
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={item.product.image_url || "/placeholder.png"}
+                        alt={item.product.title}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
 
-                    <div className="flex-1">
-                      <h4 className="font-medium">{item.product?.title}</h4>
-                      <p className="text-sm text-gray-400">
-                        Quantity: {item.quantity} • ${item.price} each
-                      </p>
+                      <div className="flex-1">
+                        <h4 className="font-medium mb-1">
+                          {item.product.title}
+                        </h4>
+                        <p className="text-sm text-gray-400">
+                          Quantity: {item.quantity} • ${item.price} each
+                        </p>
 
-                      {/* Review Button for Completed Orders */}
-                      {order.status === "completed" && !item.has_reviewed && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/product/${item.product.id}?review=true`);
-                          }}
-                          className="mt-2 text-sm text-neon-purple hover:text-neon-pink transition-colors"
-                        >
-                          Write a Review
-                        </button>
-                      )}
+                        {/* Review Button for Completed Orders */}
+                        {order.status === "completed" && !item.has_reviewed && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                `/product/${item.product.id}?review=true`
+                              );
+                            }}
+                            className="mt-2 text-sm text-neon-purple hover:text-neon-pink transition-colors flex items-center space-x-1"
+                          >
+                            <span>Write a Review</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
+                        )}
 
-                      {/* Gift Card Code Section for Completed Orders */}
-                      {order.status === "completed" && item.decrypted_code && (
-                        <div className="mt-3 p-3 bg-dark-bg rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-gray-300">
-                              Gift Card Code:
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleCodeVisibility(item.id);
-                              }}
-                              className="text-neon-purple hover:text-neon-pink transition-colors"
-                              title={
-                                revealedCodes.has(item.id)
-                                  ? "Hide code"
-                                  : "Show code"
-                              }
-                            >
-                              {revealedCodes.has(item.id) ? (
-                                <EyeOff className="w-4 h-4" />
-                              ) : (
-                                <Eye className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-
-                          {revealedCodes.has(item.id) ? (
-                            <div className="flex items-center space-x-2">
-                              <code className="bg-gray-900 px-3 py-2 rounded text-sm font-mono text-green-400 select-all">
-                                {item.decrypted_code}
-                              </code>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  copyCode(item.decrypted_code, item.id);
-                                }}
-                                className="text-neon-purple hover:text-neon-pink transition-colors"
-                                title="Copy code"
-                              >
-                                {copiedCodes.has(item.id) ? (
-                                  <Check className="w-4 h-4" />
-                                ) : (
-                                  <Copy className="w-4 h-4" />
-                                )}
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="bg-gray-900 px-3 py-2 rounded">
-                              <span className="text-sm font-mono text-gray-500">
-                                ••••••••••••••••
-                              </span>
-                            </div>
+                        {/* Gift Card Section for Completed Orders */}
+                        {order.status === "completed" &&
+                          item.decrypted_code && (
+                            <GiftCardReveal item={item} order={order} />
                           )}
 
-                          {item.product_code?.expires_at && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              Expires:{" "}
-                              {new Date(
-                                item.product_code.expires_at
-                              ).toLocaleDateString()}
+                        {/* Pending Order Message */}
+                        {order.status === "processing" && (
+                          <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                            <p className="text-sm text-yellow-500">
+                              Your gift card code will be available once the
+                              order is completed.
                             </p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Pending Order Message */}
-                      {order.status === "processing" && (
-                        <div className="mt-2 text-sm text-yellow-500">
-                          Your gift card code will be available once the order
-                          is completed.
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

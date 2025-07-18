@@ -110,8 +110,43 @@ const getUsers = async (req, res) => {
       throw error;
     }
 
+    // Fetch user stats including reviews
+    const userIds = users.map(u => u.id);
+    
+    // Get review counts
+    const { data: reviewCounts } = await supabaseAdmin
+      .from("reviews")
+      .select("user_id")
+      .in("user_id", userIds)
+      .eq("is_deleted", false);
+
+    // Get order counts and total spent
+    const { data: orderStats } = await supabaseAdmin
+      .from("orders")
+      .select("user_id, total_amount, status")
+      .in("user_id", userIds)
+      .eq("status", "completed");
+
+    // Aggregate stats
+    const userStats = {};
+    userIds.forEach(userId => {
+      userStats[userId] = {
+        total_reviews: reviewCounts?.filter(r => r.user_id === userId).length || 0,
+        total_orders: orderStats?.filter(o => o.user_id === userId).length || 0,
+        total_spent: orderStats
+          ?.filter(o => o.user_id === userId)
+          .reduce((sum, o) => sum + parseFloat(o.total_amount), 0) || 0
+      };
+    });
+
+    // Merge stats with users
+    const usersWithStats = users.map(user => ({
+      ...user,
+      stats: userStats[user.id] || { total_reviews: 0, total_orders: 0, total_spent: 0 }
+    }));
+
     res.json({
-      users,
+      users: usersWithStats,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

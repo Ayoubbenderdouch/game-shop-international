@@ -145,14 +145,14 @@ export const adminAPI = {
   createCategory: (data) => api.post("/admin/categories", data),
   updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
+  getAllOrders: (params) => api.get("/admin/orders", { params }),
 
   getOrders: (params) => api.get("/admin/orders", { params }),
   updateOrderStatus: (id, status) =>
     api.patch(`/admin/orders/${id}/status`, { status }),
-    getReviews: (params) => api.get("/admin/reviews", { params }),
+  getReviews: (params) => api.get("/admin/reviews", { params }),
   getReviewStats: () => api.get("/admin/reviews/stats"),
   deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
-
 };
 
 // Stock endpoints - Fixed paths
