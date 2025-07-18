@@ -179,3 +179,37 @@ $$ LANGUAGE plpgsql;
 -- Schedule cleanup to run daily
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 SELECT cron.schedule('cleanup-health-checks', '0 0 * * *', 'SELECT cleanup_old_health_checks();');
+
+
+-- Add indexes for better performance when fetching orders with codes
+
+-- Index for faster order lookups by user
+CREATE INDEX idx_orders_user_id_status ON orders(user_id, status);
+
+-- Index for faster order items lookup
+CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+
+-- Index for product codes lookup
+CREATE INDEX idx_product_codes_used ON product_codes(is_used, product_id);
+
+-- Composite index for order items with product codes
+CREATE INDEX idx_order_items_product_code ON order_items(order_id, product_code_id);
+
+-- Enable Row Level Security (RLS) for additional security
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_codes ENABLE ROW LEVEL SECURITY;
+
+-- Policy to ensure users can only see their own orders
+CREATE POLICY "Users can view own orders" ON orders
+    FOR SELECT USING (user_id = auth.uid());
+
+-- Policy for order items
+CREATE POLICY "Users can view own order items" ON order_items
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM orders 
+            WHERE orders.id = order_items.order_id 
+            AND orders.user_id = auth.uid()
+        )
+    );

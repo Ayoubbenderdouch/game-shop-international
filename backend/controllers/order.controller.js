@@ -3,6 +3,7 @@ const { getCountryFromIP, getClientIP } = require("../utils/geolocation");
 const { logAudit } = require("../utils/auditLogger");
 const logger = require("../utils/logger");
 const stripe = require("../config/stripe");
+const { decrypt } = require('../utils/encryption');
 
 const createCheckoutSession = async (req, res) => {
   try {
@@ -293,7 +294,6 @@ const createMockCheckout = async (req, res) => {
     res.status(500).json({ error: "Checkout failed" });
   }
 };
-
 const getUserOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
@@ -326,8 +326,24 @@ const getUserOrders = async (req, res) => {
       throw error;
     }
 
+    // Decrypt codes for completed orders
+    const processedOrders = orders.map(order => {
+      if (order.status === 'completed') {
+        order.order_items = order.order_items.map(item => {
+          if (item.product_code && item.product_code.code) {
+            // Add decrypted code to the item
+            item.decrypted_code = decrypt(item.product_code.code);
+            // Remove the encrypted code from response
+            delete item.product_code.code;
+          }
+          return item;
+        });
+      }
+      return order;
+    });
+
     res.json({
-      orders,
+      orders: processedOrders,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -363,6 +379,19 @@ const getOrder = async (req, res) => {
 
     if (error || !order) {
       return res.status(404).json({ error: "Order not found" });
+    }
+
+    // Decrypt codes for completed orders
+    if (order.status === 'completed') {
+      order.order_items = order.order_items.map(item => {
+        if (item.product_code && item.product_code.code) {
+          // Add decrypted code to the item
+          item.decrypted_code = decrypt(item.product_code.code);
+          // Remove the encrypted code from response
+          delete item.product_code.code;
+        }
+        return item;
+      });
     }
 
     res.json(order);
