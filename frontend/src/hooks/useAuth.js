@@ -1,108 +1,199 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   supabase,
   startSessionRefresh,
   stopSessionRefresh,
+  sessionNeedsRefresh,
+  refreshSession,
+  getSession,
 } from "../services/supabase";
 import { authAPI } from "../services/api";
 import useStore from "../store/useStore";
 import toast from "react-hot-toast";
 
+// Global flag to track if auth is already initializing
+let isInitializing = false;
+
 export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const { user, setUser, clearUser, isAdmin } = useStore();
+  const mountedRef = useRef(true);
+  const initStartedRef = useRef(false);
 
   const fetchUserProfile = useCallback(async () => {
     try {
+      console.log("Fetching user profile...");
       const { data } = await authAPI.getProfile();
-      setUser(data);
+      console.log("Profile fetched successfully:", data);
+      if (mountedRef.current) {
+        setUser(data);
+      }
       return true;
     } catch (error) {
       console.error("Error fetching profile:", error);
+      console.error("Error response:", error.response);
       // Don't clear user here - let the error interceptor handle it
       return false;
     }
   }, [setUser]);
 
-  const checkUser = useCallback(async () => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user) {
-        await fetchUserProfile();
-        startSessionRefresh(); // Start session refresh
-      } else {
-        clearUser();
-        stopSessionRefresh(); // Stop session refresh
-      }
-    } catch (error) {
-      console.error("Error checking user:", error);
-      clearUser();
-      stopSessionRefresh();
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchUserProfile, clearUser]);
-
+  // Initialize auth on mount
   useEffect(() => {
-    // Initial check
-    checkUser();
+    mountedRef.current = true;
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
+    // Prevent multiple simultaneous initializations
+    if (initStartedRef.current || isInitializing) {
+      console.log("Auth initialization already in progress, skipping...");
+      return;
+    }
 
-      // Skip handling during email verification (when on /auth/confirm path)
-      if (
-        window.location.pathname.includes("/auth/confirm") &&
-        (event === "SIGNED_IN" || event === "INITIAL_SESSION")
-      ) {
-        console.log("Skipping auth state change during email verification");
-        return;
+    initStartedRef.current = true;
+    isInitializing = true;
+
+    const initAuth = async () => {
+      try {
+        console.log("Initializing auth on mount...");
+        
+        // Small delay to let Supabase fully initialize
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Get the current session
+        const session = await getSession();
+        
+        if (!mountedRef.current) {
+          console.log("Component unmounted during init");
+          return;
+        }
+
+        if (session?.user && session.user.confirmed_at) {
+          console.log("Found existing session on mount");
+          
+          // Check if we need to refresh the token first
+          if (sessionNeedsRefresh(session)) {
+            console.log("Session needs refresh on mount");
+            const refreshedSession = await refreshSession();
+            if (!refreshedSession) {
+              console.error("Failed to refresh session on mount");
+              if (mountedRef.current) {
+                clearUser();
+                setLoading(false);
+              }
+              return;
+            }
+          }
+          
+          // Fetch the user profile
+          const success = await fetchUserProfile();
+          if (success && mountedRef.current) {
+            startSessionRefresh();
+          }
+        } else {
+          console.log("No session found on mount");
+          if (mountedRef.current) {
+            clearUser();
+          }
+        }
+      } catch (error) {
+        console.error("Error during auth initialization:", error);
+        if (mountedRef.current) {
+          clearUser();
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+        isInitializing = false;
       }
+    };
 
-      if (event === "SIGNED_IN" && session?.user) {
-        // User signed in - only fetch profile if email is confirmed
-        if (session.user.confirmed_at) {
-          await fetchUserProfile();
-          startSessionRefresh();
-        }
-      } else if (event === "SIGNED_OUT") {
-        // User signed out
-        clearUser();
-        stopSessionRefresh();
-      } else if (event === "TOKEN_REFRESHED" && session?.user) {
-        // Token was refreshed, update profile if needed
-        if (session.user.confirmed_at) {
-          await fetchUserProfile();
-        }
-      } else if (event === "USER_UPDATED" && session?.user) {
-        // User data was updated
-        if (session.user.confirmed_at) {
-          await fetchUserProfile();
-        }
-      }
-
-      setLoading(false);
-    });
+    initAuth();
 
     return () => {
-      subscription?.unsubscribe();
-      stopSessionRefresh();
+      mountedRef.current = false;
     };
-  }, [checkUser, fetchUserProfile, clearUser]);
+  }, []); // Empty deps - only run once
+
+  // Listen for auth state changes
+  useEffect(() => {
+    let subscription;
+
+    const setupAuthListener = async () => {
+      // Small delay to ensure Supabase is ready
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!mountedRef.current) return;
+
+        console.log("Auth state changed:", event);
+
+        // Don't handle initial session as we already handle it in initAuth
+        if (event === "INITIAL_SESSION") {
+          return;
+        }
+
+        // Skip during email verification
+        if (
+          window.location.pathname.includes("/auth/confirm") &&
+          window.location.hash.includes("access_token")
+        ) {
+          console.log("Skipping auth change during email verification");
+          return;
+        }
+
+        if (event === "SIGNED_IN" && session?.user?.confirmed_at) {
+          console.log("User signed in via auth state change");
+          
+          // Small delay to let things stabilize
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          if (mountedRef.current) {
+            const success = await fetchUserProfile();
+            if (success) {
+              startSessionRefresh();
+            }
+            setLoading(false);
+          }
+        } else if (event === "SIGNED_OUT") {
+          console.log("User signed out");
+          if (mountedRef.current) {
+            clearUser();
+            stopSessionRefresh();
+            setLoading(false);
+          }
+        } else if (event === "TOKEN_REFRESHED") {
+          console.log("Token was refreshed by Supabase");
+          // No need to do anything - Supabase handles this
+        } else if (event === "USER_UPDATED" && session?.user?.confirmed_at) {
+          console.log("User data updated");
+          if (mountedRef.current) {
+            await fetchUserProfile();
+          }
+        }
+      });
+
+      subscription = data.subscription;
+    };
+
+    setupAuthListener();
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, [fetchUserProfile, clearUser]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (!mountedRef.current) {
+        stopSessionRefresh();
+      }
+    };
+  }, []);
 
   const login = async (email, password) => {
     try {
-      setLoading(true);
-
-      // Clear any existing session before login
-      await supabase.auth.signOut();
-      clearUser();
-
       // First, sign in with Supabase
       const { data: supabaseData, error: supabaseError } =
         await supabase.auth.signInWithPassword({
@@ -111,16 +202,15 @@ export const useAuth = () => {
         });
 
       if (supabaseError) {
-        // Make sure to clean up on Supabase error
-        await supabase.auth.signOut();
-        clearUser();
         return { success: false, error: supabaseError.message };
       }
 
       try {
         // Then call our backend login endpoint
         const { data } = await authAPI.login({ email, password });
-        setUser(data.user);
+        if (mountedRef.current) {
+          setUser(data.user);
+        }
 
         // Start session refresh after successful login
         startSessionRefresh();
@@ -131,7 +221,9 @@ export const useAuth = () => {
       } catch (backendError) {
         // If backend login fails, clean up Supabase session
         await supabase.auth.signOut();
-        clearUser();
+        if (mountedRef.current) {
+          clearUser();
+        }
 
         // Check for specific error types
         const errorMessage =
@@ -149,14 +241,14 @@ export const useAuth = () => {
 
       // Ensure cleanup on any error
       await supabase.auth.signOut();
-      clearUser();
+      if (mountedRef.current) {
+        clearUser();
+      }
 
       return {
         success: false,
         error: "Login failed",
       };
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -166,8 +258,9 @@ export const useAuth = () => {
 
       // Call our backend register endpoint (which handles Supabase signup)
       const { data } = await authAPI.register({ email, password });
-      setUser(data.user);
-      toast.success("Account created successfully!");
+      
+      // Don't set user here as they need to verify email first
+      toast.success("Account created successfully! Please check your email to verify your account.");
 
       return { success: true };
     } catch (error) {
@@ -177,7 +270,9 @@ export const useAuth = () => {
         error: error.response?.data?.error || "Registration failed",
       };
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -196,7 +291,9 @@ export const useAuth = () => {
       await supabase.auth.signOut();
 
       // Clear local user state
-      clearUser();
+      if (mountedRef.current) {
+        clearUser();
+      }
 
       // Stop session refresh
       stopSessionRefresh();
@@ -206,7 +303,9 @@ export const useAuth = () => {
       console.error("Logout error:", error);
       toast.error("Error logging out");
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 

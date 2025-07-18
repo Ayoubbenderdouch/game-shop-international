@@ -24,6 +24,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 
 // Error Pages
 import NotFoundPage from "./pages/error/NotFoundPage";
+import AuthDebug from "./pages/AuthDebug";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         v7_relativeSplatPath: true,
       }}
     >
+      <AuthDebug />
       <Toaster
         position="top-right"
         toastOptions={{

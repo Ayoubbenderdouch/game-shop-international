@@ -67,6 +67,7 @@ const login = async (req, res) => {
       });
     }
 
+    // Try to get existing user profile
     const { data: userData, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
@@ -143,7 +144,16 @@ const logout = async (req, res) => {
 
     if (token) {
       await supabase.auth.signOut();
-      await logAudit(req.user.id, "USER_LOGOUT", "users", req.user.id, {}, req);
+      if (req.user?.id) {
+        await logAudit(
+          req.user.id,
+          "USER_LOGOUT",
+          "users",
+          req.user.id,
+          {},
+          req
+        );
+      }
     }
 
     res.json({ message: "Logged out successfully" });
@@ -153,13 +163,59 @@ const logout = async (req, res) => {
   }
 };
 
-// Add this updated getProfile function to your auth.controller.js
-
 const getProfile = async (req, res) => {
   try {
-    // Handle case where user profile doesn't exist yet (from middleware)
+    logger.info(
+      `Getting profile for user: ${req.supabaseUser?.id || "unknown"}`
+    );
+
+    // If user is authenticated via Supabase but no profile exists
     if (!req.user && req.supabaseUser) {
-      // Create profile for authenticated user who doesn't have one yet
+      logger.info(
+        `No profile found in middleware for user ${req.supabaseUser.id}, checking database...`
+      );
+
+      // First, check if profile already exists (in case of race condition)
+      const { data: existingUser, error: fetchError } = await supabaseAdmin
+        .from("users")
+        .select("*")
+        .eq("id", req.supabaseUser.id)
+        .single();
+
+      if (fetchError && fetchError.code !== "PGRST116") {
+        logger.error(
+          `Error fetching user profile: ${fetchError.message}`,
+          fetchError
+        );
+        return res.status(500).json({ error: "Database error" });
+      }
+
+      if (existingUser) {
+        logger.info(`Found existing profile for user ${req.supabaseUser.id}`);
+        // Profile exists, return it
+        const { data: orders } = await supabaseAdmin
+          .from("orders")
+          .select("id")
+          .eq("user_id", existingUser.id)
+          .eq("status", "completed");
+
+        const { data: reviews } = await supabaseAdmin
+          .from("reviews")
+          .select("id")
+          .eq("user_id", existingUser.id)
+          .eq("is_deleted", false);
+
+        return res.json({
+          ...existingUser,
+          stats: {
+            total_orders: orders?.length || 0,
+            total_reviews: reviews?.length || 0,
+          },
+        });
+      }
+
+      logger.info(`Creating new profile for user ${req.supabaseUser.id}`);
+      // Profile doesn't exist, create it
       const country = getCountryFromIP(getClientIP(req));
       const isFirstUser = await checkFirstUser();
 
@@ -176,18 +232,21 @@ const getProfile = async (req, res) => {
         .single();
 
       if (createError) {
-        // Check if user already exists (race condition)
+        // Check if it's a unique constraint violation (profile was created by another request)
         if (createError.code === "23505") {
-          // Unique violation
-          const { data: existingUser, error: fetchError } = await supabaseAdmin
+          logger.info(
+            `Profile already exists (race condition) for user ${req.supabaseUser.id}`
+          );
+          // Try to fetch the profile again
+          const { data: retryUser, error: retryError } = await supabaseAdmin
             .from("users")
             .select("*")
             .eq("id", req.supabaseUser.id)
             .single();
 
-          if (!fetchError && existingUser) {
+          if (retryUser && !retryError) {
             return res.json({
-              ...existingUser,
+              ...retryUser,
               stats: {
                 total_orders: 0,
                 total_reviews: 0,
@@ -200,8 +259,17 @@ const getProfile = async (req, res) => {
           "Failed to create user profile in getProfile:",
           createError
         );
-        return res.status(400).json({ error: "Failed to create user profile" });
+        return res.status(500).json({ error: "Failed to create user profile" });
       }
+
+      await logAudit(
+        req.supabaseUser.id,
+        "USER_PROFILE_CREATED",
+        "users",
+        req.supabaseUser.id,
+        { email: req.supabaseUser.email },
+        req
+      );
 
       return res.json({
         ...newUserData,
@@ -214,9 +282,11 @@ const getProfile = async (req, res) => {
 
     // Normal case - user profile exists
     if (!req.user) {
+      logger.error("No user found in request");
       return res.status(404).json({ error: "User profile not found" });
     }
 
+    logger.info(`Returning existing profile for user ${req.user.id}`);
     // Get user stats
     const { data: orders } = await supabaseAdmin
       .from("orders")
@@ -309,6 +379,85 @@ const confirmEmail = async (req, res) => {
   }
 };
 
+// Debug endpoint
+const debugAuth = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+
+    logger.info("Debug auth endpoint called");
+
+    // Step 1: Validate the token
+    const {
+      data: { user: supabaseUser },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError) {
+      return res.json({
+        step: "Token validation",
+        error: authError.message,
+        success: false,
+      });
+    }
+
+    logger.info(`Token valid for user: ${supabaseUser.id}`);
+
+    // Step 2: Try to fetch user from database with detailed logging
+    logger.info(`Attempting to fetch user ${supabaseUser.id} from database...`);
+
+    const { data: dbUser, error: dbError } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("id", supabaseUser.id)
+      .single();
+
+    if (dbError) {
+      logger.error(`Database error: ${dbError.message}`, dbError);
+    } else {
+      logger.info(`Database user found: ${JSON.stringify(dbUser)}`);
+    }
+
+    // Step 3: Check all users (for debugging)
+    const { data: allUsers, error: allUsersError } = await supabaseAdmin
+      .from("users")
+      .select("id, email")
+      .limit(10);
+
+    // Step 4: Test a direct query with the user ID
+    const directQuery = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("id", supabaseUser.id);
+
+    res.json({
+      supabaseUser: {
+        id: supabaseUser.id,
+        email: supabaseUser.email,
+        confirmed_at: supabaseUser.confirmed_at,
+      },
+      dbUser: dbUser || null,
+      dbError: dbError
+        ? {
+            message: dbError.message,
+            code: dbError.code,
+            details: dbError.details,
+          }
+        : null,
+      allUsers: allUsers || [],
+      allUsersError: allUsersError?.message || null,
+      directQuery: directQuery.data || null,
+      directQueryError: directQuery.error?.message || null,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error("Debug endpoint error:", error);
+    res.json({
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -316,4 +465,6 @@ module.exports = {
   getProfile,
   resendVerification,
   confirmEmail,
+  debugAuth,
+  checkFirstUser,
 };

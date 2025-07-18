@@ -60,41 +60,25 @@ const EmailVerificationPage = () => {
 
           if (user && user.confirmed_at) {
             console.log("Email confirmed for user:", user.email);
+            setVerified(true);
+            toast.success("Email verified successfully!");
 
-            try {
-              // Small delay to ensure session is properly set
-              await new Promise((resolve) => setTimeout(resolve, 500));
+            // Always sign out after email verification
+            // User will need to login to create their profile
+            await supabase.auth.signOut();
 
-              // Call the backend to create/get user profile
-              const { data: profile } = await authAPI.getProfile();
-              console.log("User profile created/fetched:", profile);
+            // Set verifying to false
+            setVerifying(false);
 
-              setVerified(true);
-              toast.success("Email verified successfully!");
-            } catch (profileError) {
-              console.error("Profile creation error:", profileError);
-              // Even if profile creation fails, the email is verified
-              setVerified(true);
-
-              // Still show success since email is verified
-              toast.success("Email verified! Please login to continue.");
-            } finally {
-              // Always sign out the user so they can login properly
-              await supabase.auth.signOut();
-
-              // Always set verifying to false
-              setVerifying(false);
-
-              // Redirect to login after a delay
-              setTimeout(() => {
-                navigate("/login", {
-                  state: {
-                    message: "Email verified! Please login to continue.",
-                  },
-                  replace: true,
-                });
-              }, 2000);
-            }
+            // Redirect to login after a delay
+            setTimeout(() => {
+              navigate("/login", {
+                state: {
+                  message: "Email verified! Please login to continue.",
+                },
+                replace: true,
+              });
+            }, 2000);
           } else {
             throw new Error("Email verification failed - user not confirmed");
           }
@@ -153,7 +137,6 @@ const EmailVerificationPage = () => {
     }
   };
 
-  // Show loading while verifying
   if (verifying) {
     return (
       <div className="max-w-md mx-auto">
@@ -162,7 +145,7 @@ const EmailVerificationPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="neon-card text-center"
         >
-          <Loader className="w-12 h-12 mx-auto mb-4 text-neon-purple animate-spin" />
+          <Loader className="w-16 h-16 mx-auto mb-4 text-neon-purple animate-spin" />
           <h2 className="text-2xl font-bold mb-2">Verifying your email...</h2>
           <p className="text-gray-400">
             Please wait while we confirm your email address.
@@ -172,13 +155,12 @@ const EmailVerificationPage = () => {
     );
   }
 
-  // Show success message
   if (verified) {
     return (
       <div className="max-w-md mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="neon-card text-center"
         >
           <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
@@ -186,20 +168,17 @@ const EmailVerificationPage = () => {
           <p className="text-gray-400 mb-6">
             Your email has been successfully verified. Redirecting to login...
           </p>
-          <div className="w-full bg-dark-bg rounded-full h-2 overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-neon-purple to-neon-pink"
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 2 }}
-            />
-          </div>
+          <Link
+            to="/login"
+            className="neon-button inline-flex items-center space-x-2"
+          >
+            <span>Go to Login</span>
+          </Link>
         </motion.div>
       </div>
     );
   }
 
-  // Show error message
   if (error) {
     return (
       <div className="max-w-md mx-auto">
@@ -211,15 +190,18 @@ const EmailVerificationPage = () => {
           <XCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
           <h2 className="text-2xl font-bold mb-2">Verification Failed</h2>
           <p className="text-gray-400 mb-6">{error}</p>
-          <Link to="/login" className="neon-button inline-block">
-            Go to Login
+          <Link
+            to="/register"
+            className="neon-button inline-flex items-center space-x-2"
+          >
+            <span>Back to Register</span>
           </Link>
         </motion.div>
       </div>
     );
   }
 
-  // Show "check your email" message
+  // Default state - waiting for email verification
   return (
     <div className="max-w-md mx-auto">
       <motion.div
@@ -229,35 +211,32 @@ const EmailVerificationPage = () => {
       >
         <Mail className="w-16 h-16 mx-auto mb-4 text-neon-purple" />
         <h2 className="text-2xl font-bold mb-2">Check Your Email</h2>
-        {email ? (
-          <>
-            <p className="text-gray-400 mb-6">
-              We've sent a verification email to{" "}
-              <strong className="text-white">{email}</strong>. Please check your
-              inbox and click the confirmation link.
-            </p>
-            <button
-              onClick={resendVerificationEmail}
-              className="neon-button mb-4"
-            >
-              Resend Verification Email
-            </button>
-            <p className="text-sm text-gray-500">
-              Didn't receive the email? Check your spam folder or try resending.
-            </p>
-          </>
-        ) : (
-          <p className="text-gray-400 mb-6">
-            Please check your email for the verification link.
-          </p>
-        )}
-        <hr className="my-6 border-dark-border" />
-        <p className="text-sm text-gray-500">
-          Already verified?{" "}
-          <Link to="/login" className="text-neon-purple hover:text-neon-pink">
-            Go to login
-          </Link>
+        <p className="text-gray-400 mb-6">
+          We've sent a verification link to <strong>{email}</strong>. Please
+          check your inbox and click the link to verify your account.
         </p>
+
+        <div className="space-y-4">
+          <button
+            onClick={resendVerificationEmail}
+            className="neon-button w-full"
+          >
+            Resend Verification Email
+          </button>
+
+          <Link
+            to="/login"
+            className="text-gray-400 hover:text-white transition-colors block"
+          >
+            Back to Login
+          </Link>
+        </div>
+
+        <div className="mt-6 p-4 bg-dark-bg rounded-lg border border-dark-border">
+          <p className="text-sm text-gray-400">
+            Didn't receive the email? Check your spam folder or try resending.
+          </p>
+        </div>
       </motion.div>
     </div>
   );

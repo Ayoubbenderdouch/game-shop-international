@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { Mail, Lock, UserPlus, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { authAPI } from "../../services/api";
-import toast from "react-hot-toast";
+import { useAuth } from "../../hooks/useAuth";
 
 const RegisterPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [registerError, setRegisterError] = useState("");
 
@@ -19,6 +19,7 @@ const RegisterPage = () => {
     watch,
     formState: { errors },
   } = useForm();
+
   const password = watch("password");
 
   const onSubmit = async (data) => {
@@ -26,24 +27,22 @@ const RegisterPage = () => {
       setLoading(true);
       setRegisterError("");
 
-      const response = await authAPI.register({
-        email: data.email,
-        password: data.password,
-      });
+      const result = await registerUser(data.email, data.password);
 
-      navigate("/auth/verify-email", {
-        state: { email: data.email },
-        replace: true,
-      });
-
-      toast.success(
-        "Account created! Please check your email to verify your account."
-      );
+      if (result.success) {
+        // Navigate to email verification page
+        navigate("/auth/verify-email", {
+          state: { email: data.email },
+          replace: true,
+        });
+      } else {
+        setRegisterError(
+          result.error || "Registration failed. Please try again."
+        );
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      const errorMessage =
-        error.response?.data?.error || "Registration failed. Please try again.";
-      setRegisterError(errorMessage);
+      setRegisterError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +62,6 @@ const RegisterPage = () => {
           </h1>
         </div>
 
-        {/* Show registration error if any */}
         {registerError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}

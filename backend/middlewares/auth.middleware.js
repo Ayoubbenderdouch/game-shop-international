@@ -33,6 +33,7 @@ const authenticate = async (req, res, next) => {
       });
     }
 
+    // Try to get user profile
     const { data: userData, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
@@ -40,14 +41,23 @@ const authenticate = async (req, res, next) => {
       .single();
 
     if (userError || !userData) {
-      // Don't return 401 here, as the user is authenticated
-      // This might be a first-time user after email confirmation
-      logger.info(`User profile not found for authenticated user: ${user.id}`);
+      // For the profile endpoint, allow continuation without user profile
+      // The controller will handle profile creation
+      // Check the full path including the base route
+      const isProfileEndpoint = req.originalUrl.includes('/auth/profile') || 
+                               req.path.includes('/profile') ||
+                               req.url.includes('/profile');
       
-      // You might want to create the profile here or handle it differently
-      req.user = null;
-      req.supabaseUser = user;
-      return next();
+      if (isProfileEndpoint) {
+        logger.info(`User profile not found for authenticated user: ${user.id}, will create in controller`);
+        req.user = null;
+        req.supabaseUser = user;
+        return next();
+      }
+      
+      // For other endpoints, user profile is required
+      logger.error(`User profile not found for authenticated user: ${user.id} on path: ${req.originalUrl}`);
+      return res.status(404).json({ error: "User profile not found" });
     }
 
     req.user = userData;

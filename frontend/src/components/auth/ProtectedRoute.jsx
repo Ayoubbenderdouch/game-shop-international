@@ -1,46 +1,13 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import LoadingSpinner from '../common/LoadingSpinner';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../services/supabase';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const location = useLocation();
-  const [isReady, setIsReady] = useState(false);
-  const [sessionChecked, setSessionChecked] = useState(false);
 
-  useEffect(() => {
-    // Check session before rendering protected content
-    const checkSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (!error && session) {
-          setSessionChecked(true);
-        } else {
-          setSessionChecked(true);
-        }
-      } catch (error) {
-        console.error('Session check error:', error);
-        setSessionChecked(true);
-      }
-    };
-
-    checkSession();
-  }, []);
-
-  useEffect(() => {
-    // Add a small delay to ensure auth state is fully loaded
-    if (!authLoading && sessionChecked) {
-      const timer = setTimeout(() => {
-        setIsReady(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [authLoading, sessionChecked]);
-
-  if (authLoading || !isReady || !sessionChecked) {
+  // Show loading spinner while auth is being checked
+  if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <LoadingSpinner size="lg" />
@@ -48,14 +15,17 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     );
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Redirect to home if admin route but not admin
   if (adminOnly && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
+  // Render children if all checks pass
   return children;
 };
 
