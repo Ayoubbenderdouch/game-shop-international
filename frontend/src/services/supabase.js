@@ -9,7 +9,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     detectSessionInUrl: true,
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
-    flowType: 'pkce'
+    flowType: 'pkce',
+    // Add session refresh configuration
+    sessionAutoRefreshInterval: 30 * 60 * 1000, // Refresh every 30 minutes
+    sessionExpiryMargin: 5 * 60 // Refresh 5 minutes before expiry
   }
 });
 
@@ -40,4 +43,25 @@ export const refreshSession = async () => {
     return null;
   }
   return session;
+};
+
+// Add session refresh interval
+let refreshInterval;
+
+export const startSessionRefresh = () => {
+  if (refreshInterval) clearInterval(refreshInterval);
+  
+  refreshInterval = setInterval(async () => {
+    const session = await getSession();
+    if (session) {
+      await refreshSession();
+    }
+  }, 25 * 60 * 1000); // Refresh every 25 minutes
+};
+
+export const stopSessionRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
 };

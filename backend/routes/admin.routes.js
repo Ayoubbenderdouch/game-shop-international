@@ -59,5 +59,5 @@ router.post('/categories',
 );
 
 router.delete('/reviews/:id', adminController.deleteReview);
-
+router.patch('/products/:id/toggle-status', adminController.toggleProductStatus);
 module.exports = router;

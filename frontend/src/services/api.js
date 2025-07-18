@@ -75,7 +75,8 @@ export const productAPI = {
 
 // Order endpoints
 export const orderAPI = {
-  createCheckout: (data) => api.post("/orders/checkout", data),
+  // Remove Stripe checkout - use mock checkout instead
+  createCheckout: (data) => api.post("/orders/mock-checkout", data),
   getUserOrders: (params) => api.get("/orders", { params }),
   getOrder: (id) => api.get(`/orders/${id}`),
   resendCodes: (id) => api.post(`/orders/${id}/resend-codes`),
@@ -102,6 +103,7 @@ export const adminAPI = {
   updateProduct: (id, data) => api.put(`/admin/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/admin/products/${id}`),
   toggleProductStatus: (id) => api.patch(`/admin/products/${id}/toggle-status`),
+  getCategories: () => api.get("/products/categories"),
 
   createCategory: (data) => api.post("/admin/categories", data),
   updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
@@ -112,18 +114,18 @@ export const adminAPI = {
     api.patch(`/admin/orders/${id}/status`, { status }),
 };
 
-// Stock endpoints
+// Stock endpoints - Fixed paths
 export const stockAPI = {
   getProductStock: (productId, params) =>
-    api.get(`/admin/stock/${productId}`, { params }),
-  addSingleCode: (data) => api.post("/admin/stock/single", data),
+    api.get(`/stock/product/${productId}`, { params }),
+  addSingleCode: (data) => api.post("/stock/codes/single", data),
   bulkAddCodes: (formData) =>
-    api.post("/admin/stock/bulk", formData, {
+    api.post("/stock/codes/bulk", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
-  deleteCode: (id) => api.delete(`/admin/stock/${id}`),
+  deleteCode: (id) => api.delete(`/stock/codes/${id}`),
   exportCodes: (productId) =>
-    api.get(`/admin/stock/${productId}/export`, {
+    api.get(`/stock/product/${productId}/export`, {
       responseType: "blob",
     }),
 };

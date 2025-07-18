@@ -388,6 +388,38 @@ const getAuditLogs = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch audit logs" });
   }
 };
+const toggleProductStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const product = await db.Product.findByPk(id);
+        
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        await product.update({
+            is_active: !product.is_active
+        });
+        
+        await logAudit(
+            req.user.id,
+            'PRODUCT_STATUS_TOGGLE',
+            'products',
+            id,
+            { is_active: product.is_active },
+            req
+        );
+        
+        res.json({ 
+            message: 'Product status updated',
+            product 
+        });
+    } catch (error) {
+        logger.error('Toggle product status error:', error);
+        res.status(500).json({ error: 'Failed to update product status' });
+    }
+};
 
 module.exports = {
   getDashboardStats,
@@ -397,6 +429,7 @@ module.exports = {
   updateProduct,
   deleteProduct,
   createCategory,
+  toggleProductStatus,
   deleteReview,
   getAuditLogs,
 };

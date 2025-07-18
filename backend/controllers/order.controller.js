@@ -227,10 +227,113 @@ const resendOrderCodes = async (req, res) => {
         res.status(500).json({ error: 'Failed to resend codes' });
     }
 };
+// Add this function to the existing order.controller.js
+
+const createMockCheckout = async (req, res) => {
+    const transaction = await db.transaction();
+    
+    try {
+        const { items } = req.body;
+        const userId = req.user.id;
+        
+        // Validate items
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: 'Invalid items' });
+        }
+        
+        // Calculate total and validate stock
+        let totalAmount = 0;
+        const orderItems = [];
+        
+        for (const item of items) {
+            const product = await db.Product.findByPk(item.productId);
+            if (!product || !product.is_active) {
+                await transaction.rollback();
+                return res.status(400).json({ error: `Product ${item.productId} not available` });
+            }
+            
+            const availableStock = await db.Stock.count({
+                where: { 
+                    product_id: item.productId,
+                    is_used: false
+                }
+            });
+            
+            if (availableStock < item.quantity) {
+                await transaction.rollback();
+                return res.status(400).json({ error: `Insufficient stock for ${product.title}` });
+            }
+            
+            totalAmount += product.price * item.quantity;
+            orderItems.push({
+                product,
+                quantity: item.quantity,
+                price: product.price
+            });
+        }
+        
+        // Create order
+        const order = await db.Order.create({
+            id: uuidv4(),
+            user_id: userId,
+            total_amount: totalAmount,
+            status: 'completed',
+            payment_method: 'mock',
+            payment_status: 'paid'
+        }, { transaction });
+        
+        // Create order items and assign codes
+        for (const item of orderItems) {
+            const orderItem = await db.OrderItem.create({
+                id: uuidv4(),
+                order_id: order.id,
+                product_id: item.product.id,
+                quantity: item.quantity,
+                price: item.price
+            }, { transaction });
+            
+            // Assign codes
+            const codes = await db.Stock.findAll({
+                where: {
+                    product_id: item.product.id,
+                    is_used: false
+                },
+                limit: item.quantity,
+                transaction
+            });
+            
+            for (const code of codes) {
+                await code.update({
+                    is_used: true,
+                    used_by: userId,
+                    used_at: new Date(),
+                    order_item_id: orderItem.id
+                }, { transaction });
+            }
+        }
+        
+        await transaction.commit();
+        
+        // Send order confirmation email (mock)
+        console.log('Mock email sent for order:', order.id);
+        
+        res.json({
+            success: true,
+            orderId: order.id,
+            message: 'Order completed successfully'
+        });
+        
+    } catch (error) {
+        await transaction.rollback();
+        logger.error('Mock checkout error:', error);
+        res.status(500).json({ error: 'Checkout failed' });
+    }
+};
 
 module.exports = {
     createCheckoutSession,
     getUserOrders,
     getOrder,
-    resendOrderCodes
+    resendOrderCodes,
+    createMockCheckout
 };

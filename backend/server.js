@@ -13,7 +13,7 @@ const orderRoutes = require("./routes/order.routes");
 const reviewRoutes = require("./routes/review.routes");
 const adminRoutes = require("./routes/admin.routes");
 const stockRoutes = require("./routes/stock.routes");
-const stripeRoutes = require("./routes/stripe.routes");
+// const stripeRoutes = require("./routes/stripe.routes");
 
 const errorHandler = require("./middlewares/errorHandler.middleware");
 const rateLimiter = require("./middlewares/rateLimiter.middleware");
@@ -37,7 +37,7 @@ app.use(
   })
 );
 
-app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
+// app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -49,7 +49,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/stock", stockRoutes);
-app.use("/api/stripe", stripeRoutes);
+// app.use("/api/stripe", stripeRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });

@@ -25,7 +25,12 @@ import NotFoundPage from "./pages/error/NotFoundPage";
 
 function App() {
   return (
-    <Router>
+    <Router 
+      future={{ 
+        v7_startTransition: true,
+        v7_relativeSplatPath: true 
+      }}
+    >
       <Toaster
         position="top-right"
         toastOptions={{

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase, startSessionRefresh, stopSessionRefresh } from '../services/supabase';
 import { authAPI } from '../services/api';
 import useStore from '../store/useStore';
 import toast from 'react-hot-toast';
@@ -25,12 +25,15 @@ export const useAuth = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         await fetchUserProfile();
+        startSessionRefresh(); // Start session refresh
       } else {
         clearUser();
+        stopSessionRefresh(); // Stop session refresh
       }
     } catch (error) {
       console.error('Error checking user:', error);
       clearUser();
+      stopSessionRefresh();
     } finally {
       setLoading(false);
     }
@@ -47,9 +50,11 @@ export const useAuth = () => {
       if (event === 'SIGNED_IN' && session?.user) {
         // User signed in
         await fetchUserProfile();
+        startSessionRefresh();
       } else if (event === 'SIGNED_OUT') {
         // User signed out
         clearUser();
+        stopSessionRefresh();
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         // Token was refreshed, update profile if needed
         await fetchUserProfile();
@@ -63,8 +68,9 @@ export const useAuth = () => {
 
     return () => {
       subscription?.unsubscribe();
+      stopSessionRefresh();
     };
-  }, []);
+  }, [checkUser, fetchUserProfile, clearUser]);
 
   const login = async (email, password) => {
     try {
@@ -83,6 +89,10 @@ export const useAuth = () => {
       // Then call our backend login endpoint
       const { data } = await authAPI.login({ email, password });
       setUser(data.user);
+      
+      // Start session refresh after successful login
+      startSessionRefresh();
+      
       toast.success('Welcome back!');
       
       return { success: true };
@@ -138,6 +148,9 @@ export const useAuth = () => {
       
       // Clear local user state
       clearUser();
+      
+      // Stop session refresh
+      stopSessionRefresh();
       
       toast.success('Logged out successfully');
     } catch (error) {

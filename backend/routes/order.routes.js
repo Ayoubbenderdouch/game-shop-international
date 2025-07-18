@@ -20,5 +20,15 @@ router.post('/checkout',
 router.get('/', authenticate, orderController.getUserOrders);
 router.get('/:id', authenticate, orderController.getOrder);
 router.post('/:id/resend-codes', authenticate, orderController.resendOrderCodes);
+router.post('/mock-checkout',
+    authenticate,
+    [
+        body('items').isArray().withMessage('Items must be an array'),
+        body('items.*.productId').isUUID().withMessage('Invalid product ID'),
+        body('items.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1')
+    ],
+    validate,
+    orderController.createMockCheckout
+);
 
 module.exports = router;

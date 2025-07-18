@@ -5,12 +5,14 @@ import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import useStore from '../../store/useStore';
 
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { user, isAdmin } = useStore();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   
@@ -20,15 +22,19 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      setLoginError(''); // Clear any previous errors
+      setLoginError(''); 
       
       const result = await login(data.email, data.password);
       
       if (result.success) {
-        // Small delay to ensure auth state is updated
         setTimeout(() => {
-          navigate(from, { replace: true });
-        }, 100);
+          const store = useStore.getState();
+          if (store.isAdmin) {
+            navigate('/admin', { replace: true });
+          } else {
+            navigate(from === '/admin' ? '/' : from, { replace: true });
+          }
+        }, 200);
       } else {
         // Show the error message
         setLoginError(result.error || 'Login failed. Please check your credentials.');
@@ -81,13 +87,13 @@ const LoginPage = () => {
                     message: 'Invalid email address'
                   }
                 })}
-                className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none transition-colors"
                 placeholder="you@example.com"
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-            )}
           </div>
 
           <div>
@@ -99,37 +105,33 @@ const LoginPage = () => {
               <input
                 type="password"
                 {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters'
-                  }
+                  required: 'Password is required'
                 })}
-                className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+                className="w-full pl-10 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none transition-colors"
                 placeholder="••••••••"
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
-            )}
           </div>
 
-          <motion.button
+          <button
             type="submit"
             disabled={loading}
-            className="w-full neon-button disabled:opacity-50 disabled:cursor-not-allowed"
-            whileHover={!loading ? { scale: 1.02 } : {}}
-            whileTap={!loading ? { scale: 0.98 } : {}}
+            className="w-full neon-button py-3 font-medium disabled:opacity-50"
           >
             {loading ? 'Logging in...' : t('auth.login.submit')}
-          </motion.button>
+          </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <span className="text-gray-400">{t('auth.login.noAccount')} </span>
-          <Link to="/register" className="text-neon-purple hover:text-neon-pink transition-colors">
-            {t('auth.login.signUp')}
-          </Link>
+        <div className="mt-6 text-center">
+          <p className="text-gray-400">
+            {t('auth.login.noAccount')}{' '}
+            <Link to="/register" className="text-neon-purple hover:underline">
+              {t('auth.login.signUp')}
+            </Link>
+          </p>
         </div>
       </motion.div>
     </div>
