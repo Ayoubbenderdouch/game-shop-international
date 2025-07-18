@@ -149,6 +149,10 @@ export const adminAPI = {
   getOrders: (params) => api.get("/admin/orders", { params }),
   updateOrderStatus: (id, status) =>
     api.patch(`/admin/orders/${id}/status`, { status }),
+    getReviews: (params) => api.get("/admin/reviews", { params }),
+  getReviewStats: () => api.get("/admin/reviews/stats"),
+  deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+
 };
 
 // Stock endpoints - Fixed paths

@@ -11,8 +11,8 @@ import CartPage from "./pages/user/CartPage";
 import OrdersPage from "./pages/user/OrdersPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
-import EmailVerificationPage from './pages/auth/EmailVerificationPage';
-import AuthCallbackPage from './pages/auth/AuthCallbackPage';
+import EmailVerificationPage from "./pages/auth/EmailVerificationPage";
+import AuthCallbackPage from "./pages/auth/AuthCallbackPage";
 
 // Admin Pages
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -21,6 +21,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminStock from "./pages/admin/AdminStock";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminReviews from "./pages/admin/AdminReviews";
 
 // Error Pages
 import NotFoundPage from "./pages/error/NotFoundPage";
@@ -106,6 +107,12 @@ function App() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="stock" element={<AdminStock />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route
+            path="/admin/reviews"
+            element={
+                <AdminReviews />
+            }
+          />
           <Route path="users" element={<AdminUsers />} />
         </Route>
 

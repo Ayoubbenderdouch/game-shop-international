@@ -108,13 +108,55 @@
     "products": {
       "title": "Product Management",
       "addProduct": "Add Product",
-      "editProduct": "Edit Product"
+      "editProduct": "Edit Product",
+      "reviews": "Reviews",
+      "writeReview": "Write a Review",
+      "description": "Description",
+      "availability": "Available in",
+      "stock": "Stock",
+      "price": "Price",
+      "averageRating": "Average Rating",
+      "noReviews": "No reviews yet. Be the first to review!",
+      "mustPurchase": "You must purchase this product to review it"
     },
     "stock": {
       "title": "Stock Management",
       "uploadCodes": "Upload Codes",
       "addSingle": "Add Single Code",
       "bulkUpload": "Bulk Upload"
+    },
+    "reviews": {
+      "title": "Review Management",
+      "stats": "Review Statistics",
+      "averageRating": "Average Rating",
+      "totalReviews": "Total Reviews",
+      "distribution": "Rating Distribution",
+      "deleteReview": "Delete Review",
+      "confirmDelete": "Are you sure you want to delete this review?",
+      "searchReviews": "Search reviews...",
+      "allRatings": "All Ratings",
+      "allProducts": "All Products",
+      "newestFirst": "Newest First",
+      "oldestFirst": "Oldest First",
+      "highestRating": "Highest Rating",
+      "lowestRating": "Lowest Rating",
+      "selectAll": "Select All",
+      "deleteSelected": "Delete Selected",
+      "product": "Product",
+      "user": "User",
+      "date": "Date",
+      "actions": "Actions",
+      "rating": "Rating",
+      "comment": "Comment",
+      "submit": "Submit Review",
+      "cancel": "Cancel",
+      "reviewSubmitted": "Review submitted successfully!",
+      "reviewDeleted": "Review deleted",
+      "writeYourReview": "Write Your Review",
+      "shareExperience": "Share your experience with this product...",
+      "optional": "Optional",
+      "verified": "Verified Purchase",
+      "helpful": "Was this helpful?"
     }
   }
 }

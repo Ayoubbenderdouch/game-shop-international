@@ -58,6 +58,7 @@ router.post('/categories',
     adminController.createCategory
 );
 
-router.delete('/reviews/:id', adminController.deleteReview);
-router.patch('/products/:id/toggle-status', adminController.toggleProductStatus);
+router.get('/reviews', adminController.getReviews);
+router.get('/reviews/stats', adminController.getReviewStats);
+router.delete('/reviews/:id', adminController.deleteReview); 
 module.exports = router;

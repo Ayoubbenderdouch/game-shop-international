@@ -304,27 +304,6 @@ const createCategory = async (req, res) => {
   }
 };
 
-const deleteReview = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const { error } = await supabaseAdmin
-      .from("reviews")
-      .update({ is_deleted: true })
-      .eq("id", id);
-
-    if (error) {
-      throw error;
-    }
-
-    await logAudit(req.user.id, "REVIEW_DELETE_ADMIN", "reviews", id, {}, req);
-
-    res.json({ message: "Review deleted successfully" });
-  } catch (error) {
-    logger.error("Delete review error:", error);
-    res.status(500).json({ error: "Failed to delete review" });
-  }
-};
 
 const getAuditLogs = async (req, res) => {
   try {
@@ -421,6 +400,158 @@ const toggleProductStatus = async (req, res) => {
     }
 };
 
+
+// Add these methods to backend/controllers/admin.controller.js
+
+const getReviews = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      rating,
+      product,
+      sortBy = 'created_at',
+      sortOrder = 'desc'
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    let query = supabaseAdmin
+      .from('reviews')
+      .select(`
+        *,
+        user:users(id, email),
+        product:products(id, title, image_url)
+      `, { count: 'exact' })
+      .eq('is_deleted', false);
+
+    if (search) {
+      query = query.or(`comment.ilike.%${search}%`);
+    }
+
+    if (rating) {
+      query = query.eq('rating', parseInt(rating));
+    }
+
+    if (product) {
+      query = query.eq('product_id', product);
+    }
+
+    const { data: reviews, error, count } = await query
+      .range(offset, offset + limit - 1)
+      .order(sortBy, { ascending: sortOrder === 'asc' });
+
+    if (error) {
+      throw error;
+    }
+
+    res.json({
+      reviews,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: count,
+        totalPages: Math.ceil(count / limit)
+      }
+    });
+  } catch (error) {
+    logger.error('Get reviews error:', error);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+};
+
+const getReviewStats = async (req, res) => {
+  try {
+    // Get overall stats
+    const { data: reviews, error: reviewsError } = await supabaseAdmin
+      .from('reviews')
+      .select('rating')
+      .eq('is_deleted', false);
+
+    if (reviewsError) throw reviewsError;
+
+    const totalReviews = reviews.length;
+    const averageRating = totalReviews > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
+
+    // Get distribution
+    const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach(r => {
+      distribution[r.rating]++;
+    });
+
+    // Get recent reviews
+    const { data: recentReviews, error: recentError } = await supabaseAdmin
+      .from('reviews')
+      .select(`
+        *,
+        user:users(email),
+        product:products(title)
+      `)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (recentError) throw recentError;
+
+    res.json({
+      totalReviews,
+      averageRating,
+      distribution,
+      recentReviews
+    });
+  } catch (error) {
+    logger.error('Get review stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch review statistics' });
+  }
+};
+
+const deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get review details before deletion for audit log
+    const { data: review, error: fetchError } = await supabaseAdmin
+      .from("reviews")
+      .select(`
+        *,
+        user:users(email),
+        product:products(title)
+      `)
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !review) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+
+    // Soft delete the review
+    const { error } = await supabaseAdmin
+      .from("reviews")
+      .update({ is_deleted: true })
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    await logAudit(req.user.id, "REVIEW_DELETE_ADMIN", "reviews", id, {
+      user_email: review.user.email,
+      product_title: review.product.title,
+      rating: review.rating,
+      comment: review.comment
+    }, req);
+
+    res.json({ message: "Review deleted successfully" });
+  } catch (error) {
+    logger.error("Delete review error:", error);
+    res.status(500).json({ error: "Failed to delete review" });
+  }
+};
+
+
 module.exports = {
   getDashboardStats,
   getUsers,
@@ -430,6 +561,8 @@ module.exports = {
   deleteProduct,
   createCategory,
   toggleProductStatus,
-  deleteReview,
   getAuditLogs,
+  getReviews,
+  getReviewStats,
+  deleteReview
 };

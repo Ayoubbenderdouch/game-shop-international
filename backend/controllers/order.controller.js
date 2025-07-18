@@ -326,14 +326,26 @@ const getUserOrders = async (req, res) => {
       throw error;
     }
 
-    // Decrypt codes for completed orders
+    // Get user's reviews to check which products have been reviewed
+    const { data: userReviews } = await supabaseAdmin
+      .from("reviews")
+      .select("product_id, order_item_id")
+      .eq("user_id", req.user.id)
+      .eq("is_deleted", false);
+
+    const reviewedProducts = new Set(userReviews?.map(r => r.product_id) || []);
+    const reviewedOrderItems = new Set(userReviews?.map(r => r.order_item_id) || []);
+
+    // Process orders to add review status and decrypt codes
     const processedOrders = orders.map(order => {
       if (order.status === 'completed') {
         order.order_items = order.order_items.map(item => {
+          // Check if this item has been reviewed
+          item.has_reviewed = reviewedOrderItems.has(item.id) || reviewedProducts.has(item.product_id);
+          
+          // Decrypt code if exists
           if (item.product_code && item.product_code.code) {
-            // Add decrypted code to the item
             item.decrypted_code = decrypt(item.product_code.code);
-            // Remove the encrypted code from response
             delete item.product_code.code;
           }
           return item;

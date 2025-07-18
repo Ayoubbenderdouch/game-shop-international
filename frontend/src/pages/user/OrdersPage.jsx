@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Package, Eye, EyeOff, Copy, Check } from "lucide-react";
+import { Package, Eye, EyeOff, Copy, Check, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { orderAPI } from "../../services/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import toast from "react-hot-toast";
 
 const OrdersPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -158,6 +160,19 @@ const OrdersPage = () => {
                         Quantity: {item.quantity} • ${item.price} each
                       </p>
 
+                      {/* Review Button for Completed Orders */}
+                      {order.status === "completed" && !item.has_reviewed && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/product/${item.product.id}?review=true`);
+                          }}
+                          className="mt-2 text-sm text-neon-purple hover:text-neon-pink transition-colors"
+                        >
+                          Write a Review
+                        </button>
+                      )}
+
                       {/* Gift Card Code Section for Completed Orders */}
                       {order.status === "completed" && item.decrypted_code && (
                         <div className="mt-3 p-3 bg-dark-bg rounded-lg">
@@ -238,7 +253,7 @@ const OrdersPage = () => {
                 {/* Order Actions */}
                 {order.status === "completed" && (
                   <div className="pt-4 border-t border-dark-border flex justify-between items-center">
-                    {/* <button
+                    <button
                       onClick={() => {
                         orderAPI.resendCodes(order.id);
                         toast.success("Gift card codes sent to your email!");
@@ -246,7 +261,7 @@ const OrdersPage = () => {
                       className="text-sm text-neon-purple hover:text-neon-pink transition-colors"
                     >
                       Resend codes to email
-                    </button> */}
+                    </button>
 
                     <p className="text-xs text-gray-500">
                       Codes are encrypted for your security

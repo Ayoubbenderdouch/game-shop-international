@@ -1,14 +1,23 @@
-import { Outlet, NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, Package, Layers, ShoppingBag, Users, ChevronLeft } from 'lucide-react';
+import { Outlet, NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  Package,
+  Layers,
+  ShoppingBag,
+  Users,
+  ChevronLeft,
+  Star,
+} from "lucide-react";
 
 const AdminLayout = () => {
   const navItems = [
-    { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: '/admin/products', icon: Package, label: 'Products' },
-    { to: '/admin/stock', icon: Layers, label: 'Stock' },
-    { to: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
-    { to: '/admin/users', icon: Users, label: 'Users' },
+    { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
+    { to: "/admin/products", icon: Package, label: "Products" },
+    { to: "/admin/stock", icon: Layers, label: "Stock" },
+    { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+    { to: "/admin/reviews", icon: Star, label: "Reviews" }, 
+    { to: "/admin/users", icon: Users, label: "Users" },
   ];
 
   return (
@@ -22,7 +31,7 @@ const AdminLayout = () => {
         >
           <div className="p-6">
             <h2 className="text-2xl font-bold glow-text mb-8">Admin Panel</h2>
-            
+
             <nav className="space-y-2">
               {navItems.map((item) => (
                 <NavLink
@@ -32,8 +41,8 @@ const AdminLayout = () => {
                   className={({ isActive }) =>
                     `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
                       isActive
-                        ? 'bg-neon-purple text-white'
-                        : 'hover:bg-dark-hover text-gray-400 hover:text-white'
+                        ? "bg-neon-purple text-white"
+                        : "hover:bg-dark-hover text-gray-400 hover:text-white"
                     }`
                   }
                 >
@@ -42,7 +51,7 @@ const AdminLayout = () => {
                 </NavLink>
               ))}
             </nav>
-            
+
             <div className="mt-8 pt-8 border-t border-dark-border">
               <NavLink
                 to="/"
