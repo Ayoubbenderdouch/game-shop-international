@@ -1,10 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ShoppingCart, User, LogOut, Shield, Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import useStore from '../../store/useStore';
-import { useAuth } from '../../hooks/useAuth';
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ShoppingCart, User, LogOut, Shield, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import useStore from "../../store/useStore";
+import { useAuth } from "../../hooks/useAuth";
+import LanguageSwitcher from "../common/LanguageSwitcher";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,7 +17,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -26,8 +27,8 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <motion.img
-              src="/favi.png" 
-              alt="Reload X" 
+              src="/favi.png"
+              alt="Reload X"
               className="h-40 w-40 object-contain"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -37,27 +38,42 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="hover:text-neon-purple transition-colors">
-              {t('nav.home')}
+              {t("nav.home")}
             </Link>
-            <Link to="/shop" className="hover:text-neon-purple transition-colors">
-              {t('nav.shop')}
+            <Link
+              to="/shop"
+              className="hover:text-neon-purple transition-colors"
+            >
+              {t("nav.shop")}
             </Link>
             {user && (
-              <Link to="/orders" className="hover:text-neon-purple transition-colors">
-                {t('nav.orders')}
+              <Link
+                to="/orders"
+                className="hover:text-neon-purple transition-colors"
+              >
+                {t("nav.orders")}
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className="hover:text-neon-purple transition-colors flex items-center">
+              <Link
+                to="/admin"
+                className="hover:text-neon-purple transition-colors flex items-center"
+              >
                 <Shield className="w-4 h-4 mr-1" />
-                {t('nav.admin')}
+                {t("nav.admin")}
               </Link>
             )}
           </div>
 
           {/* Right Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/cart" className="relative hover:text-neon-purple transition-colors">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
+            <Link
+              to="/cart"
+              className="relative hover:text-neon-purple transition-colors"
+            >
               <ShoppingCart className="w-6 h-6" />
               {cartCount > 0 && (
                 <motion.span
@@ -70,7 +86,7 @@ const Navbar = () => {
                 </motion.span>
               )}
             </Link>
-            
+
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-400">{user.email}</span>
@@ -83,7 +99,7 @@ const Navbar = () => {
               </div>
             ) : (
               <Link to="/login" className="neon-button text-sm">
-                {t('nav.login')}
+                {t("nav.login")}
               </Link>
             )}
           </div>
@@ -105,23 +121,43 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <Link to="/" className="block hover:text-neon-purple transition-colors">
-              {t('nav.home')}
+            {/* Language Switcher for Mobile */}
+            <div className="pb-4 border-b border-dark-border">
+              <LanguageSwitcher />
+            </div>
+
+            <Link
+              to="/"
+              className="block hover:text-neon-purple transition-colors"
+            >
+              {t("nav.home")}
             </Link>
-            <Link to="/shop" className="block hover:text-neon-purple transition-colors">
-              {t('nav.shop')}
+            <Link
+              to="/shop"
+              className="block hover:text-neon-purple transition-colors"
+            >
+              {t("nav.shop")}
             </Link>
-            <Link to="/cart" className="block hover:text-neon-purple transition-colors">
-              {t('nav.cart')} ({cartCount})
+            <Link
+              to="/cart"
+              className="block hover:text-neon-purple transition-colors"
+            >
+              {t("nav.cart")} ({cartCount})
             </Link>
             {user && (
-              <Link to="/orders" className="block hover:text-neon-purple transition-colors">
-                {t('nav.orders')}
+              <Link
+                to="/orders"
+                className="block hover:text-neon-purple transition-colors"
+              >
+                {t("nav.orders")}
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className="block hover:text-neon-purple transition-colors">
-                {t('nav.admin')}
+              <Link
+                to="/admin"
+                className="block hover:text-neon-purple transition-colors"
+              >
+                {t("nav.admin")}
               </Link>
             )}
             {user ? (
@@ -129,11 +165,14 @@ const Navbar = () => {
                 onClick={handleLogout}
                 className="block w-full text-left hover:text-neon-purple transition-colors"
               >
-                {t('nav.logout')}
+                {t("nav.logout")}
               </button>
             ) : (
-              <Link to="/login" className="block hover:text-neon-purple transition-colors">
-                {t('nav.login')}
+              <Link
+                to="/login"
+                className="block hover:text-neon-purple transition-colors"
+              >
+                {t("nav.login")}
               </Link>
             )}
           </motion.div>
