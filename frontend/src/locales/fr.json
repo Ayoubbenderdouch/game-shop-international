@@ -1,0 +1,168 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "addToCart": "Ajouter au panier",
+    "buyNow": "Acheter maintenant",
+    "outOfStock": "Rupture de stock",
+    "lowStock": "Stock faible",
+    "inStock": "En stock"
+  },
+  "nav": {
+    "home": "Accueil",
+    "shop": "Boutique",
+    "cart": "Panier",
+    "orders": "Commandes",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion",
+    "admin": "Admin",
+    "profile": "Profil"
+  },
+  "home": {
+    "hero": {
+      "title": "Améliorez votre expérience de jeu",
+      "subtitle": "Obtenez un accès instantané aux cartes de jeu, cartes-cadeaux et abonnements",
+      "cta": "Acheter maintenant"
+    },
+    "featured": "Catégories en vedette"
+  },
+  "shop": {
+    "title": "Boutique",
+    "filters": {
+      "category": "Catégorie",
+      "priceRange": "Gamme de prix",
+      "platform": "Plateforme",
+      "all": "Toutes les catégories"
+    },
+    "sort": {
+      "latest": "Plus récent",
+      "priceLow": "Prix : Croissant",
+      "priceHigh": "Prix : Décroissant",
+      "popular": "Plus populaire"
+    }
+  },
+  "product": {
+    "reviews": "Avis",
+    "writeReview": "Écrire un avis",
+    "description": "Description",
+    "availability": "Disponible en",
+    "stock": "Stock",
+    "price": "Prix"
+  },
+  "cart": {
+    "title": "Panier d'achat",
+    "empty": "Votre panier est vide",
+    "total": "Total",
+    "checkout": "Passer commande",
+    "quantity": "Quantité",
+    "remove": "Retirer"
+  },
+  "orders": {
+    "title": "Mes commandes",
+    "empty": "Aucune commande pour le moment",
+    "orderNumber": "Commande n°",
+    "date": "Date",
+    "status": "Statut",
+    "total": "Total",
+    "viewDetails": "Voir les détails",
+    "revealCode": "Révéler le code",
+    "codeRevealed": "Code révélé ! Ceci est une vue unique."
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signUp": "S'inscrire"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "S'inscrire",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Tableau de bord administrateur",
+      "totalRevenue": "Chiffre d'affaires total",
+      "totalOrders": "Total des commandes",
+      "totalProducts": "Total des produits",
+      "lowStock": "Articles en stock faible"
+    },
+    "products": {
+      "title": "Gestion des produits",
+      "addProduct": "Ajouter un produit",
+      "editProduct": "Modifier le produit",
+      "reviews": "Avis",
+      "writeReview": "Écrire un avis",
+      "description": "Description",
+      "availability": "Disponible en",
+      "stock": "Stock",
+      "price": "Prix",
+      "averageRating": "Note moyenne",
+      "noReviews": "Aucun avis pour le moment. Soyez le premier à évaluer !",
+      "mustPurchase": "Vous devez acheter ce produit pour l'évaluer"
+    },
+    "stock": {
+      "title": "Gestion des stocks",
+      "uploadCodes": "Télécharger des codes",
+      "addSingle": "Ajouter un code unique",
+      "bulkUpload": "Téléchargement en masse"
+    },
+    "reviews": {
+      "title": "Gestion des avis",
+      "stats": "Statistiques des avis",
+      "averageRating": "Note moyenne",
+      "totalReviews": "Total des avis",
+      "distribution": "Distribution des notes",
+      "deleteReview": "Supprimer l'avis",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet avis ?",
+      "searchReviews": "Rechercher des avis...",
+      "allRatings": "Toutes les notes",
+      "allProducts": "Tous les produits",
+      "newestFirst": "Plus récents en premier",
+      "oldestFirst": "Plus anciens en premier",
+      "highestRating": "Note la plus élevée",
+      "lowestRating": "Note la plus basse",
+      "selectAll": "Tout sélectionner",
+      "deleteSelected": "Supprimer la sélection",
+      "product": "Produit",
+      "user": "Utilisateur",
+      "date": "Date",
+      "actions": "Actions",
+      "rating": "Note",
+      "comment": "Commentaire",
+      "submit": "Soumettre l'avis",
+      "cancel": "Annuler",
+      "reviewSubmitted": "Avis soumis avec succès !",
+      "reviewDeleted": "Avis supprimé",
+      "writeYourReview": "Écrivez votre avis",
+      "shareExperience": "Partagez votre expérience avec ce produit...",
+      "optional": "Optionnel",
+      "verified": "Achat vérifié",
+      "helpful": "Cet avis vous a-t-il été utile ?"
+    }
+  },
+  "language": {
+    "select": "Sélectionner la langue",
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français"
+  }
+}

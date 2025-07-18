@@ -158,5 +158,11 @@
       "verified": "Verified Purchase",
       "helpful": "Was this helpful?"
     }
+  },
+  "language": {
+    "select": "Select Language",
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français"
   }
 }
