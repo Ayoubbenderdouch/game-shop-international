@@ -62,6 +62,8 @@ export const authAPI = {
   login: (data) => api.post("/auth/login", data),
   logout: () => api.post("/auth/logout"),
   getProfile: () => api.get("/auth/profile"),
+  resendVerification: (email) =>
+    api.post("/auth/resend-verification", { email }),
 };
 
 // Product endpoints

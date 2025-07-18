@@ -31,4 +31,16 @@ router.post('/logout', authenticate, authController.logout);
 
 router.get('/profile', authenticate, authController.getProfile);
 
+// Add resend verification email route
+router.post('/resend-verification',
+    authLimiter,
+    [
+        body('email').isEmail().normalizeEmail()
+    ],
+    validate,
+    authController.resendVerification
+);
+
+router.get('/confirm-email', authController.confirmEmail);
+
 module.exports = router;

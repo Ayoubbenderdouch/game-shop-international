@@ -11,6 +11,8 @@ import CartPage from "./pages/user/CartPage";
 import OrdersPage from "./pages/user/OrdersPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import EmailVerificationPage from './pages/auth/EmailVerificationPage';
+import AuthCallbackPage from './pages/auth/AuthCallbackPage';
 
 // Admin Pages
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -25,10 +27,10 @@ import NotFoundPage from "./pages/error/NotFoundPage";
 
 function App() {
   return (
-    <Router 
-      future={{ 
+    <Router
+      future={{
         v7_startTransition: true,
-        v7_relativeSplatPath: true 
+        v7_relativeSplatPath: true,
       }}
     >
       <Toaster
@@ -63,6 +65,12 @@ function App() {
           <Route path="product/:id" element={<ProductDetailPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route
+            path="/auth/verify-email"
+            element={<EmailVerificationPage />}
+          />
+          <Route path="/auth/confirm" element={<EmailVerificationPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
           {/* Protected Routes */}
           <Route

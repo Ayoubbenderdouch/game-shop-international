@@ -8,38 +8,29 @@ const register = async (req, res) => {
         const { email, password } = req.body;
         const country = getCountryFromIP(getClientIP(req));
 
+        // Get the origin from request headers for redirect URL
+        const origin = req.headers.origin || 'http://localhost:5173';
+        
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
-            password
+            password,
+            options: {
+                emailRedirectTo: `${origin}/auth/confirm`,
+                data: {
+                    country: country
+                }
+            }
         });
 
         if (authError) {
             return res.status(400).json({ error: authError.message });
         }
 
-        const isFirstUser = await checkFirstUser();
-        
-        const { data: userData, error: userError } = await supabaseAdmin
-            .from('users')
-            .insert({
-                id: authData.user.id,
-                email,
-                country,
-                is_admin: isFirstUser || email === process.env.ADMIN_EMAIL
-            })
-            .select()
-            .single();
-
-        if (userError) {
-            await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-            return res.status(400).json({ error: 'Failed to create user profile' });
-        }
-
-        await logAudit(authData.user.id, 'USER_REGISTER', 'users', authData.user.id, { email }, req);
-
+        // Always require email confirmation
         res.status(201).json({
-            user: userData,
-            session: authData.session
+            message: 'Please check your email to confirm your account',
+            requiresEmailConfirmation: true,
+            email: email
         });
     } catch (error) {
         logger.error('Registration error:', error);
@@ -57,7 +48,22 @@ const login = async (req, res) => {
         });
 
         if (authError) {
+            // Check if email not confirmed
+            if (authError.message.includes('Email not confirmed')) {
+                return res.status(401).json({ 
+                    error: 'Please confirm your email before logging in',
+                    code: 'EMAIL_NOT_CONFIRMED'
+                });
+            }
             return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Double-check email confirmation
+        if (!authData.user.confirmed_at) {
+            return res.status(401).json({ 
+                error: 'Please confirm your email before logging in',
+                code: 'EMAIL_NOT_CONFIRMED'
+            });
         }
 
         const { data: userData, error: userError } = await supabaseAdmin
@@ -67,9 +73,35 @@ const login = async (req, res) => {
             .single();
 
         if (userError || !userData) {
-            return res.status(401).json({ error: 'User not found' });
+            // Create user profile if doesn't exist (first login after confirmation)
+            const country = getCountryFromIP(getClientIP(req));
+            const isFirstUser = await checkFirstUser();
+            
+            const { data: newUserData, error: createError } = await supabaseAdmin
+                .from('users')
+                .insert({
+                    id: authData.user.id,
+                    email,
+                    country,
+                    is_admin: isFirstUser || email === process.env.ADMIN_EMAIL
+                })
+                .select()
+                .single();
+
+            if (createError) {
+                logger.error('Failed to create user profile:', createError);
+                return res.status(400).json({ error: 'Failed to create user profile' });
+            }
+
+            await logAudit(authData.user.id, 'USER_FIRST_LOGIN', 'users', authData.user.id, { email }, req);
+
+            return res.json({
+                user: newUserData,
+                session: authData.session
+            });
         }
 
+        // Update country if changed
         const country = getCountryFromIP(getClientIP(req));
         if (userData.country !== country) {
             await supabaseAdmin
@@ -108,20 +140,58 @@ const logout = async (req, res) => {
 
 const getProfile = async (req, res) => {
     try {
+        // First check if user profile exists
+        const { data: userData, error: userError } = await supabaseAdmin
+            .from('users')
+            .select('*')
+            .eq('id', req.supabaseUser.id)
+            .single();
+
+        if (userError || !userData) {
+            // Create profile if it doesn't exist (can happen after email verification)
+            const country = getCountryFromIP(getClientIP(req));
+            const isFirstUser = await checkFirstUser();
+            
+            const { data: newUserData, error: createError } = await supabaseAdmin
+                .from('users')
+                .insert({
+                    id: req.supabaseUser.id,
+                    email: req.supabaseUser.email,
+                    country,
+                    is_admin: isFirstUser || req.supabaseUser.email === process.env.ADMIN_EMAIL
+                })
+                .select()
+                .single();
+
+            if (createError) {
+                logger.error('Failed to create user profile in getProfile:', createError);
+                return res.status(400).json({ error: 'Failed to create user profile' });
+            }
+
+            return res.json({
+                ...newUserData,
+                stats: {
+                    total_orders: 0,
+                    total_reviews: 0
+                }
+            });
+        }
+
+        // Get user stats
         const { data: orders } = await supabaseAdmin
             .from('orders')
             .select('id')
-            .eq('user_id', req.user.id)
+            .eq('user_id', userData.id)
             .eq('status', 'completed');
 
         const { data: reviews } = await supabaseAdmin
             .from('reviews')
             .select('id')
-            .eq('user_id', req.user.id)
+            .eq('user_id', userData.id)
             .eq('is_deleted', false);
 
         res.json({
-            ...req.user,
+            ...userData,
             stats: {
                 total_orders: orders?.length || 0,
                 total_reviews: reviews?.length || 0
@@ -141,9 +211,66 @@ const checkFirstUser = async () => {
     return count === 0;
 };
 
+const resendVerification = async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        const origin = req.headers.origin || 'http://localhost:5173';
+        
+        const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email: email,
+            options: {
+                emailRedirectTo: `${origin}/auth/confirm`
+            }
+        });
+
+        if (error) {
+            logger.error('Resend verification error:', error);
+            return res.status(400).json({ error: 'Failed to resend verification email' });
+        }
+
+        res.json({ message: 'Verification email sent successfully' });
+    } catch (error) {
+        logger.error('Resend verification error:', error);
+        res.status(500).json({ error: 'Failed to resend verification email' });
+    }
+};
+
+const confirmEmail = async (req, res) => {
+    try {
+        const { token_hash, type } = req.query;
+
+        if (!token_hash || type !== 'email') {
+            return res.status(400).json({ error: 'Invalid confirmation link' });
+        }
+
+        const { data, error } = await supabase.auth.verifyOtp({
+            token_hash,
+            type: 'email'
+        });
+
+        if (error) {
+            return res.status(400).json({ error: 'Invalid or expired confirmation link' });
+        }
+
+        res.json({ message: 'Email confirmed successfully' });
+    } catch (error) {
+        logger.error('Email confirmation error:', error);
+        res.status(500).json({ error: 'Confirmation failed' });
+    }
+};
+
+
 module.exports = {
     register,
     login,
     logout,
-    getProfile
+    getProfile,
+    resendVerification,
+    confirmEmail
 };

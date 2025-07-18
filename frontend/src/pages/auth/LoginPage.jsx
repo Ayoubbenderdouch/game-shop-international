@@ -1,43 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Info } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
-import useStore from '../../store/useStore';
 
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const { user, isAdmin } = useStore();
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   
   const { register, handleSubmit, formState: { errors } } = useForm();
   const from = location.state?.from?.pathname || '/';
+  const message = location.state?.message;
+
+  useEffect(() => {
+    // Clear location state after displaying message
+    if (message) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [message]);
 
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      setLoginError(''); 
+      setLoginError('');
       
       const result = await login(data.email, data.password);
       
       if (result.success) {
         setTimeout(() => {
-          const store = useStore.getState();
-          if (store.isAdmin) {
-            navigate('/admin', { replace: true });
-          } else {
-            navigate(from === '/admin' ? '/' : from, { replace: true });
-          }
-        }, 200);
+          navigate(from, { replace: true });
+        }, 100);
       } else {
-        // Show the error message
-        setLoginError(result.error || 'Login failed. Please check your credentials.');
+        // Check for specific error codes
+        if (result.error?.includes('Email not confirmed') || 
+            result.code === 'EMAIL_NOT_CONFIRMED') {
+          setLoginError('Please verify your email before logging in. Check your inbox for the verification link.');
+        } else {
+          setLoginError(result.error || 'Login failed. Please check your credentials.');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -59,6 +65,18 @@ const LoginPage = () => {
           <h1 className="text-3xl font-bold glow-text">{t('auth.login.title')}</h1>
         </div>
 
+        {/* Show success message if coming from email verification */}
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-green-500/10 border border-green-500 rounded-lg flex items-center gap-3"
+          >
+            <Info className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <p className="text-sm text-green-500">{message}</p>
+          </motion.div>
+        )}
+
         {/* Show login error if any */}
         {loginError && (
           <motion.div
@@ -70,7 +88,6 @@ const LoginPage = () => {
             <p className="text-sm text-red-500">{loginError}</p>
           </motion.div>
         )}
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-2">
