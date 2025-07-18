@@ -10,53 +10,77 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
     flowType: 'pkce',
-    // Add session refresh configuration
-    sessionAutoRefreshInterval: 30 * 60 * 1000, // Refresh every 30 minutes
-    sessionExpiryMargin: 5 * 60 // Refresh 5 minutes before expiry
+    // Updated session refresh configuration
+    sessionAutoRefresh: true,
   }
 });
 
 // Helper functions
 export const getSession = async () => {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error) {
-    console.error('Error getting session:', error);
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('Error getting session:', error);
+      return null;
+    }
+    return session;
+  } catch (error) {
+    console.error('Session error:', error);
     return null;
   }
-  return session;
 };
 
 export const getUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) {
-    console.error('Error getting user:', error);
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error('Error getting user:', error);
+      return null;
+    }
+    return user;
+  } catch (error) {
+    console.error('User error:', error);
     return null;
   }
-  return user;
 };
 
 // Refresh session helper
 export const refreshSession = async () => {
-  const { data: { session }, error } = await supabase.auth.refreshSession();
-  if (error) {
-    console.error('Error refreshing session:', error);
+  try {
+    const { data: { session }, error } = await supabase.auth.refreshSession();
+    if (error) {
+      console.error('Error refreshing session:', error);
+      return null;
+    }
+    return session;
+  } catch (error) {
+    console.error('Refresh error:', error);
     return null;
   }
-  return session;
 };
 
-// Add session refresh interval
+// Add session refresh interval with error handling
 let refreshInterval;
 
 export const startSessionRefresh = () => {
   if (refreshInterval) clearInterval(refreshInterval);
   
+  // Initial refresh
+  refreshSession();
+  
   refreshInterval = setInterval(async () => {
     const session = await getSession();
     if (session) {
-      await refreshSession();
+      const refreshed = await refreshSession();
+      if (!refreshed) {
+        // If refresh fails, stop the interval
+        stopSessionRefresh();
+      }
+    } else {
+      // No session, stop refreshing
+      stopSessionRefresh();
     }
-  }, 25 * 60 * 1000); // Refresh every 25 minutes
+  }, 20 * 60 * 1000); // Refresh every 20 minutes
 };
 
 export const stopSessionRefresh = () => {

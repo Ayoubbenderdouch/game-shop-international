@@ -17,7 +17,6 @@ const EmailVerificationPage = () => {
   const email = location.state?.email;
 
   useEffect(() => {
-    // Function to handle the email confirmation
     const handleEmailConfirmation = async () => {
       try {
         // Parse the hash fragment
@@ -59,6 +58,7 @@ const EmailVerificationPage = () => {
               console.log("User profile created/fetched:", profile);
 
               setVerified(true);
+              setVerifying(false); // ADD THIS LINE
               toast.success("Email verified successfully!");
 
               // Sign out the user so they can login properly
@@ -77,6 +77,7 @@ const EmailVerificationPage = () => {
               console.error("Profile creation error:", profileError);
               // Even if profile creation fails, the email is verified
               setVerified(true);
+              setVerifying(false); // ADD THIS LINE
 
               // Sign out and redirect to login
               await supabase.auth.signOut();

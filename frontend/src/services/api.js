@@ -2,6 +2,7 @@ import axios from "axios";
 import { API_URL } from "../config/api";
 import { supabase } from "./supabase";
 import toast from "react-hot-toast";
+import { useStore } from "zustand";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -22,7 +23,7 @@ api.interceptors.request.use(async (config) => {
 // Handle errors
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const message = error.response?.data?.error || "Something went wrong";
 
     // Only show toast for non-401 errors or specific login failures
@@ -35,21 +36,30 @@ api.interceptors.response.use(
 
     // Only redirect to login if:
     // 1. It's a 401 error
-    // 2. NOT from the login endpoint itself
-    // 3. User is actually logged in (to prevent redirect loops)
+    // 2. NOT from auth endpoints
+    // 3. NOT from public endpoints that use optionalAuth
+    // 4. User actually has a session
     if (
       error.response?.status === 401 &&
-      !error.config.url.includes("/auth/login") &&
-      !error.config.url.includes("/auth/register")
+      !error.config.url.includes("/auth/") &&
+      !error.config.url.includes("/products") &&
+      !error.config.url.includes("/reviews/product/")
     ) {
       // Check if we actually have a session before signing out
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          supabase.auth.signOut();
-          window.location.href = "/login";
-          toast.error("Session expired. Please login again.");
-        }
-      });
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // Only sign out if we have an actual session
+        await supabase.auth.signOut();
+        
+        // Use store to clear user state
+        const store = useStore.getState();
+        store.clearUser();
+        
+        // Redirect to login
+        window.location.href = "/login";
+        toast.error("Session expired. Please login again.");
+      }
     }
 
     return Promise.reject(error);

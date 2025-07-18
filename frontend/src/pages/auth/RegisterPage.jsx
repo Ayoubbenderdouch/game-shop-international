@@ -31,7 +31,6 @@ const RegisterPage = () => {
         password: data.password,
       });
 
-      // Registration always requires email confirmation now
       navigate("/auth/verify-email", {
         state: { email: data.email },
         replace: true,

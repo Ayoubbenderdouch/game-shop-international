@@ -51,7 +51,7 @@ const useStore = create(
       user: null,
       isAdmin: false,
       setUser: (user) => set({ user, isAdmin: user?.is_admin || false }),
-      clearUser: () => set({ user: null, isAdmin: false }),
+      clearUser: () => set({ user: null, isAdmin: false ,cart: [] }),
     }),
     {
       name: "game-gift-store",
