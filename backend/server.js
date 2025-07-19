@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, process.env.ADMIN_DASHBOARD_URL],
+    origin: [process.env.FRONTEND_URL, process.env.ADMIN_DASHBOARD_URL,"https://game-shop-wine.vercel.app"],
     credentials: true,
   })
 );
