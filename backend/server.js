@@ -14,6 +14,7 @@ const reviewRoutes = require("./routes/review.routes");
 const adminRoutes = require("./routes/admin.routes");
 const stockRoutes = require("./routes/stock.routes");
 // const stripeRoutes = require("./routes/stripe.routes");
+const uploadRoutes = require('./routes/upload.routes');
 
 const errorHandler = require("./middlewares/errorHandler.middleware");
 const rateLimiter = require("./middlewares/rateLimiter.middleware");
@@ -49,6 +50,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/stock", stockRoutes);
+app.use('/api/upload', uploadRoutes);
+
 // app.use("/api/stripe", stripeRoutes);
 
 app.get("/health", (req, res) => {

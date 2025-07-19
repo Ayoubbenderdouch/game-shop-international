@@ -1,11 +1,22 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Eye, EyeOff, Search, Package } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
-import { adminAPI, productAPI } from '../../services/api';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Search,
+  Package,
+  Upload,
+  X,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
+import { adminAPI, productAPI } from "../../services/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { API_URL } from "../../config/api";
 
 const AdminProducts = () => {
   const { t } = useTranslation();
@@ -14,10 +25,21 @@ const AdminProducts = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
-  
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+
+  // New state for image upload
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     fetchProducts();
@@ -30,7 +52,7 @@ const AdminProducts = () => {
       const { data } = await productAPI.getAll(params);
       setProducts(data.products);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
@@ -41,23 +63,84 @@ const AdminProducts = () => {
       const { data } = await productAPI.getCategories();
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
+
+      setImageFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!imageFile) return null;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    try {
+      const response = await fetch(`${API_URL}/upload/product-image`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setValue("image_url", "");
   };
 
   const openModal = (product = null) => {
     if (product) {
       setEditingProduct(product);
-      Object.keys(product).forEach(key => {
-        if (key === 'tags' || key === 'country_availability') {
-          setValue(key, product[key]?.join(', ') || '');
+      Object.keys(product).forEach((key) => {
+        if (key === "tags" || key === "country_availability") {
+          setValue(key, product[key]?.join(", ") || "");
         } else {
           setValue(key, product[key]);
         }
       });
+      // Set image preview if editing
+      if (product.image_url) {
+        setImagePreview(product.image_url);
+      }
     } else {
       setEditingProduct(null);
       reset();
+      clearImage();
     }
     setShowModal(true);
   };
@@ -66,58 +149,80 @@ const AdminProducts = () => {
     setShowModal(false);
     setEditingProduct(null);
     reset();
+    clearImage();
   };
 
   const onSubmit = async (data) => {
     try {
+      // Upload image first if selected
+      let imageUrl = data.image_url;
+      if (imageFile) {
+        const uploadedUrl = await uploadImage();
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        } else if (!editingProduct) {
+          // If new product and upload failed, don't proceed
+          return;
+        }
+      }
+
       const productData = {
         ...data,
         price: parseFloat(data.price),
-        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()) : [],
-        country_availability: data.country_availability ? data.country_availability.split(',').map(c => c.trim()) : [],
-        is_active: data.is_active === 'true',
-        is_preorder: data.is_preorder === 'true',
+        image_url: imageUrl,
+        tags: data.tags ? data.tags.split(",").map((tag) => tag.trim()) : [],
+        country_availability: data.country_availability
+          ? data.country_availability.split(",").map((c) => c.trim())
+          : [],
+        is_active: data.is_active === "true",
+        is_preorder: data.is_preorder === "true",
       };
 
       if (editingProduct) {
         await adminAPI.updateProduct(editingProduct.id, productData);
-        toast.success('Product updated successfully');
+        toast.success("Product updated successfully");
       } else {
-        console.log('Creating product with data:', productData);
+        console.log("Creating product with data:", productData);
         await adminAPI.createProduct(productData);
-        toast.success('Product created successfully');
+        toast.success("Product created successfully");
       }
-      
+
       closeModal();
       fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error("Error saving product:", error);
+      toast.error("Failed to save product");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
-    
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
     try {
       await adminAPI.deleteProduct(id);
-      toast.success('Product deleted successfully');
+      toast.success("Product deleted successfully");
       fetchProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
   const toggleProductStatus = async (product) => {
     try {
-      await adminAPI.updateProduct(product.id, { is_active: !product.is_active });
-      toast.success(`Product ${product.is_active ? 'deactivated' : 'activated'}`);
+      await adminAPI.updateProduct(product.id, {
+        is_active: !product.is_active,
+      });
+      toast.success(
+        `Product ${product.is_active ? "deactivated" : "activated"}`
+      );
       fetchProducts();
     } catch (error) {
-      console.error('Error toggling product status:', error);
+      console.error("Error toggling product status:", error);
     }
   };
 
-  const filteredProducts = products.filter(product =>
+  const filteredProducts = products.filter((product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -132,7 +237,9 @@ const AdminProducts = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold glow-text">{t('admin.products.title')}</h1>
+        <h1 className="text-3xl font-bold glow-text">
+          {t("admin.products.title")}
+        </h1>
         <motion.button
           onClick={() => openModal()}
           className="neon-button flex items-center space-x-2"
@@ -140,7 +247,7 @@ const AdminProducts = () => {
           whileTap={{ scale: 0.95 }}
         >
           <Plus className="w-5 h-5" />
-          <span>{t('admin.products.addProduct')}</span>
+          <span>{t("admin.products.addProduct")}</span>
         </motion.button>
       </div>
 
@@ -156,15 +263,17 @@ const AdminProducts = () => {
             className="w-full pl-10 pr-4 py-2 bg-dark-card border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
           />
         </div>
-        
+
         <select
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
           className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
         >
           <option value="">All Categories</option>
-          {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
           ))}
         </select>
       </div>
@@ -194,7 +303,7 @@ const AdminProducts = () => {
                   <td className="py-4 px-4">
                     <div className="flex items-center space-x-3">
                       <img
-                        src={product.image_url || '/images/placeholder.jpg'}
+                        src={product.image_url || "/images/placeholder.jpg"}
                         alt={product.title}
                         className="w-10 h-10 rounded object-cover"
                       />
@@ -207,10 +316,15 @@ const AdminProducts = () => {
                   <td className="py-4 px-4">{product.category?.name}</td>
                   <td className="py-4 px-4">${product.price}</td>
                   <td className="py-4 px-4">
-                    <span className={`${
-                      product.stock_count === 0 ? 'text-red-500' :
-                      product.stock_count <= 10 ? 'text-yellow-500' : 'text-green-500'
-                    }`}>
+                    <span
+                      className={`${
+                        product.stock_count === 0
+                          ? "text-red-500"
+                          : product.stock_count <= 10
+                          ? "text-yellow-500"
+                          : "text-green-500"
+                      }`}
+                    >
                       {product.stock_count}
                     </span>
                   </td>
@@ -218,11 +332,15 @@ const AdminProducts = () => {
                     <button
                       onClick={() => toggleProductStatus(product)}
                       className={`flex items-center space-x-1 text-sm ${
-                        product.is_active ? 'text-green-500' : 'text-gray-500'
+                        product.is_active ? "text-green-500" : "text-gray-500"
                       }`}
                     >
-                      {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                      <span>{product.is_active ? 'Active' : 'Inactive'}</span>
+                      {product.is_active ? (
+                        <Eye className="w-4 h-4" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
+                      <span>{product.is_active ? "Active" : "Inactive"}</span>
                     </button>
                   </td>
                   <td className="py-4 px-4">
@@ -266,24 +384,34 @@ const AdminProducts = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-6">
-                {editingProduct ? t('admin.products.editProduct') : t('admin.products.addProduct')}
+                {editingProduct
+                  ? t("admin.products.editProduct")
+                  : t("admin.products.addProduct")}
               </h2>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Title</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Title
+                    </label>
                     <input
-                      {...register('title', { required: 'Title is required' })}
+                      {...register("title", { required: "Title is required" })}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     />
-                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                    {errors.title && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.title.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Type</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Type
+                    </label>
                     <select
-                      {...register('type', { required: 'Type is required' })}
+                      {...register("type", { required: "Type is required" })}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     >
                       <option value="">Select type</option>
@@ -292,65 +420,149 @@ const AdminProducts = () => {
                       <option value="subscription">Subscription</option>
                       <option value="uc_topup">UC Top-up</option>
                     </select>
-                    {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>}
+                    {errors.type && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.type.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Category</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Category
+                    </label>
                     <select
-                      {...register('category_id', { required: 'Category is required' })}
+                      {...register("category_id", {
+                        required: "Category is required",
+                      })}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     >
                       <option value="">Select category</option>
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
                       ))}
                     </select>
-                    {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id.message}</p>}
+                    {errors.category_id && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.category_id.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Price</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Price
+                    </label>
                     <input
                       type="number"
                       step="0.01"
-                      {...register('price', { required: 'Price is required', min: 0 })}
+                      {...register("price", {
+                        required: "Price is required",
+                        min: 0,
+                      })}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     />
-                    {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+                    {errors.price && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.price.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Description
+                  </label>
                   <textarea
-                    {...register('description')}
+                    {...register("description")}
                     rows="3"
                     className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                   />
                 </div>
 
+                {/* New Image Upload Section */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Image URL</label>
-                  <input
-                    {...register('image_url')}
-                    className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
-                  />
+                  <label className="block text-sm font-medium mb-2">
+                    Product Image
+                  </label>
+
+                  {/* Image Preview */}
+                  {imagePreview && (
+                    <div className="mb-4 relative">
+                      <img
+                        src={imagePreview}
+                        alt="Product preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* File Upload */}
+                  <div className="space-y-2">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dark-border border-dashed rounded-lg cursor-pointer bg-dark-bg hover:bg-dark-hover transition-colors">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-400">
+                          <span className="font-semibold">Click to upload</span>{" "}
+                          or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          PNG, JPG, WEBP up to 5MB
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                        onChange={handleImageSelect}
+                      />
+                    </label>
+
+                    {/* Alternative: URL Input */}
+                    <div className="text-center text-sm text-gray-400">OR</div>
+                    <input
+                      {...register("image_url")}
+                      placeholder="Enter image URL"
+                      className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+                      disabled={imageFile !== null}
+                    />
+                  </div>
+
+                  {uploading && (
+                    <div className="mt-2 text-sm text-gray-400 flex items-center">
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      Uploading image...
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Tags (comma separated)</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Tags (comma separated)
+                  </label>
                   <input
-                    {...register('tags')}
+                    {...register("tags")}
                     placeholder="steam, gaming, pc"
                     className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Country Availability (comma separated)</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Country Availability (comma separated)
+                  </label>
                   <input
-                    {...register('country_availability')}
+                    {...register("country_availability")}
                     placeholder="US, CA, UK, EU"
                     className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                   />
@@ -358,9 +570,11 @@ const AdminProducts = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Status</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Status
+                    </label>
                     <select
-                      {...register('is_active')}
+                      {...register("is_active")}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     >
                       <option value="true">Active</option>
@@ -369,9 +583,11 @@ const AdminProducts = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Pre-order</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Pre-order
+                    </label>
                     <select
-                      {...register('is_preorder')}
+                      {...register("is_preorder")}
                       className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
                     >
                       <option value="false">No</option>
@@ -388,8 +604,17 @@ const AdminProducts = () => {
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="neon-button">
-                    {editingProduct ? 'Update' : 'Create'} Product
+                  <button
+                    type="submit"
+                    className="neon-button"
+                    disabled={uploading}
+                  >
+                    {uploading
+                      ? "Uploading..."
+                      : editingProduct
+                      ? "Update"
+                      : "Create"}{" "}
+                    Product
                   </button>
                 </div>
               </form>

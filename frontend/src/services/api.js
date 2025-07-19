@@ -151,6 +151,10 @@ export const adminAPI = {
   getReviews: (params) => api.get("/admin/reviews", { params }),
   getReviewStats: () => api.get("/admin/reviews/stats"),
   deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+  uploadProductImage: (formData) =>
+    api.post("/upload/product-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 };
 
 // Stock endpoints - Fixed paths
