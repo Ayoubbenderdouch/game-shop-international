@@ -143,6 +143,7 @@ const getProduct = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
+        // Get all categories
         const { data: categories, error } = await supabaseAdmin
             .from('categories')
             .select('*')
@@ -152,13 +153,28 @@ const getCategories = async (req, res) => {
             throw error;
         }
 
-        res.json(categories);
+        // Get product counts for each category
+        const categoriesWithCount = await Promise.all(
+            categories.map(async (category) => {
+                const { count } = await supabaseAdmin
+                    .from('products')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('category_id', category.id)
+                    .eq('is_active', true);
+
+                return {
+                    ...category,
+                    products_count: count || 0
+                };
+            })
+        );
+
+        res.json(categoriesWithCount);
     } catch (error) {
         logger.error('Get categories error:', error);
         res.status(500).json({ error: 'Failed to fetch categories' });
     }
 };
-
 const getProductsByCategory = async (req, res) => {
     try {
         const { slug } = req.params;

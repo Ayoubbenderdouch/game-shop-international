@@ -8,6 +8,7 @@ import {
   Users,
   ChevronLeft,
   Star,
+  Tags,
 } from "lucide-react";
 
 const AdminLayout = () => {
@@ -16,7 +17,8 @@ const AdminLayout = () => {
     { to: "/admin/products", icon: Package, label: "Products" },
     { to: "/admin/stock", icon: Layers, label: "Stock" },
     { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
-    { to: "/admin/reviews", icon: Star, label: "Reviews" }, 
+    { to: "/admin/categories", icon: Tags, label: "Categories" },
+    { to: "/admin/reviews", icon: Star, label: "Reviews" },
     { to: "/admin/users", icon: Users, label: "Users" },
   ];
 

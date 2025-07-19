@@ -58,6 +58,17 @@ router.post('/categories',
     adminController.createCategory
 );
 
+router.put('/categories/:id',
+    [
+        body('name').notEmpty().trim(),
+        body('slug').notEmpty().trim().matches(/^[a-z0-9-]+$/)
+    ],
+    validate,
+    adminController.updateCategory
+);
+
+router.delete('/categories/:id', adminController.deleteCategory);
+
 router.get('/reviews', adminController.getReviews);
 router.get('/reviews/stats', adminController.getReviewStats);
 router.delete('/reviews/:id', adminController.deleteReview); 

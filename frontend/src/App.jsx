@@ -25,6 +25,7 @@ import AdminReviews from "./pages/admin/AdminReviews";
 
 // Error Pages
 import NotFoundPage from "./pages/error/NotFoundPage";
+import AdminCategories from "./pages/admin/AdminCategories";
 
 function App() {
   return (
@@ -112,6 +113,7 @@ function App() {
             }
           />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="categories" element={<AdminCategories />} />
         </Route>
 
         {/* 404 Page */}

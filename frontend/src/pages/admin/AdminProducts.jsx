@@ -86,31 +86,39 @@ const AdminProducts = () => {
     }
   };
 
-  const uploadImage = async () => {
-    if (!imageFile) return null;
-
+  const uploadImage = async (imageFile) => {
     setUploading(true);
     const formData = new FormData();
     formData.append("image", imageFile);
 
     try {
+      // Get the current session token
+      const token = JSON.parse(
+        localStorage.getItem("supabase.auth.token")
+      )?.access_token;
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
       const response = await fetch(`${API_URL}/upload/product-image`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`, // Use the session token
         },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to upload image");
+        const errorData = await response.json();
+        console.error("Upload error response:", errorData);
+        throw new Error(errorData.error || "Failed to upload image");
       }
 
       const data = await response.json();
       return data.url;
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload image");
+      toast.error(error.message || "Failed to upload image");
       return null;
     } finally {
       setUploading(false);
@@ -157,7 +165,7 @@ const AdminProducts = () => {
       // Upload image first if selected
       let imageUrl = data.image_url;
       if (imageFile) {
-        const uploadedUrl = await uploadImage();
+        const uploadedUrl = await uploadImage(imageFile); // ADD THE PARAMETER HERE!
         if (uploadedUrl) {
           imageUrl = uploadedUrl;
         } else if (!editingProduct) {

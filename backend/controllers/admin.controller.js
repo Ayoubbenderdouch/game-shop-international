@@ -587,6 +587,74 @@ const deleteReview = async (req, res) => {
 };
 
 
+const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, slug } = req.body;
+
+    const { data: category, error } = await supabaseAdmin
+      .from("categories")
+      .update({ name, slug })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    await logAudit(
+      req.user.id,
+      "CATEGORY_UPDATE",
+      "categories",
+      category.id,
+      { name, slug },
+      req
+    );
+
+    res.json(category);
+  } catch (error) {
+    logger.error("Update category error:", error);
+    res.status(500).json({ error: "Failed to update category" });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if category has products
+    const { count } = await supabaseAdmin
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("category_id", id);
+
+    if (count > 0) {
+      return res.status(400).json({ 
+        error: "Cannot delete category with existing products" 
+      });
+    }
+
+    const { error } = await supabaseAdmin
+      .from("categories")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    await logAudit(req.user.id, "CATEGORY_DELETE", "categories", id, {}, req);
+
+    res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    logger.error("Delete category error:", error);
+    res.status(500).json({ error: "Failed to delete category" });
+  }
+};
+
+
+
 module.exports = {
   getDashboardStats,
   getUsers,
@@ -595,6 +663,8 @@ module.exports = {
   updateProduct,
   deleteProduct,
   createCategory,
+  updateCategory,
+  deleteCategory,
   toggleProductStatus,
   getAuditLogs,
   getReviews,

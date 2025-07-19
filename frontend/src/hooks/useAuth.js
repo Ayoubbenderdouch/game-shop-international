@@ -22,9 +22,7 @@ export const useAuth = () => {
 
   const fetchUserProfile = useCallback(async () => {
     try {
-      console.log("Fetching user profile...");
       const { data } = await authAPI.getProfile();
-      console.log("Profile fetched successfully:", data);
       if (mountedRef.current) {
         setUser(data);
       }
