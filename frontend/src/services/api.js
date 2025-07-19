@@ -11,7 +11,6 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests
 api.interceptors.request.use(async (config) => {
   try {
     const {
@@ -33,7 +32,6 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const message = error.response?.data?.error || "Something went wrong";
 
-    // Only show toast for non-401 errors or specific login failures
     if (
       error.response?.status !== 401 ||
       error.config.url.includes("/auth/login")

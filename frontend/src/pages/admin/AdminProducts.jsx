@@ -83,6 +83,7 @@ const AdminProducts = () => {
         await adminAPI.updateProduct(editingProduct.id, productData);
         toast.success('Product updated successfully');
       } else {
+        console.log('Creating product with data:', productData);
         await adminAPI.createProduct(productData);
         toast.success('Product created successfully');
       }
