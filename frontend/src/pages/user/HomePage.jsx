@@ -21,9 +21,42 @@ const HomePage = () => {
   const { t } = useTranslation();
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Carousel images data
+  const carouselSlides = [
+    {
+      id: 1,
+      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=600&fit=crop",
+      title: "Gaming Gift Cards",
+      subtitle: "Steam, PlayStation, Xbox & More",
+      badge: "BEST SELLERS",
+    },
+    {
+      id: 2,
+      image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=1200&h=600&fit=crop",
+      title: "Streaming Services",
+      subtitle: "Netflix, Spotify, Disney+ & More",
+      badge: "TRENDING",
+    },
+    {
+      id: 3,
+      image: "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=1200&h=600&fit=crop",
+      title: "Digital Subscriptions",
+      subtitle: "Premium Services at Best Prices",
+      badge: "HOT DEALS",
+    },
+  ];
 
   useEffect(() => {
     fetchFeaturedProducts();
+    
+    // Auto-slide carousel
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchFeaturedProducts = async () => {
@@ -37,169 +70,252 @@ const HomePage = () => {
     }
   };
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  };
+
   const categories = [
     {
       icon: Gamepad2,
       name: "Game Cards",
       slug: "game-cards",
-      color: "from-purple-500 to-pink-500",
+      color: "from-[#49baee] to-[#38a8dc]",
+      description: "Top gaming platforms",
     },
     {
       icon: CreditCard,
       name: "Gift Cards",
       slug: "gift-cards",
-      color: "from-blue-500 to-cyan-500",
+      color: "from-[#5cc5f5] to-[#49baee]",
+      description: "Popular retailers",
     },
     {
       icon: Tv,
       name: "Subscriptions",
       slug: "subscriptions",
-      color: "from-green-500 to-emerald-500",
+      color: "from-[#38a8dc] to-[#2d8cb8]",
+      description: "Streaming & services",
     },
     {
       icon: Gift,
       name: "Game Top-Ups",
       slug: "game-topups",
-      color: "from-orange-500 to-red-500",
+      color: "from-[#49baee] to-[#38a8dc]",
+      description: "In-game currencies",
+    },
+  ];
+
+  const features = [
+    {
+      icon: Zap,
+      title: "Instant Delivery",
+      description: "Get your codes in seconds",
+    },
+    {
+      icon: Star,
+      title: "Trusted Service",
+      description: "5-star rated platform",
+    },
+    {
+      icon: Trophy,
+      title: "Best Prices",
+      description: "Competitive rates always",
+    },
+    {
+      icon: Gift,
+      title: "Wide Selection",
+      description: "1000+ products available",
     },
   ];
 
   return (
-    <div className="space-y-16">
-      {/* Enhanced Hero Section */}
+    <div className="space-y-24 -mt-8">
+      {/* Hero Section with Carousel */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="relative overflow-hidden rounded-2xl"
+        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/20 to-neon-blue/20" />
-
-        {/* Animated Background Grid */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIyMiIgb3BhY2l0eT0iMC4yIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20 animate-pulse" />
+        {/* Dynamic Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(73,186,238,0.1),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(73,186,238,0.05),transparent_50%)]" />
         </div>
 
-        <div className="relative z-10 text-center py-24 px-4">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink"
-          >
-            <Zap className="w-10 h-10 text-white" />
-          </motion.div>
-
-          <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <span className="glow-text bg-gradient-to-r from-black via-neon-purple to-neon-pink bg-clip-text text-transparent">
-              RELOAD X
-            </span>
-          </motion.h1>
-
-          <motion.p
-            className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            {t("home.hero.subtitle")}
-          </motion.p>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Link
-              to="/shop"
-              className="neon-button inline-flex items-center space-x-2 group"
+        {/* Carousel Container */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4">
+          <div className="relative h-[600px] flex items-center justify-center">
+            {/* Carousel Images */}
+            {carouselSlides.map((slide, index) => {
+              const isActive = index === currentSlide;
+              const isPrev = index === (currentSlide - 1 + carouselSlides.length) % carouselSlides.length;
+              const isNext = index === (currentSlide + 1) % carouselSlides.length;
+              
+              return (
+                <motion.div
+                  key={slide.id}
+                  animate={{
+                    x: isActive ? 0 : isPrev ? "-85%" : isNext ? "85%" : 0,
+                    scale: isActive ? 1 : 0.8,
+                    opacity: isActive ? 1 : isPrev || isNext ? 0.5 : 0,
+                    zIndex: isActive ? 10 : 5,
+                  }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute w-[90%] h-full cursor-pointer"
+                  onClick={() => {
+                    if (isPrev) prevSlide();
+                    if (isNext) nextSlide();
+                  }}
+                >
+                  <div className="relative w-full h-full rounded-3xl overflow-hidden group">
+                    {/* Image */}
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-12">
+                      <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: isActive ? 1 : 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <span className="inline-block px-4 py-2 bg-[#49baee] text-slate-950 font-bold rounded-lg text-sm mb-4">
+                          {slide.badge}
+                        </span>
+                        <h2 className="text-5xl font-black text-white mb-2">
+                          {slide.title}
+                        </h2>
+                        <p className="text-xl text-slate-300 mb-6">
+                          {slide.subtitle}
+                        </p>
+                        {isActive && (
+                          <Link
+                            to="/shop"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-[#49baee] text-slate-950 font-bold rounded-xl hover:bg-[#5cc5f5] hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] transition-all duration-300"
+                          >
+                            Explore Collection
+                            <ArrowRight className="w-5 h-5" />
+                          </Link>
+                        )}
+                      </motion.div>
+                    </div>
+                    
+                    {/* Hover Effect */}
+                    {isActive && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#49baee]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+            
+            {/* Navigation Arrows */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 z-20 p-3 bg-slate-900/80 backdrop-blur-sm rounded-full text-white hover:bg-slate-800 transition-colors group"
             >
-              <span>{t("home.hero.cta")}</span>
-              <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              to="/shop?sort=popular"
-              className="px-6 py-3 border-2 border-neon-purple rounded-lg hover:bg-neon-purple/10 transition-all inline-flex items-center space-x-2"
+              <ArrowRight className="w-6 h-6 rotate-180 group-hover:-translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 z-20 p-3 bg-slate-900/80 backdrop-blur-sm rounded-full text-white hover:bg-slate-800 transition-colors group"
             >
-              <Trophy className="w-5 h-5" />
-              <span>Best Sellers</span>
-            </Link>
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </button>
+            
+            {/* Dots Indicator */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {carouselSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentSlide
+                      ? "w-8 bg-[#49baee]"
+                      : "bg-slate-600 hover:bg-slate-500"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mt-12 flex flex-wrap items-center justify-center gap-8 text-slate-400"
+          >
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <feature.icon className="w-5 h-5 text-[#49baee]" />
+                <span className="text-sm font-medium">{feature.title}</span>
+              </div>
+            ))}
           </motion.div>
         </div>
+      </motion.section>
 
-        {/* Floating Gaming Icons Animation */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[Gamepad2, Gift, Star, Sparkles].map((Icon, i) => (
+      {/* Stats Section - Redesigned */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="relative"
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { number: "50K+", label: "Happy Customers", icon: Star },
+            { number: "100+", label: "Digital Products", icon: Gift },
+            { number: "24/7", label: "Instant Delivery", icon: Zap },
+            { number: "30+", label: "Countries Served", icon: Trophy },
+          ].map((stat, index) => (
             <motion.div
-              key={i}
-              className="absolute"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: window.innerHeight + 100,
-                rotate: 0,
-              }}
-              animate={{
-                y: -100,
-                rotate: 360,
-              }}
-              transition={{
-                duration: 15 + i * 5,
-                repeat: Infinity,
-                delay: i * 3,
-                ease: "linear",
-              }}
+              key={index}
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 text-center hover:border-[#49baee]/30 transition-all duration-300 group"
             >
-              <Icon className="w-8 h-8 text-neon-purple/30" />
+              <stat.icon className="w-8 h-8 mx-auto mb-4 text-[#49baee] group-hover:scale-110 transition-transform" />
+              <h3 className="text-3xl font-black text-[#49baee] mb-2">
+                {stat.number}
+              </h3>
+              <p className="text-slate-500 text-sm">{stat.label}</p>
             </motion.div>
           ))}
         </div>
       </motion.section>
 
-      {/* Stats Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-6"
-      >
-        {[
-          { number: "50K+", label: "Happy Gamers" },
-          { number: "100+", label: "Game Titles" },
-          { number: "24/7", label: "Instant Delivery" },
-          { number: "30+", label: "Countries" },
-        ].map((stat, index) => (
-          <motion.div
-            key={index}
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            className="neon-card text-center p-6"
-          >
-            <h3 className="text-3xl font-bold text-neon-purple mb-2">
-              {stat.number}
-            </h3>
-            <p className="text-gray-400">{stat.label}</p>
-          </motion.div>
-        ))}
-      </motion.section>
-
-      {/* Enhanced Categories */}
+      {/* Categories Section - Redesigned */}
       <section>
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl font-bold mb-8 text-center glow-text"
+          className="text-center mb-12"
         >
-          {t("home.featured")}
-        </motion.h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#49baee] to-[#7dd3fc]">
+              Shop by Category
+            </span>
+          </h2>
+          <p className="text-slate-400 text-lg">Choose from our wide selection of digital products</p>
+        </motion.div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {categories.map((category, index) => (
             <motion.div
@@ -211,25 +327,15 @@ const HomePage = () => {
             >
               <Link to={`/shop?category=${category.slug}`}>
                 <motion.div
-                  className="neon-card text-center p-6 cursor-pointer group relative overflow-hidden"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="category-card group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div
-                    className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                    style={{
-                      backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`,
-                    }}
-                  />
-
-                  <motion.div
-                    className={`w-16 h-16 mx-auto mb-4 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center transform transition-all group-hover:rotate-12 group-hover:scale-110`}
-                  >
-                    <category.icon className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <h3 className="font-semibold group-hover:text-neon-purple transition-colors">
-                    {category.name}
-                  </h3>
+                  <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${category.color} p-4 shadow-lg group-hover:shadow-[0_0_30px_rgba(73,186,238,0.3)] transition-all duration-300`}>
+                    <category.icon className="w-full h-full text-slate-950" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 text-white">{category.name}</h3>
+                  <p className="text-slate-500 text-sm">{category.description}</p>
                 </motion.div>
               </Link>
             </motion.div>
@@ -237,16 +343,16 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Products with Enhanced Design */}
+      {/* Featured Products - Redesigned */}
       <section>
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-12">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-3xl font-bold glow-text"
+            className="text-4xl md:text-5xl font-black"
           >
-            🔥 Hot Deals
+            <span className="text-[#49baee]">🔥</span> Hot Deals
           </motion.h2>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -255,16 +361,18 @@ const HomePage = () => {
           >
             <Link
               to="/shop"
-              className="text-neon-purple hover:text-neon-pink transition-colors flex items-center space-x-1 group"
+              className="text-[#49baee] hover:text-[#5cc5f5] transition-colors flex items-center gap-2 group font-semibold"
             >
-              <span>View All</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+              View All Products
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>
 
         {loading ? (
-          <LoadingSpinner size="lg" />
+          <div className="flex justify-center py-12">
+            <LoadingSpinner size="lg" />
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product, index) => (
@@ -282,25 +390,38 @@ const HomePage = () => {
         )}
       </section>
 
-      {/* Call to Action Section */}
+      {/* CTA Section - New Design */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="neon-card text-center py-12 relative overflow-hidden"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-900 border border-slate-800 p-12"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/10 to-neon-pink/10 animate-pulse" />
-        <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-4">Ready to Level Up?</h2>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-            Join thousands of gamers who trust Reload X for their gaming needs.
-            Instant delivery, secure payments, and 24/7 support.
-          </p>
-          <Link
-            to="/register"
-            className="neon-button inline-flex items-center space-x-2"
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(73,186,238,0.1),transparent_70%)]" />
+        
+        <div className="relative z-10 text-center max-w-3xl mx-auto">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#49baee]/20 mb-6"
           >
-            <span>Get Started Now</span>
+            <Sparkles className="w-8 h-8 text-[#49baee]" />
+          </motion.div>
+          
+          <h2 className="text-4xl font-black mb-4">
+            Ready to <span className="text-[#49baee]">Level Up</span>?
+          </h2>
+          <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+            Join thousands of gamers who trust Reload X for their digital needs. 
+            Instant delivery, secure payments, and 24/7 customer support.
+          </p>
+          
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-xl hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] hover:scale-105 transition-all duration-300"
+          >
+            Get Started Now
             <Sparkles className="w-5 h-5" />
           </Link>
         </div>

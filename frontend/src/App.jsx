@@ -39,14 +39,14 @@ function App() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: "#1a1a2e",
+            background: "#0f172a",
             color: "#fff",
-            border: "1px solid #2a2a4a",
+            border: "1px solid #1e293b",
           },
           success: {
             iconTheme: {
-              primary: "#9333ea",
-              secondary: "#fff",
+              primary: "#49baee",
+              secondary: "#020617",
             },
           },
           error: {

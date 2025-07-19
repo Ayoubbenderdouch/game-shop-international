@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Search, User, Globe, Calendar, ShoppingBag, Star } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { adminAPI } from '../../services/api';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Search, User, Globe, Calendar, ShoppingBag, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { adminAPI } from "../../services/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const AdminUsers = () => {
   const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -34,7 +34,7 @@ const AdminUsers = () => {
       setUsers(data.users);
       setPagination(data.pagination);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ const AdminUsers = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchUsers();
   };
 
@@ -98,7 +98,9 @@ const AdminUsers = () => {
                 </div>
                 <div>
                   <p className="font-semibold">{user.email}</p>
-                  <p className="text-sm text-gray-400">ID: {user.id.slice(0, 8)}</p>
+                  <p className="text-sm text-gray-400">
+                    ID: {user.id.slice(0, 8)}
+                  </p>
                 </div>
               </div>
               {user.is_admin && (
@@ -111,7 +113,7 @@ const AdminUsers = () => {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="flex items-center space-x-2 text-sm">
                 <Globe className="w-4 h-4 text-gray-400" />
-                <span>{user.country || 'Unknown'}</span>
+                <span>{user.country || "Unknown"}</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
                 <Calendar className="w-4 h-4 text-gray-400" />
@@ -123,17 +125,23 @@ const AdminUsers = () => {
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-dark-bg rounded-lg p-3 text-center">
                 <ShoppingBag className="w-5 h-5 mx-auto mb-1 text-neon-blue" />
-                <p className="text-lg font-semibold">{getUserStats(user).orders}</p>
+                <p className="text-lg font-semibold">
+                  {getUserStats(user).orders}
+                </p>
                 <p className="text-xs text-gray-400">Orders</p>
               </div>
               <div className="bg-dark-bg rounded-lg p-3 text-center">
                 <Star className="w-5 h-5 mx-auto mb-1 text-yellow-500" />
-                <p className="text-lg font-semibold">{getUserStats(user).reviews}</p>
+                <p className="text-lg font-semibold">
+                  {getUserStats(user).reviews}
+                </p>
                 <p className="text-xs text-gray-400">Reviews</p>
               </div>
               <div className="bg-dark-bg rounded-lg p-3 text-center">
                 <span className="text-xs text-green-500">$</span>
-                <p className="text-lg font-semibold">{getUserStats(user).spent}</p>
+                <p className="text-lg font-semibold">
+                  {getUserStats(user).spent}
+                </p>
                 <p className="text-xs text-gray-400">Spent</p>
               </div>
             </div>
@@ -145,19 +153,29 @@ const AdminUsers = () => {
       {pagination.totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-2">
           <button
-            onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+            onClick={() =>
+              setPagination((prev) => ({
+                ...prev,
+                page: Math.max(1, prev.page - 1),
+              }))
+            }
             disabled={pagination.page === 1}
             className="px-4 py-2 border border-dark-border rounded-lg hover:bg-dark-hover disabled:opacity-50"
           >
             Previous
           </button>
-          
+
           <span className="px-4 py-2">
             Page {pagination.page} of {pagination.totalPages}
           </span>
-          
+
           <button
-            onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.totalPages, prev.page + 1) }))}
+            onClick={() =>
+              setPagination((prev) => ({
+                ...prev,
+                page: Math.min(prev.totalPages, prev.page + 1),
+              }))
+            }
             disabled={pagination.page === pagination.totalPages}
             className="px-4 py-2 border border-dark-border rounded-lg hover:bg-dark-hover disabled:opacity-50"
           >
@@ -179,11 +197,11 @@ const AdminUsers = () => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-dark-card rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-dark-card rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-gray-700"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-bold mb-6">User Details</h2>
-            
+
             <div className="space-y-6">
               {/* User Info */}
               <div className="grid grid-cols-2 gap-4">
@@ -197,19 +215,27 @@ const AdminUsers = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Country</p>
-                  <p className="font-medium">{selectedUser.country || 'Unknown'}</p>
+                  <p className="font-medium">
+                    {selectedUser.country || "Unknown"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Role</p>
-                  <p className="font-medium">{selectedUser.is_admin ? 'Admin' : 'Customer'}</p>
+                  <p className="font-medium">
+                    {selectedUser.is_admin ? "Admin" : "Customer"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Joined</p>
-                  <p className="font-medium">{new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                  <p className="font-medium">
+                    {new Date(selectedUser.created_at).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Last Updated</p>
-                  <p className="font-medium">{new Date(selectedUser.updated_at).toLocaleDateString()}</p>
+                  <p className="font-medium">
+                    {new Date(selectedUser.updated_at).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
 
@@ -219,12 +245,16 @@ const AdminUsers = () => {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-dark-bg rounded-lg p-4 text-center">
                     <ShoppingBag className="w-8 h-8 mx-auto mb-2 text-neon-blue" />
-                    <p className="text-2xl font-bold">{getUserStats(selectedUser).orders}</p>
+                    <p className="text-2xl font-bold">
+                      {getUserStats(selectedUser).orders}
+                    </p>
                     <p className="text-sm text-gray-400">Total Orders</p>
                   </div>
                   <div className="bg-dark-bg rounded-lg p-4 text-center">
                     <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
-                    <p className="text-2xl font-bold">{getUserStats(selectedUser).reviews}</p>
+                    <p className="text-2xl font-bold">
+                      {getUserStats(selectedUser).reviews}
+                    </p>
                     <p className="text-sm text-gray-400">Reviews Written</p>
                   </div>
                   <div className="bg-dark-bg rounded-lg p-4 text-center">

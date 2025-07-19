@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Search, X } from "lucide-react";
+import { Filter, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { productAPI } from "../../services/api";
@@ -40,9 +40,7 @@ const ShopPage = () => {
 
   const fetchCategories = async () => {
     try {
-      console.log("Fetching categories...");
       const { data } = await productAPI.getCategories();
-      console.log("Fetched categories:", data);
       setCategories(data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -59,7 +57,6 @@ const ShopPage = () => {
       };
 
       const { data } = await productAPI.getAll(params);
-      console.log("Fetched products:", data);
       setProducts(data.products);
       setPagination(data.pagination);
     } catch (error) {
@@ -96,30 +93,30 @@ const ShopPage = () => {
     <div className="space-y-6">
       {/* Search */}
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-2 text-slate-300">
           {t("common.search")}
         </label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+            className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300"
           />
         </div>
       </div>
 
       {/* Categories */}
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-2 text-slate-300">
           {t("shop.filters.category")}
         </label>
         <select
           value={filters.category}
           onChange={(e) => updateFilter("category", e.target.value)}
-          className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300"
         >
           <option value="">{t("shop.filters.all")}</option>
           {categories.map((cat) => (
@@ -132,36 +129,36 @@ const ShopPage = () => {
 
       {/* Price Range */}
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-2 text-slate-300">
           {t("shop.filters.priceRange")}
         </label>
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           <input
             type="number"
             value={filters.minPrice}
             onChange={(e) => updateFilter("minPrice", e.target.value)}
             placeholder="Min"
-            className="w-1/2 px-3 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+            className="w-1/2 px-3 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300"
           />
           <input
             type="number"
             value={filters.maxPrice}
             onChange={(e) => updateFilter("maxPrice", e.target.value)}
             placeholder="Max"
-            className="w-1/2 px-3 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+            className="w-1/2 px-3 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300"
           />
         </div>
       </div>
 
       {/* Sort */}
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-2 text-slate-300">
           {t("common.sort")}
         </label>
         <select
           value={filters.sort}
           onChange={(e) => updateFilter("sort", e.target.value)}
-          className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-neon-purple focus:outline-none"
+          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300"
         >
           <option value="latest">{t("shop.sort.latest")}</option>
           <option value="priceLow">{t("shop.sort.priceLow")}</option>
@@ -173,7 +170,7 @@ const ShopPage = () => {
       {/* Clear Filters */}
       <button
         onClick={clearFilters}
-        className="w-full py-2 border border-neon-purple text-neon-purple rounded-lg hover:bg-neon-purple hover:text-white transition-colors"
+        className="w-full py-3 border-2 border-[#49baee]/30 text-[#49baee] rounded-xl hover:bg-[#49baee] hover:text-slate-950 hover:border-[#49baee] font-semibold transition-all duration-300"
       >
         Clear Filters
       </button>
@@ -182,69 +179,143 @@ const ShopPage = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8 glow-text">{t("shop.title")}</h1>
+      {/* Page Header */}
+      <div className="mb-12 text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-5xl font-black mb-4"
+        >
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#49baee] to-[#7dd3fc]">
+            {t("shop.title")}
+          </span>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-slate-400 text-lg"
+        >
+          Browse our collection of digital products
+        </motion.p>
+      </div>
 
       <div className="flex gap-8">
         {/* Desktop Filters */}
-        <aside className="hidden lg:block w-64 flex-shrink-0">
-          <div className="neon-card sticky top-24">
-            <h2 className="text-lg font-semibold mb-4 flex items-center">
-              <Filter className="w-5 h-5 mr-2" />
+        <motion.aside
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="hidden lg:block w-80 flex-shrink-0"
+        >
+          <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-6 sticky top-24">
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2 text-[#49baee]">
+              <Filter className="w-5 h-5" />
               Filters
             </h2>
             <FilterSection />
           </div>
-        </aside>
+        </motion.aside>
 
         {/* Main Content */}
         <div className="flex-1">
           {/* Mobile Filter Button */}
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="lg:hidden mb-4 neon-button flex items-center space-x-2"
+            className="lg:hidden mb-6 px-6 py-3 bg-[#49baee] text-slate-950 font-bold rounded-xl hover:bg-[#5cc5f5] transition-all duration-300 flex items-center gap-2"
           >
-            <Filter className="w-4 h-4" />
+            <Filter className="w-5 h-5" />
             <span>Filters</span>
           </button>
 
           {/* Products Grid */}
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center py-20">
               <LoadingSpinner size="lg" />
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400">No products found</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <p className="text-slate-400 text-lg">No products found</p>
+              <button
+                onClick={clearFilters}
+                className="mt-4 text-[#49baee] hover:text-[#5cc5f5] transition-colors"
+              >
+                Clear filters and try again
+              </button>
+            </motion.div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {products.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex justify-center mt-8 space-x-2">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex justify-center items-center mt-12 gap-2"
+                >
+                  <button
+                    onClick={() =>
+                      setPagination((prev) => ({
+                        ...prev,
+                        page: Math.max(1, prev.page - 1),
+                      }))
+                    }
+                    disabled={pagination.page === 1}
+                    className="p-2 rounded-lg bg-slate-900/50 border border-slate-800 text-slate-400 hover:text-[#49baee] hover:border-[#49baee]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
                   {[...Array(pagination.totalPages)].map((_, i) => (
                     <motion.button
                       key={i}
                       onClick={() =>
                         setPagination((prev) => ({ ...prev, page: i + 1 }))
                       }
-                      className={`px-4 py-2 rounded-lg ${
-                        pagination.page === i + 1
-                          ? "bg-neon-purple text-white"
-                          : "bg-dark-card hover:bg-dark-hover"
-                      }`}
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
+                      className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
+                        pagination.page === i + 1
+                          ? "bg-[#49baee] text-slate-950 shadow-[0_0_20px_rgba(73,186,238,0.4)]"
+                          : "bg-slate-900/50 border border-slate-800 text-slate-400 hover:text-[#49baee] hover:border-[#49baee]/50"
+                      }`}
                     >
                       {i + 1}
                     </motion.button>
                   ))}
-                </div>
+
+                  <button
+                    onClick={() =>
+                      setPagination((prev) => ({
+                        ...prev,
+                        page: Math.min(pagination.totalPages, prev.page + 1),
+                      }))
+                    }
+                    disabled={pagination.page === pagination.totalPages}
+                    className="p-2 rounded-lg bg-slate-900/50 border border-slate-800 text-slate-400 hover:text-[#49baee] hover:border-[#49baee]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </motion.div>
               )}
             </>
           )}
@@ -254,30 +325,38 @@ const ShopPage = () => {
       {/* Mobile Filters Modal */}
       <AnimatePresence>
         {mobileFiltersOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 lg:hidden"
-            onClick={() => setMobileFiltersOpen(false)}
-          >
+          <>
             <motion.div
-              initial={{ x: "-100%" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              onClick={() => setMobileFiltersOpen(false)}
+            />
+            <motion.div
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween" }}
-              className="absolute left-0 top-0 h-full w-80 bg-dark-card p-6 overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 20 }}
+              className="fixed right-0 top-0 h-full w-80 bg-slate-900 border-l border-slate-800 z-50 lg:hidden overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">Filters</h2>
-                <button onClick={() => setMobileFiltersOpen(false)}>
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold flex items-center gap-2 text-[#49baee]">
+                    <Filter className="w-5 h-5" />
+                    Filters
+                  </h2>
+                  <button
+                    onClick={() => setMobileFiltersOpen(false)}
+                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <FilterSection />
               </div>
-              <FilterSection />
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

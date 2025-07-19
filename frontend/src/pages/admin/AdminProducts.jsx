@@ -262,7 +262,7 @@ const AdminProducts = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-dark-card rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white"
+              className="bg-dark-card rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-black"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-6">

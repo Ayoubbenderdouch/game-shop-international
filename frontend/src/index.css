@@ -1,8 +1,154 @@
 @import "tailwindcss";
 
-/* Add to your existing styles */
+/* Dark Theme Base Styles */
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased;
+    background-image: 
+      radial-gradient(at 40% 20%, rgb(73, 186, 238, 0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgb(73, 186, 238, 0.02) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgb(73, 186, 238, 0.02) 0px, transparent 50%);
+  }
+}
 
-/* 3D Card Flip Styles */
+/* Component Styles */
+@layer components {
+  /* Enhanced Card Styles */
+  .neon-card {
+    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-6 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(73,186,238,0.1)];
+  }
+
+  /* Enhanced Button Styles */
+  .neon-button {
+    @apply relative px-8 py-3 bg-[#49baee] text-slate-950 font-bold rounded-xl transition-all duration-300 hover:bg-[#5cc5f5] hover:shadow-[0_0_25px_rgba(73,186,238,0.5)] active:scale-95 overflow-hidden;
+  }
+
+  .neon-button::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full transition-transform duration-700;
+  }
+
+  .neon-button:hover::before {
+    @apply translate-x-full;
+  }
+
+  /* Secondary Button Style */
+  .secondary-button {
+    @apply px-6 py-3 border-2 border-slate-700 rounded-xl font-semibold transition-all duration-300 hover:border-[#49baee] hover:text-[#49baee] hover:shadow-[0_0_15px_rgba(73,186,238,0.3)];
+  }
+
+  /* Glow Text Effect */
+  .glow-text {
+    @apply font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#49baee] to-[#7dd3fc] drop-shadow-[0_0_35px_rgba(73,186,238,0.5)];
+  }
+
+  /* Category Card */
+  .category-card {
+    @apply bg-slate-900/70 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-cyan-500/50 hover:bg-slate-900/90 hover:shadow-[0_0_30px_rgba(73,186,238,0.2)] hover:-translate-y-1;
+  }
+
+  /* Product Card */
+  .product-card {
+    @apply bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_0_25px_rgba(73,186,238,0.15)] hover:-translate-y-1;
+  }
+
+  /* Input Styles */
+  .neon-input {
+    @apply w-full px-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl focus:border-[#49baee] focus:outline-none focus:ring-2 focus:ring-[#49baee]/20 transition-all duration-300;
+  }
+
+  /* Badge Styles */
+  .badge-cyan {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+  }
+}
+
+/* Utility Styles */
+@layer utilities {
+  /* Gradient Backgrounds */
+  .gradient-dark {
+    @apply bg-gradient-to-b from-slate-900 to-slate-950;
+  }
+
+  .gradient-cyan {
+    @apply bg-gradient-to-r from-[#49baee] to-[#7dd3fc];
+  }
+
+  /* Text Shadows */
+  .text-shadow-glow {
+    text-shadow: 0 0 20px rgba(73, 186, 238, 0.5);
+  }
+
+  /* Custom Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(73, 186, 238, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(73, 186, 238, 0.4); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(73, 186, 238, 0.1) 50%, transparent 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+  }
+}
+
+/* Enhanced Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full hover:bg-[#49baee]/50 transition-colors;
+}
+
+/* Selection Color */
+::selection {
+  @apply bg-[#49baee]/30 text-[#49baee];
+}
+
+/* Focus Visible */
+*:focus-visible {
+  @apply outline-none ring-2 ring-[#49baee]/50 ring-offset-2 ring-offset-slate-950;
+}
+
+/* Loading Animation */
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.loading-card {
+  @apply bg-slate-900/30 rounded-2xl animate-pulse;
+}
+
+/* 3D Card Flip Styles - Updated */
 .preserve-3d {
   transform-style: preserve-3d;
 }
@@ -11,70 +157,13 @@
   backface-visibility: hidden;
 }
 
-/* Enhanced animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Glitch effect for gaming theme */
-@keyframes glitch {
-  0%, 100% {
-    text-shadow: 
-      0.05em 0 0 rgba(255, 0, 0, 0.75),
-      -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-      0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-  14% {
-    text-shadow: 
-      0.05em 0 0 rgba(255, 0, 0, 0.75),
-      -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-      0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-  15% {
-    text-shadow: 
-      -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-      0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-  49% {
-    text-shadow: 
-      -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-      0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-      -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-  50% {
-    text-shadow: 
-      0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-      0.05em 0 0 rgba(0, 255, 0, 0.75),
-      0 -0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-  99% {
-    text-shadow: 
-      0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-      0.05em 0 0 rgba(0, 255, 0, 0.75),
-      0 -0.05em 0 rgba(0, 0, 255, 0.75);
-  }
-}
-
-.glitch-text:hover {
-  animation: glitch 0.5s infinite;
-}
-
-
-/* RTL Support Styles */
-
-/* Base RTL Direction */
+/* RTL Support Styles - Keeping existing RTL styles */
 [dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
 
-/* Flex Direction Reversals */
+/* Keep all existing RTL styles below... */
 [dir="rtl"] .flex-row {
   flex-direction: row-reverse;
 }
@@ -289,3 +378,397 @@
   right: auto;
 }
 
+[dir="rtl"] .ml-1 {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+[dir="rtl"] .ml-3 {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+[dir="rtl"] .ml-4 {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+[dir="rtl"] .ml-5 {
+  margin-left: 0;
+  margin-right: 1.25rem;
+}
+[dir="rtl"] .ml-6 {
+  margin-left: 0;
+  margin-right: 1.5rem;
+}
+[dir="rtl"] .ml-8 {
+  margin-left: 0;
+  margin-right: 2rem;
+}
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-1 {
+  margin-right: 0;
+  margin-left: 0.25rem;
+}
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+[dir="rtl"] .mr-3 {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+[dir="rtl"] .mr-4 {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+[dir="rtl"] .mr-5 {
+  margin-right: 0;
+  margin-left: 1.25rem;
+}
+[dir="rtl"] .mr-6 {
+  margin-right: 0;
+  margin-left: 1.5rem;
+}
+[dir="rtl"] .mr-8 {
+  margin-right: 0;
+  margin-left: 2rem;
+}
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Padding Utilities */
+[dir="rtl"] .pl-1 {
+  padding-left: 0;
+  padding-right: 0.25rem;
+}
+[dir="rtl"] .pl-2 {
+  padding-left: 0;
+  padding-right: 0.5rem;
+}
+[dir="rtl"] .pl-3 {
+  padding-left: 0;
+  padding-right: 0.75rem;
+}
+[dir="rtl"] .pl-4 {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+[dir="rtl"] .pl-5 {
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+[dir="rtl"] .pl-6 {
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+[dir="rtl"] .pl-8 {
+  padding-left: 0;
+  padding-right: 2rem;
+}
+
+[dir="rtl"] .pr-1 {
+  padding-right: 0;
+  padding-left: 0.25rem;
+}
+[dir="rtl"] .pr-2 {
+  padding-right: 0;
+  padding-left: 0.5rem;
+}
+[dir="rtl"] .pr-3 {
+  padding-right: 0;
+  padding-left: 0.75rem;
+}
+[dir="rtl"] .pr-4 {
+  padding-right: 0;
+  padding-left: 1rem;
+}
+[dir="rtl"] .pr-5 {
+  padding-right: 0;
+  padding-left: 1.25rem;
+}
+[dir="rtl"] .pr-6 {
+  padding-right: 0;
+  padding-left: 1.5rem;
+}
+[dir="rtl"] .pr-8 {
+  padding-right: 0;
+  padding-left: 2rem;
+}
+
+/* Space Utilities (Tailwind space-x) */
+[dir="rtl"] .space-x-1 > * + * {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+[dir="rtl"] .space-x-2 > * + * {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+[dir="rtl"] .space-x-3 > * + * {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+[dir="rtl"] .space-x-4 > * + * {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+[dir="rtl"] .space-x-5 > * + * {
+  margin-left: 0;
+  margin-right: 1.25rem;
+}
+[dir="rtl"] .space-x-6 > * + * {
+  margin-left: 0;
+  margin-right: 1.5rem;
+}
+[dir="rtl"] .space-x-8 > * + * {
+  margin-left: 0;
+  margin-right: 2rem;
+}
+
+/* Position Utilities */
+[dir="rtl"] .left-0 {
+  left: auto;
+  right: 0;
+}
+[dir="rtl"] .right-0 {
+  right: auto;
+  left: 0;
+}
+[dir="rtl"] .left-1 {
+  left: auto;
+  right: 0.25rem;
+}
+[dir="rtl"] .right-1 {
+  right: auto;
+  left: 0.25rem;
+}
+[dir="rtl"] .left-2 {
+  left: auto;
+  right: 0.5rem;
+}
+[dir="rtl"] .right-2 {
+  right: auto;
+  left: 0.5rem;
+}
+[dir="rtl"] .left-4 {
+  left: auto;
+  right: 1rem;
+}
+[dir="rtl"] .right-4 {
+  right: auto;
+  left: 1rem;
+}
+
+/* Text Alignment */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Border Radius */
+[dir="rtl"] .rounded-l {
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+[dir="rtl"] .rounded-r {
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+[dir="rtl"] .rounded-l-md {
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+[dir="rtl"] .rounded-r-md {
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+[dir="rtl"] .rounded-l-lg {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+[dir="rtl"] .rounded-r-lg {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+/* Border Width */
+[dir="rtl"] .border-l {
+  border-left-width: 0;
+  border-right-width: 1px;
+}
+[dir="rtl"] .border-r {
+  border-right-width: 0;
+  border-left-width: 1px;
+}
+[dir="rtl"] .border-l-2 {
+  border-left-width: 0;
+  border-right-width: 2px;
+}
+[dir="rtl"] .border-r-2 {
+  border-right-width: 0;
+  border-left-width: 2px;
+}
+
+/* Transform */
+[dir="rtl"] .rotate-90 {
+  transform: rotate(-90deg);
+}
+[dir="rtl"] .-rotate-90 {
+  transform: rotate(90deg);
+}
+
+/* Icons and Arrows */
+[dir="rtl"] .chevron-right {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .chevron-left {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .arrow-right {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Forms */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] input[type="search"],
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+}
+
+/* Dropdown Menus */
+[dir="rtl"] .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+/* Progress Bars */
+[dir="rtl"] .progress-bar {
+  transform-origin: right;
+}
+
+/* Tooltips */
+[dir="rtl"] .tooltip-left {
+  left: auto;
+  right: 100%;
+}
+
+[dir="rtl"] .tooltip-right {
+  right: auto;
+  left: 100%;
+}
+
+/* Cards and Lists */
+[dir="rtl"] .card-image-left {
+  float: right;
+  margin-left: 1rem;
+  margin-right: 0;
+}
+
+[dir="rtl"] .card-image-right {
+  float: left;
+  margin-right: 1rem;
+  margin-left: 0;
+}
+
+/* Navigation */
+[dir="rtl"] .nav-item {
+  float: right;
+}
+
+[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+  content: "\\";
+}
+
+/* Tables */
+[dir="rtl"] table {
+  text-align: right;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+/* Animations */
+[dir="rtl"] .slide-in-left {
+  animation-name: slideInRight;
+}
+
+[dir="rtl"] .slide-in-right {
+  animation-name: slideInLeft;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Grid Utilities */
+[dir="rtl"] .col-start-1 {
+  grid-column-start: auto;
+  grid-column-end: 1;
+}
+[dir="rtl"] .col-end-1 {
+  grid-column-end: auto;
+  grid-column-start: 1;
+}
+
+/* Float Utilities */
+[dir="rtl"] .float-left {
+  float: right;
+}
+[dir="rtl"] .float-right {
+  float: left;
+}
+
+/* Clear Utilities */
+[dir="rtl"] .clear-left {
+  clear: right;
+}
+[dir="rtl"] .clear-right {
+  clear: left;
+}
+
+/* Arabic Font Improvements */
+[dir="rtl"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    Arial, "Noto Sans Arabic", sans-serif;
+}
+
+/* Ensure proper number display in Arabic */
+[dir="rtl"] .price,
+[dir="rtl"] .quantity,
+[dir="rtl"] .order-number {
+  direction: ltr;
+  display: inline-block;
+}
+
+/* Custom scrollbar for RTL */
+[dir="rtl"] ::-webkit-scrollbar {
+  position: absolute;
+  left: 0;
+  right: auto;
+}
