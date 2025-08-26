@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Shopping Cart')
+@section('title', __('cart.title'))
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+    <h1 class="text-3xl font-bold mb-8">{{ __('cart.title') }}</h1>
 
     @if($cartItems->isEmpty())
         <div class="text-center py-16 bg-gray-800 rounded-lg">
-            <p class="text-xl text-gray-400 mb-4">Your cart is empty</p>
+            <p class="text-xl text-gray-400 mb-4">{{ __('cart.empty') }}</p>
             <a href="/shop" class="neon-button px-6 py-2 rounded inline-block">
-                Continue Shopping
+                {{ __('shop.continue_shopping') }}
             </a>
         </div>
     @else
@@ -24,7 +24,7 @@
                              class="w-20 h-20 object-cover rounded">
                     @else
                         <div class="w-20 h-20 bg-gray-700 rounded flex items-center justify-center">
-                            <span class="text-gray-500 text-xs">No Image</span>
+                            <span class="text-gray-500 text-xs">{{ __('shop.no_image') }}</span>
                         </div>
                     @endif
 
@@ -63,7 +63,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-500 hover:text-red-400 transition">
-                            Remove
+                            {{ __('cart.remove') }}
                         </button>
                     </form>
                 </div>
@@ -72,7 +72,7 @@
 
             <div class="mt-6 pt-6 border-t border-gray-700">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xl font-semibold">Total:</span>
+                    <span class="text-xl font-semibold">{{ __('cart.total') }}:</span>
                     <span class="text-2xl font-bold text-[#49baee]">
                         ${{ number_format($total, 2) }}
                     </span>
@@ -80,10 +80,10 @@
 
                 <div class="flex justify-between">
                     <a href="/shop" class="text-gray-400 hover:text-white transition">
-                        Continue Shopping
+                        {{ __('shop.continue_shopping') }}
                     </a>
                     <a href="/checkout" class="neon-button px-8 py-2 rounded">
-                        Proceed to Checkout
+                        {{ __('cart.proceed_to_checkout') }}
                     </a>
                 </div>
             </div>
@@ -91,3 +91,6 @@
     @endif
 </div>
 @endsection
+
+
+

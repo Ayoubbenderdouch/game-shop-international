@@ -17,6 +17,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop');
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 
+// Locale switch route
+Route::get('/locale/{locale}', function ($locale) {
+    if (in_array($locale, ['en'])) { // Add more locales when available
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('locale.switch');
+
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

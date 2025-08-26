@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Game Shop')</title>
+    <title>@yield('title', __('app.name'))</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -67,6 +67,35 @@
         .mobile-menu {
             transition: max-height 0.3s ease, opacity 0.3s ease;
         }
+
+        /* Language Switcher Styles */
+        .language-dropdown {
+            position: relative;
+        }
+
+        .language-dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(73, 186, 238, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            min-width: 150px;
+            margin-top: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .language-dropdown:hover .language-dropdown-content,
+        .language-dropdown:focus-within .language-dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -82,24 +111,24 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-black bg-gradient-to-r from-[#49baee] to-[#5cc5f5] bg-clip-text text-transparent">
-                        Game Shop
+                        {{ __('app.name') }}
                     </span>
                 </a>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="/" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                        Home
+                        {{ __('nav.home') }}
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
                     <a href="/shop" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                        Shop
+                        {{ __('nav.shop') }}
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
                     <a href="/pubg-uc" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
                         <span class="flex items-center gap-1">
-                            PUBG UC
-                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">HOT</span>
+                            {{ __('nav.pubg_uc') }}
+                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('nav.hot') }}</span>
                         </span>
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
@@ -115,14 +144,14 @@
                         </a>
 
                         <a href="/orders" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                            Orders
+                            {{ __('nav.orders') }}
                             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                         </a>
 
                         @if(auth()->user()->is_admin)
                             <a href="/admin" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
                                 <span class="flex items-center gap-1">
-                                    Admin
+                                    {{ __('nav.admin') }}
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                     </svg>
@@ -134,17 +163,39 @@
                         <form action="/logout" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors duration-300 font-medium">
-                                Logout
+                                {{ __('nav.logout') }}
                             </button>
                         </form>
                     @else
                         <a href="/login" class="px-4 py-2 text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium">
-                            Login
+                            {{ __('nav.login') }}
                         </a>
                         <a href="/register" class="px-6 py-2.5 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-lg hover:shadow-[0_0_20px_rgba(73,186,238,0.4)] transition-all duration-300">
-                            Register
+                            {{ __('nav.register') }}
                         </a>
                     @endauth
+
+                    <!-- Language Switcher -->
+                    <div class="language-dropdown">
+                        <button class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                            </svg>
+                            <span>{{ strtoupper(app()->getLocale()) }}</span>
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                        <div class="language-dropdown-content">
+                            <a href="{{ route('locale.switch', 'en') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
+                                English
+                            </a>
+                            <!-- Add more languages here when available -->
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-500 cursor-not-allowed opacity-50">
+                                More languages coming soon
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -159,41 +210,49 @@
             <div id="mobile-menu" class="mobile-menu md:hidden max-h-0 opacity-0 overflow-hidden">
                 <div class="py-4 space-y-3 border-t border-slate-800">
                     <a href="/" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        Home
+                        {{ __('nav.home') }}
                     </a>
                     <a href="/shop" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        Shop
+                        {{ __('nav.shop') }}
                     </a>
                     <a href="/pubg-uc" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        PUBG UC <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">HOT</span>
+                        {{ __('nav.pubg_uc') }} <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('nav.hot') }}</span>
                     </a>
 
                     @auth
                         <a href="/cart" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            Cart
+                            {{ __('nav.cart') }}
                         </a>
                         <a href="/orders" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            Orders
+                            {{ __('nav.orders') }}
                         </a>
                         @if(auth()->user()->is_admin)
                             <a href="/admin" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                                Admin Panel
+                                {{ __('nav.admin_panel') }}
                             </a>
                         @endif
                         <form action="/logout" method="POST">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                                Logout
+                                {{ __('nav.logout') }}
                             </button>
                         </form>
                     @else
                         <a href="/login" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            Login
+                            {{ __('nav.login') }}
                         </a>
                         <a href="/register" class="block px-4 py-2 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-lg text-center">
-                            Register
+                            {{ __('nav.register') }}
                         </a>
                     @endauth
+
+                    <!-- Mobile Language Switcher -->
+                    <div class="border-t border-slate-800 pt-3">
+                        <p class="px-4 py-2 text-xs text-slate-500 uppercase tracking-wider">Language</p>
+                        <a href="{{ route('locale.switch', 'en') }}" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300 {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
+                            English
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,36 +308,36 @@
                                 <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
                             </svg>
                         </div>
-                        <span class="text-xl font-bold text-white">Game Shop</span>
+                        <span class="text-xl font-bold text-white">{{ __('app.name') }}</span>
                     </div>
-                    <p class="text-slate-400 text-sm">Your trusted source for digital game cards and subscriptions.</p>
+                    <p class="text-slate-400 text-sm">{{ __('footer.company_description') }}</p>
                 </div>
 
                 <!-- Quick Links -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">Quick Links</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('footer.quick_links') }}</h3>
                     <ul class="space-y-2">
-                        <li><a href="/shop" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Shop</a></li>
-                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">PUBG UC</a></li>
-                        <li><a href="/orders" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">My Orders</a></li>
-                        <li><a href="/cart" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Cart</a></li>
+                        <li><a href="/shop" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.shop') }}</a></li>
+                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.pubg_uc') }}</a></li>
+                        <li><a href="/orders" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('footer.my_orders') }}</a></li>
+                        <li><a href="/cart" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.cart') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Categories -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">Categories</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('footer.categories') }}</h3>
                     <ul class="space-y-2">
-                        <li><a href="/shop?category=game-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Game Cards</a></li>
-                        <li><a href="/shop?category=gift-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Gift Cards</a></li>
-                        <li><a href="/shop?category=subscriptions" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Subscriptions</a></li>
-                        <li><a href="/shop?category=game-topups" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">Game Top-Ups</a></li>
+                        <li><a href="/shop?category=game-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.game_cards') }}</a></li>
+                        <li><a href="/shop?category=gift-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.gift_cards') }}</a></li>
+                        <li><a href="/shop?category=subscriptions" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.subscriptions') }}</a></li>
+                        <li><a href="/shop?category=game-topups" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.game_topups') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Contact -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">Connect</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('footer.connect') }}</h3>
                     <div class="flex gap-3">
                         <a href="#" class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-[#49baee] transition-colors group">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-950" fill="currentColor" viewBox="0 0 24 24">
@@ -300,8 +359,8 @@
             </div>
 
             <div class="border-t border-slate-800 pt-8 text-center">
-                <p class="text-slate-500 text-sm">&copy; {{ date('Y') }} Game Shop. All rights reserved.</p>
-                <p class="text-slate-600 text-xs mt-2">Made with <span class="text-[#49baee]">♥</span> for gamers</p>
+                <p class="text-slate-500 text-sm">{{ __('app.copyright', ['year' => date('Y')]) }}</p>
+                <p class="text-slate-600 text-xs mt-2">{!! __('app.tagline') !!}</p>
             </div>
         </div>
     </footer>
@@ -376,3 +435,4 @@
     </script>
 </body>
 </html>
+
