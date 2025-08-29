@@ -3,9 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('app.app.name') }}</title>
+    <title>@yield('title', __('app.app.name'))</title>
+
+    <!-- Dynamic Favicon based on theme -->
+    <link id="favicon-light" rel="icon" href="/storage/logo/r8.png" media="(prefers-color-scheme: light)">
+    <link id="favicon-dark" rel="icon" href="/storage/logo/r7.png" media="(prefers-color-scheme: dark)">
+    <link id="favicon-default" rel="icon" href="/storage/logo/r10.png">
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/storage/logo/r6.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Dynamic favicon switcher
+        function updateFavicon() {
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const favicon = document.getElementById('favicon-default');
+            if (isDark) {
+                favicon.href = '/storage/logo/r7.png'; // Blue for dark theme
+            } else {
+                favicon.href = '/storage/logo/r8.png'; // Gold for light theme
+            }
+        }
+
+        // Listen for theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+        updateFavicon();
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -32,6 +56,15 @@
         }
         .neon-button:hover {
             box-shadow: 0 0 20px rgba(73, 186, 238, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .neon-button-orange {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            transition: all 0.3s;
+        }
+        .neon-button-orange:hover {
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
             transform: translateY(-2px);
         }
 
@@ -103,13 +136,10 @@
     <nav class="navbar-blur border-b border-slate-800 sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <!-- Logo -->
+                <!-- Logo with dynamic image based on theme -->
                 <a href="/" class="flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-[#49baee] to-[#38a8dc] rounded-xl flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(73,186,238,0.5)] transition-all duration-300">
-                        <svg class="w-6 h-6 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-                        </svg>
-                    </div>
+                    <img src="/storage/logo/r5.png" alt="{{ __('app.app.name') }}"
+                         class="h-10 w-auto group-hover:scale-110 transition-transform duration-300">
                     <span class="text-2xl font-black bg-gradient-to-r from-[#49baee] to-[#5cc5f5] bg-clip-text text-transparent">
                         {{ __('app.app.name') }}
                     </span>
@@ -125,13 +155,42 @@
                         {{ __('app.nav.shop') }}
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
-                    <a href="/pubg-uc" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                        <span class="flex items-center gap-1">
-                            {{ __('app.nav.pubg_uc') }}
-                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('app.nav.hot') }}</span>
-                        </span>
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
-                    </a>
+
+                    <!-- Game Top-ups Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium flex items-center gap-1">
+                            <span>{{ __('app.nav.game_topups') }}</span>
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-56 bg-slate-900/95 backdrop-blur-sm border border-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                            <a href="/pubg-uc" class="block px-4 py-3 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 transition-all flex items-center gap-3">
+                                <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium">PUBG UC</div>
+                                    <div class="text-xs text-slate-500">Instant delivery</div>
+                                </div>
+                                <span class="ml-auto px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">HOT</span>
+                            </a>
+                            <a href="/freefire" class="block px-4 py-3 text-slate-300 hover:text-[#ff6b35] hover:bg-slate-800/50 transition-all flex items-center gap-3">
+                                <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium">Free Fire</div>
+                                    <div class="text-xs text-slate-500">Diamonds & cards</div>
+                                </div>
+                                <span class="ml-auto px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-full">NEW</span>
+                            </a>
+                        </div>
+                    </div>
 
                     @auth
                         <a href="/cart" class="relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
@@ -190,8 +249,8 @@
                             <a href="{{ route('locale.switch', 'en') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
                                 English
                             </a>
-                            <a href="{{ route('locale.switch', 'ar') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
-                                Arabic
+                            <a href="{{ route('locale.switch', 'ar') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'ar' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
+                                العربية
                             </a>
                         </div>
                     </div>
@@ -215,7 +274,10 @@
                         {{ __('app.nav.shop') }}
                     </a>
                     <a href="/pubg-uc" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        {{ __('app.nav.pubg_uc') }} <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('app.nav.hot') }}</span>
+                        PUBG UC <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">HOT</span>
+                    </a>
+                    <a href="/freefire" class="block px-4 py-2 text-slate-300 hover:text-[#ff6b35] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
+                        Free Fire <span class="ml-2 px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-full">NEW</span>
                     </a>
 
                     @auth
@@ -251,6 +313,9 @@
                         <a href="{{ route('locale.switch', 'en') }}" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300 {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
                             English
                         </a>
+                        <a href="{{ route('locale.switch', 'ar') }}" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300 {{ app()->getLocale() == 'ar' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
+                            العربية
+                        </a>
                     </div>
                 </div>
             </div>
@@ -259,39 +324,6 @@
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
-        <!-- Success/Error Messages -->
-        @if(session('success'))
-            <div class="glass-card bg-green-500/10 border border-green-500/30 text-green-400 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                    </svg>
-                    {{ session('success') }}
-                </div>
-                <button onclick="this.parentElement.style.display='none'" class="text-green-400 hover:text-green-300">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="glass-card bg-red-500/10 border border-red-500/30 text-red-400 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                    </svg>
-                    {{ session('error') }}
-                </div>
-                <button onclick="this.parentElement.style.display='none'" class="text-red-400 hover:text-red-300">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-        @endif
-
         @yield('content')
     </main>
 
@@ -302,11 +334,8 @@
                 <!-- Company Info -->
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 bg-gradient-to-br from-[#49baee] to-[#38a8dc] rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-                            </svg>
-                        </div>
+                        <img src="/storage/logo/r2.png" alt="{{ __('app.app.name') }}"
+                             class="h-8 w-auto">
                         <span class="text-xl font-bold text-white">{{ __('app.app.name') }}</span>
                     </div>
                     <p class="text-slate-400 text-sm">{{ __('app.footer.company_description') }}</p>
@@ -317,7 +346,8 @@
                     <h3 class="font-bold text-white mb-4">{{ __('app.footer.quick_links') }}</h3>
                     <ul class="space-y-2">
                         <li><a href="/shop" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.shop') }}</a></li>
-                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.pubg_uc') }}</a></li>
+                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">PUBG UC</a></li>
+                        <li><a href="/freefire" class="text-slate-400 hover:text-[#ff6b35] transition-colors text-sm">Free Fire</a></li>
                         <li><a href="/orders" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.footer.my_orders') }}</a></li>
                         <li><a href="/cart" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.cart') }}</a></li>
                     </ul>
@@ -408,30 +438,6 @@
                 })
                 .catch(error => console.log('Cart count not available'));
         }
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Add parallax effect on scroll
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallax = document.querySelector('.hero-section');
-            if (parallax) {
-                parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
     </script>
 </body>
 </html>
-

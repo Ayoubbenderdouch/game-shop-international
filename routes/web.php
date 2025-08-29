@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductAdminController;
 use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\FreeFireController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -60,6 +61,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pubg-uc/charge', [PubgUcController::class, 'charge'])->name('pubg-uc.charge');
     Route::get('/pubg-uc/orders', [PubgUcController::class, 'orders'])->name('pubg-uc.orders');
     Route::get('/pubg-uc/success/{order}', [PubgUcController::class, 'success'])->name('pubg-uc.success');
+
+
+    Route::get('/freefire', [FreeFireController::class, 'index'])->name('freefire.index');
+    Route::post('/freefire/charge', [FreeFireController::class, 'charge'])->name('freefire.charge');
+    Route::get('/freefire/orders', [FreeFireController::class, 'orders'])->name('freefire.orders');
+    Route::get('/freefire/success/{order}', [FreeFireController::class, 'success'])->name('freefire.success');
+    Route::get('/freefire/how-to-redeem', [FreeFireController::class, 'howToRedeem'])->name('freefire.how-to-redeem');
+
 });
 
 // Admin routes
