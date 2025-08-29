@@ -138,12 +138,9 @@
             <div class="flex justify-between items-center py-4">
                 <!-- Logo with dynamic image based on theme -->
                 <a href="/" class="flex items-center gap-2 group">
-                    <img src="/storage/logo/r5.png" alt="{{ __('app.app.name') }}"
-                         class="h-10 w-auto group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-2xl font-black bg-gradient-to-r from-[#49baee] to-[#5cc5f5] bg-clip-text text-transparent">
-                        {{ __('app.app.name') }}
-                    </span>
-                </a>
+                    <img src="{{ asset('storage/logo/r5.png') }}" alt="{{ __('app.app.name') }}"
+                            class="h-10 w-20 group-hover:scale-110 transition-transform duration-300">
+                    </a>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
@@ -335,8 +332,7 @@
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <img src="/storage/logo/r2.png" alt="{{ __('app.app.name') }}"
-                             class="h-8 w-auto">
-                        <span class="text-xl font-bold text-white">{{ __('app.app.name') }}</span>
+                             class="h-40 w-40">
                     </div>
                     <p class="text-slate-400 text-sm">{{ __('app.footer.company_description') }}</p>
                 </div>

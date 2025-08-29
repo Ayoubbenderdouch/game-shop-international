@@ -28,14 +28,18 @@ class LocaleMiddleware
             }
         }
 
-
         if (!$locale) {
             $locale = config('app.locale', 'en');
         }
 
         App::setLocale($locale);
 
+        // Set direction for RTL languages
+        $rtlLocales = ['ar', 'he', 'fa', 'ur'];
+        $direction = in_array($locale, $rtlLocales) ? 'rtl' : 'ltr';
+
         view()->share('currentLocale', $locale);
+        view()->share('direction', $direction);
 
         return $next($request);
     }
