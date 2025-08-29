@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', __('app.name'))</title>
+    <title>{{ __('app.app.name') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,24 +111,24 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-black bg-gradient-to-r from-[#49baee] to-[#5cc5f5] bg-clip-text text-transparent">
-                        {{ __('app.name') }}
+                        {{ __('app.app.name') }}
                     </span>
                 </a>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="/" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                        {{ __('nav.home') }}
+                        {{ __('app.nav.home') }}
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
                     <a href="/shop" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                        {{ __('nav.shop') }}
+                        {{ __('app.nav.shop') }}
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
                     <a href="/pubg-uc" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
                         <span class="flex items-center gap-1">
-                            {{ __('nav.pubg_uc') }}
-                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('nav.hot') }}</span>
+                            {{ __('app.nav.pubg_uc') }}
+                            <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('app.nav.hot') }}</span>
                         </span>
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                     </a>
@@ -144,14 +144,14 @@
                         </a>
 
                         <a href="/orders" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
-                            {{ __('nav.orders') }}
+                            {{ __('app.nav.orders') }}
                             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#49baee] group-hover:w-full transition-all duration-300"></span>
                         </a>
 
                         @if(auth()->user()->is_admin)
                             <a href="/admin" class="nav-link relative text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium group">
                                 <span class="flex items-center gap-1">
-                                    {{ __('nav.admin') }}
+                                    {{ __('app.nav.admin') }}
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                     </svg>
@@ -163,15 +163,15 @@
                         <form action="/logout" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors duration-300 font-medium">
-                                {{ __('nav.logout') }}
+                                {{ __('app.nav.logout') }}
                             </button>
                         </form>
                     @else
                         <a href="/login" class="px-4 py-2 text-slate-300 hover:text-[#49baee] transition-colors duration-300 font-medium">
-                            {{ __('nav.login') }}
+                            {{ __('app.nav.login') }}
                         </a>
                         <a href="/register" class="px-6 py-2.5 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-lg hover:shadow-[0_0_20px_rgba(73,186,238,0.4)] transition-all duration-300">
-                            {{ __('nav.register') }}
+                            {{ __('app.nav.register') }}
                         </a>
                     @endauth
 
@@ -210,39 +210,39 @@
             <div id="mobile-menu" class="mobile-menu md:hidden max-h-0 opacity-0 overflow-hidden">
                 <div class="py-4 space-y-3 border-t border-slate-800">
                     <a href="/" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        {{ __('nav.home') }}
+                        {{ __('app.nav.home') }}
                     </a>
                     <a href="/shop" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        {{ __('nav.shop') }}
+                        {{ __('app.nav.shop') }}
                     </a>
                     <a href="/pubg-uc" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                        {{ __('nav.pubg_uc') }} <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('nav.hot') }}</span>
+                        {{ __('app.nav.pubg_uc') }} <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">{{ __('app.nav.hot') }}</span>
                     </a>
 
                     @auth
                         <a href="/cart" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            {{ __('nav.cart') }}
+                            {{ __('app.nav.cart') }}
                         </a>
                         <a href="/orders" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            {{ __('nav.orders') }}
+                            {{ __('app.nav.orders') }}
                         </a>
                         @if(auth()->user()->is_admin)
                             <a href="/admin" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                                {{ __('nav.admin_panel') }}
+                                {{ __('app.nav.admin_panel') }}
                             </a>
                         @endif
                         <form action="/logout" method="POST">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                                {{ __('nav.logout') }}
+                                {{ __('app.nav.logout') }}
                             </button>
                         </form>
                     @else
                         <a href="/login" class="block px-4 py-2 text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded-lg transition-all duration-300">
-                            {{ __('nav.login') }}
+                            {{ __('app.nav.login') }}
                         </a>
                         <a href="/register" class="block px-4 py-2 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-lg text-center">
-                            {{ __('nav.register') }}
+                            {{ __('app.nav.register') }}
                         </a>
                     @endauth
 
@@ -308,36 +308,36 @@
                                 <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
                             </svg>
                         </div>
-                        <span class="text-xl font-bold text-white">{{ __('app.name') }}</span>
+                        <span class="text-xl font-bold text-white">{{ __('app.app.name') }}</span>
                     </div>
-                    <p class="text-slate-400 text-sm">{{ __('footer.company_description') }}</p>
+                    <p class="text-slate-400 text-sm">{{ __('app.footer.company_description') }}</p>
                 </div>
 
                 <!-- Quick Links -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">{{ __('footer.quick_links') }}</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('app.footer.quick_links') }}</h3>
                     <ul class="space-y-2">
-                        <li><a href="/shop" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.shop') }}</a></li>
-                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.pubg_uc') }}</a></li>
-                        <li><a href="/orders" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('footer.my_orders') }}</a></li>
-                        <li><a href="/cart" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('nav.cart') }}</a></li>
+                        <li><a href="/shop" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.shop') }}</a></li>
+                        <li><a href="/pubg-uc" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.pubg_uc') }}</a></li>
+                        <li><a href="/orders" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.footer.my_orders') }}</a></li>
+                        <li><a href="/cart" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.nav.cart') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Categories -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">{{ __('footer.categories') }}</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('app.footer.categories') }}</h3>
                     <ul class="space-y-2">
-                        <li><a href="/shop?category=game-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.game_cards') }}</a></li>
-                        <li><a href="/shop?category=gift-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.gift_cards') }}</a></li>
-                        <li><a href="/shop?category=subscriptions" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.subscriptions') }}</a></li>
-                        <li><a href="/shop?category=game-topups" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('categories.game_topups') }}</a></li>
+                        <li><a href="/shop?category=game-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.categories.game_cards') }}</a></li>
+                        <li><a href="/shop?category=gift-cards" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.categories.gift_cards') }}</a></li>
+                        <li><a href="/shop?category=subscriptions" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.categories.subscriptions') }}</a></li>
+                        <li><a href="/shop?category=game-topups" class="text-slate-400 hover:text-[#49baee] transition-colors text-sm">{{ __('app.categories.game_topups') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Contact -->
                 <div>
-                    <h3 class="font-bold text-white mb-4">{{ __('footer.connect') }}</h3>
+                    <h3 class="font-bold text-white mb-4">{{ __('app.footer.connect') }}</h3>
                     <div class="flex gap-3">
                         <a href="#" class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center hover:bg-[#49baee] transition-colors group">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-950" fill="currentColor" viewBox="0 0 24 24">
@@ -359,8 +359,8 @@
             </div>
 
             <div class="border-t border-slate-800 pt-8 text-center">
-                <p class="text-slate-500 text-sm">{{ __('app.copyright', ['year' => date('Y')]) }}</p>
-                <p class="text-slate-600 text-xs mt-2">{!! __('app.tagline') !!}</p>
+                <p class="text-slate-500 text-sm">{{ __('app.app.copyright', ['year' => date('Y')]) }}</p>
+                <p class="text-slate-600 text-xs mt-2">{!! __('app.app.tagline') !!}</p>
             </div>
         </div>
     </footer>
