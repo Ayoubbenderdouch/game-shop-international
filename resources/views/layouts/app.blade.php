@@ -190,9 +190,8 @@
                             <a href="{{ route('locale.switch', 'en') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
                                 English
                             </a>
-                            <!-- Add more languages here when available -->
-                            <a href="#" class="block px-4 py-2 text-sm text-slate-500 cursor-not-allowed opacity-50">
-                                More languages coming soon
+                            <a href="{{ route('locale.switch', 'ar') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-[#49baee] hover:bg-slate-800/50 rounded transition-all {{ app()->getLocale() == 'en' ? 'text-[#49baee] bg-slate-800/30' : '' }}">
+                                Arabic
                             </a>
                         </div>
                     </div>

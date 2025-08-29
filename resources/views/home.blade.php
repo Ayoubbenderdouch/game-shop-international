@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Home - Game Shop')
+@section('title', __('app.nav.home') . ' - ' . __('app.app.name'))
 
 @section('content')
 <div class="space-y-24 -mt-8">
@@ -20,17 +20,17 @@
                 <div class="slide-item absolute w-[90%] h-full transition-all duration-500 cursor-pointer" data-slide="0">
                     <div class="relative w-full h-full rounded-3xl overflow-hidden group">
                         <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=600&fit=crop"
-                             alt="Gaming Gift Cards"
+                             alt="{{ __('app.home.hero_title_1') }}"
                              class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-12">
                             <span class="inline-block px-4 py-2 bg-[#49baee] text-slate-950 font-bold rounded-lg text-sm mb-4">
-                                BEST SELLERS
+                                {{ __('app.home.best_sellers') }}
                             </span>
-                            <h2 class="text-5xl font-black text-white mb-2">Gaming Gift Cards</h2>
-                            <p class="text-xl text-slate-300 mb-6">Steam, PlayStation, Xbox & More</p>
+                            <h2 class="text-5xl font-black text-white mb-2">{{ __('app.home.hero_title_1') }}</h2>
+                            <p class="text-xl text-slate-300 mb-6">{{ __('app.home.hero_subtitle_1') }}</p>
                             <a href="/shop" class="slide-cta inline-flex items-center gap-2 px-8 py-4 bg-[#49baee] text-slate-950 font-bold rounded-xl hover:bg-[#5cc5f5] hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] transition-all duration-300">
-                                Explore Collection
+                                {{ __('app.home.explore_collection') }}
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
@@ -43,17 +43,17 @@
                 <div class="slide-item absolute w-[90%] h-full transition-all duration-500 cursor-pointer" data-slide="1">
                     <div class="relative w-full h-full rounded-3xl overflow-hidden group">
                         <img src="https://images.unsplash.com/photo-1556656793-08538906a9f8?w=1200&h=600&fit=crop"
-                             alt="Streaming Services"
+                             alt="{{ __('app.home.hero_title_2') }}"
                              class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-12">
                             <span class="inline-block px-4 py-2 bg-[#49baee] text-slate-950 font-bold rounded-lg text-sm mb-4">
-                                TRENDING
+                                {{ __('app.home.trending') }}
                             </span>
-                            <h2 class="text-5xl font-black text-white mb-2">Streaming Services</h2>
-                            <p class="text-xl text-slate-300 mb-6">Netflix, Spotify, Disney+ & More</p>
+                            <h2 class="text-5xl font-black text-white mb-2">{{ __('app.home.hero_title_2') }}</h2>
+                            <p class="text-xl text-slate-300 mb-6">{{ __('app.home.hero_subtitle_2') }}</p>
                             <a href="/shop" class="slide-cta inline-flex items-center gap-2 px-8 py-4 bg-[#49baee] text-slate-950 font-bold rounded-xl hover:bg-[#5cc5f5] hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] transition-all duration-300">
-                                Explore Collection
+                                {{ __('app.home.explore_collection') }}
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
@@ -66,17 +66,17 @@
                 <div class="slide-item absolute w-[90%] h-full transition-all duration-500 cursor-pointer" data-slide="2">
                     <div class="relative w-full h-full rounded-3xl overflow-hidden group">
                         <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=1200&h=600&fit=crop"
-                             alt="Digital Subscriptions"
+                             alt="{{ __('app.home.hero_title_3') }}"
                              class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-12">
                             <span class="inline-block px-4 py-2 bg-[#49baee] text-slate-950 font-bold rounded-lg text-sm mb-4">
-                                HOT DEALS
+                                {{ __('app.home.hot_deals') }}
                             </span>
-                            <h2 class="text-5xl font-black text-white mb-2">Digital Subscriptions</h2>
-                            <p class="text-xl text-slate-300 mb-6">Premium Services at Best Prices</p>
+                            <h2 class="text-5xl font-black text-white mb-2">{{ __('app.home.hero_title_3') }}</h2>
+                            <p class="text-xl text-slate-300 mb-6">{{ __('app.home.hero_subtitle_3') }}</p>
                             <a href="/shop" class="slide-cta inline-flex items-center gap-2 px-8 py-4 bg-[#49baee] text-slate-950 font-bold rounded-xl hover:bg-[#5cc5f5] hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] transition-all duration-300">
-                                Explore Collection
+                                {{ __('app.home.explore_collection') }}
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                 </svg>
@@ -110,27 +110,27 @@
             <div class="mt-12 flex flex-wrap items-center justify-center gap-8 text-slate-400">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#49baee]" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
                     </svg>
-                    <span class="text-sm font-medium">Instant Delivery</span>
+                    <span class="text-sm font-medium">{{ __('app.home.instant_delivery') }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#49baee]" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                     </svg>
-                    <span class="text-sm font-medium">Trusted Service</span>
+                    <span class="text-sm font-medium">{{ __('app.home.trusted_service') }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#49baee]" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"></path>
                     </svg>
-                    <span class="text-sm font-medium">Best Prices</span>
+                    <span class="text-sm font-medium">{{ __('app.home.best_prices') }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#49baee]" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
                     </svg>
-                    <span class="text-sm font-medium">Wide Selection</span>
+                    <span class="text-sm font-medium">{{ __('app.home.wide_selection') }}</span>
                 </div>
             </div>
         </div>
@@ -144,28 +144,28 @@
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
                 <h3 class="text-3xl font-black text-[#49baee] mb-2">50K+</h3>
-                <p class="text-slate-500 text-sm">Happy Customers</p>
+                <p class="text-slate-500 text-sm">{{ __('app.home.stats.happy_customers') }}</p>
             </div>
             <div class="stats-card bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 text-center hover:border-[#49baee]/30 transition-all duration-300 group">
                 <svg class="w-8 h-8 mx-auto mb-4 text-[#49baee] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
                 </svg>
                 <h3 class="text-3xl font-black text-[#49baee] mb-2">100+</h3>
-                <p class="text-slate-500 text-sm">Digital Products</p>
+                <p class="text-slate-500 text-sm">{{ __('app.home.stats.digital_products') }}</p>
             </div>
             <div class="stats-card bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 text-center hover:border-[#49baee]/30 transition-all duration-300 group">
                 <svg class="w-8 h-8 mx-auto mb-4 text-[#49baee] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
                 </svg>
                 <h3 class="text-3xl font-black text-[#49baee] mb-2">24/7</h3>
-                <p class="text-slate-500 text-sm">Instant Delivery</p>
+                <p class="text-slate-500 text-sm">{{ __('app.home.stats.instant_delivery_247') }}</p>
             </div>
             <div class="stats-card bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 text-center hover:border-[#49baee]/30 transition-all duration-300 group">
                 <svg class="w-8 h-8 mx-auto mb-4 text-[#49baee] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"></path>
                 </svg>
                 <h3 class="text-3xl font-black text-[#49baee] mb-2">30+</h3>
-                <p class="text-slate-500 text-sm">Countries Served</p>
+                <p class="text-slate-500 text-sm">{{ __('app.home.stats.countries_served') }}</p>
             </div>
         </div>
     </section>
@@ -175,10 +175,10 @@
         <div class="text-center mb-12">
             <h2 class="text-4xl md:text-5xl font-black mb-4">
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#49baee] to-[#7dd3fc]">
-                    Shop by Category
+                    {{ __('app.home.shop_by_category') }}
                 </span>
             </h2>
-            <p class="text-slate-400 text-lg">Choose from our wide selection of digital products</p>
+            <p class="text-slate-400 text-lg">{{ __('app.shop.title') }}</p>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -207,7 +207,7 @@
                         @endif
                     </div>
                     <h3 class="font-bold text-lg mb-2 text-white">{{ $category->name }}</h3>
-                    <p class="text-slate-500 text-sm">Browse our collection</p>
+                    <p class="text-slate-500 text-sm">{{ __('app.home.browse_collection') }}</p>
                 </div>
             </a>
             @endforeach
@@ -220,8 +220,8 @@
                             <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
                         </svg>
                     </div>
-                    <h3 class="font-bold text-lg mb-2 text-yellow-400">PUBG UC Top-Up</h3>
-                    <p class="text-yellow-300/70 text-sm">Instant UC delivery</p>
+                    <h3 class="font-bold text-lg mb-2 text-yellow-400">{{ __('app.categories.pubg_uc_topup') }}</h3>
+                    <p class="text-yellow-300/70 text-sm">{{ __('app.categories.instant_uc_delivery') }}</p>
                 </div>
             </a>
         </div>
@@ -231,10 +231,10 @@
     <section>
         <div class="flex items-center justify-between mb-12">
             <h2 class="text-4xl md:text-5xl font-black">
-                <span class="text-[#49baee]">🔥</span> Hot Deals
+                <span class="text-[#49baee]">🔥</span> {{ __('app.home.hot_deals') }}
             </h2>
             <a href="/shop" class="text-[#49baee] hover:text-[#5cc5f5] transition-colors flex items-center gap-2 group font-semibold">
-                View All Products
+                {{ __('app.home.view_all_products') }}
                 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -261,14 +261,14 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <a href="/product/{{ $product->id }}" class="text-sm text-slate-400 hover:text-[#49baee] transition-colors">
-                            View Details
+                            {{ __('app.shop.view_details') }}
                         </a>
                         <form action="/cart/add" method="POST" class="inline">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="px-4 py-2 bg-[#49baee] text-slate-950 font-bold rounded-lg hover:bg-[#5cc5f5] hover:shadow-[0_0_20px_rgba(73,186,238,0.3)] transition-all duration-300">
-                                Add to Cart
+                                {{ __('app.shop.add_to_cart') }}
                             </button>
                         </form>
                     </div>
@@ -290,15 +290,14 @@
             </div>
 
             <h2 class="text-4xl font-black mb-4">
-                Ready to <span class="text-[#49baee]">Level Up</span>?
+                {{ __('app.home.ready_to_level_up') }}
             </h2>
             <p class="text-slate-400 text-lg mb-8 leading-relaxed">
-                Join thousands of gamers who trust our shop for their digital needs.
-                Instant delivery, secure payments, and 24/7 customer support.
+                {{ __('app.home.level_up_description') }}
             </p>
 
             <a href="/shop" class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#49baee] to-[#5cc5f5] text-slate-950 font-bold rounded-xl hover:shadow-[0_0_30px_rgba(73,186,238,0.5)] hover:scale-105 transition-all duration-300">
-                Get Started Now
+                {{ __('app.home.get_started_now') }}
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"></path>
                 </svg>

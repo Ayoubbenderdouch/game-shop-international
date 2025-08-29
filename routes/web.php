@@ -17,13 +17,22 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop');
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 
-// Locale switch route
 Route::get('/locale/{locale}', function ($locale) {
-    if (in_array($locale, ['en'])) { // Add more locales when available
+    $availableLocales = ['en', 'ar', 'fr', 'es']; // Add more locales as needed
+
+    if (in_array($locale, $availableLocales)) {
         session(['locale' => $locale]);
+
+        // If user is authenticated, save preference to database
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            \App\Models\User::where('id', \Illuminate\Support\Facades\Auth::id())
+                ->update(['preferred_locale' => $locale]);
+        }
     }
+
     return redirect()->back();
 })->name('locale.switch');
+
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
