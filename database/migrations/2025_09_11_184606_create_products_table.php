@@ -8,37 +8,41 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('order_number')->unique();
-            $table->string('reference_id')->unique();
-            $table->string('api_order_id')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('vat_amount', 10, 2)->default(0);
-            $table->decimal('total_amount', 10, 2);
+            $table->string('api_id')->unique();
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
+            $table->decimal('cost_price', 10, 2); // Price from API
+            $table->decimal('selling_price', 10, 2); // Price with margin
+            $table->decimal('margin_amount', 10, 2)->default(0);
+            $table->decimal('margin_percentage', 5, 2)->default(0);
+            $table->enum('margin_type', ['fixed', 'percentage'])->default('percentage');
             $table->string('currency', 3)->default('USD');
-            $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'refunded', 'cancelled'])->default('pending');
-            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
-            $table->string('payment_method')->nullable();
-            $table->string('payment_intent_id')->nullable();
-            $table->json('payment_data')->nullable();
-            $table->text('notes')->nullable();
+            $table->boolean('is_available')->default(true);
+            $table->boolean('is_active')->default(true);
+            $table->integer('stock_quantity')->nullable();
+            $table->json('optional_fields')->nullable();
+            $table->json('forbidden_countries')->nullable();
+            $table->text('redemption_instructions')->nullable();
+            $table->integer('sort_order')->default(0);
+            $table->integer('sales_count')->default(0);
+            $table->decimal('vat_percentage', 5, 2)->default(0);
             $table->json('metadata')->nullable();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 
-            $table->index('order_number');
-            $table->index('reference_id');
-            $table->index('user_id');
-            $table->index('status');
-            $table->index('payment_status');
+            $table->index('category_id');
+            $table->index('slug');
+            $table->index('is_active');
+            $table->index('is_available');
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('products');
     }
 };

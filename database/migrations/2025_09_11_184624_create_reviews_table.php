@@ -8,22 +8,26 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('settings', function (Blueprint $table) {
+        Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
-            $table->string('type')->default('text');
-            $table->string('group')->default('general');
-            $table->text('description')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('order_id')->nullable()->constrained()->onDelete('set null');
+            $table->integer('rating')->unsigned();
+            $table->text('comment')->nullable();
+            $table->boolean('is_verified_purchase')->default(false);
+            $table->boolean('is_approved')->default(true);
             $table->timestamps();
 
-            $table->index('key');
-            $table->index('group');
+            $table->unique(['user_id', 'product_id', 'order_id']);
+            $table->index('product_id');
+            $table->index('rating');
+            $table->index('is_approved');
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('settings');
+        Schema::dropIfExists('reviews');
     }
 };
