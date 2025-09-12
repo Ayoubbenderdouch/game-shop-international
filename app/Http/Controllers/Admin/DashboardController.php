@@ -82,7 +82,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.dashboard', compact(
+        return view('admin.dashboard.dashboard', compact(
             'stats',
             'apiBalance',
             'recentOrders',
