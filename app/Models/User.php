@@ -6,11 +6,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -23,14 +23,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'phone',
         'role',
-        'preferred_language',
+        'is_active',
+        'locale',
+        'wallet_balance',
         'country',
         'city',
         'address',
-        'postal_code',
-        'email_verified_at',
-        'last_login_at',
-        'is_active',
+        'verification_token',
     ];
 
     /**
@@ -41,34 +40,30 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'verification_token',
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'password' => 'hashed',
-        'is_active' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'wallet_balance' => 'decimal:2',
+        ];
+    }
 
     /**
      * Check if user is admin
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin' || $this->role === 'super_admin';
-    }
-
-    /**
-     * Check if user is super admin
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->role === 'super_admin';
+        return $this->role === 'admin';
     }
 
     /**
@@ -112,29 +107,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get user's addresses
-     */
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
-    /**
-     * Get user's payment methods
-     */
-    public function paymentMethods()
-    {
-        return $this->hasMany(PaymentMethod::class);
-    }
-
-    /**
      * Get cart total
      */
     public function getCartTotal()
     {
         return $this->cartItems()
             ->join('products', 'cart_items.product_id', '=', 'products.id')
-            ->sum(\DB::raw('cart_items.quantity * products.selling_price'));
+            ->sum(DB::raw('cart_items.quantity * products.selling_price'));
     }
 
     /**
@@ -159,6 +138,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user has reviewed a product
+     */
+    public function hasReviewed($productId): bool
+    {
+        return $this->reviews()
+            ->where('product_id', $productId)
+            ->exists();
+    }
+
+    /**
      * Check if user can review a product
      */
     public function canReview($productId): bool
@@ -168,40 +157,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        return !$this->reviews()
-            ->where('product_id', $productId)
-            ->exists();
-    }
-
-    /**
-     * Get user's full name
-     */
-    public function getFullNameAttribute()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get user's initials
-     */
-    public function getInitialsAttribute()
-    {
-        $names = explode(' ', $this->name);
-        $initials = '';
-
-        foreach ($names as $name) {
-            $initials .= strtoupper(substr($name, 0, 1));
-        }
-
-        return substr($initials, 0, 2);
-    }
-
-    /**
-     * Update last login timestamp
-     */
-    public function updateLastLogin()
-    {
-        $this->update(['last_login_at' => now()]);
+        return !$this->hasReviewed($productId);
     }
 
     /**
@@ -217,7 +173,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function scopeAdmins($query)
     {
-        return $query->whereIn('role', ['admin', 'super_admin']);
+        return $query->where('role', 'admin');
     }
 
     /**
