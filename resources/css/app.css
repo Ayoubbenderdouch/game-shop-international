@@ -2,6 +2,15 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Apply dark theme globally */
+:root {
+    color-scheme: dark;
+}
+
+body {
+    @apply bg-slate-950 text-white;
+}
+
 /* Custom scrollbar styles */
 ::-webkit-scrollbar {
     width: 8px;
@@ -9,21 +18,21 @@
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    @apply bg-slate-900;
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-primary/30 rounded;
+    @apply bg-cyan-500/30 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/50;
+    @apply bg-cyan-500/50;
 }
 
 /* Neon button styles */
 .neon-button {
-    @apply bg-gradient-to-r from-primary to-primary-dark text-gray-950 font-semibold
-           transition-all duration-300 shadow-lg hover:shadow-primary/50 hover:-translate-y-0.5;
+    @apply bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold
+           transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 hover:-translate-y-0.5;
 }
 
 /* Glass card effect */
@@ -33,22 +42,22 @@
 
 /* Category card hover effect */
 .category-card {
-    @apply bg-white/[0.03] backdrop-blur border border-primary/20 rounded-2xl p-6
-           text-center transition-all duration-300 hover:bg-primary/10 hover:border-primary/40
+    @apply bg-white/[0.03] backdrop-blur border border-cyan-500/20 rounded-2xl p-6
+           text-center transition-all duration-300 hover:bg-cyan-500/10 hover:border-cyan-500/40
            hover:-translate-y-1;
 }
 
 /* Product card styles */
 .product-card {
-    @apply bg-gray-800/50 rounded-xl overflow-hidden transition-all duration-300
+    @apply bg-slate-800/50 rounded-xl overflow-hidden transition-all duration-300
            hover:-translate-y-1 hover:shadow-2xl;
 }
 
 /* Form input styles */
 .form-input {
-    @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2
-           text-white placeholder-gray-400 focus:outline-none focus:border-primary
-           focus:ring-2 focus:ring-primary/20 transition-all duration-200;
+    @apply w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2
+           text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500
+           focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200;
 }
 
 /* Stats card animation */
@@ -68,7 +77,7 @@
 
 /* Loading spinner */
 .spinner {
-    @apply inline-block w-8 h-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin;
+    @apply inline-block w-8 h-8 border-4 border-slate-300 border-t-cyan-500 rounded-full animate-spin;
 }
 
 /* Alert styles */
@@ -98,7 +107,7 @@
 }
 
 .badge-primary {
-    @apply bg-primary/20 text-primary;
+    @apply bg-cyan-500/20 text-cyan-400;
 }
 
 .badge-success {
@@ -115,23 +124,23 @@
 
 /* Table styles */
 .data-table {
-    @apply w-full bg-gray-800 rounded-lg overflow-hidden;
+    @apply w-full bg-slate-800 rounded-lg overflow-hidden;
 }
 
 .data-table thead {
-    @apply bg-gray-900;
+    @apply bg-slate-900;
 }
 
 .data-table th {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider;
+    @apply px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider;
 }
 
 .data-table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-300;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-slate-300;
 }
 
 .data-table tbody tr {
-    @apply border-t border-gray-700 hover:bg-gray-700/50 transition-colors;
+    @apply border-t border-slate-700 hover:bg-slate-700/50 transition-colors;
 }
 
 /* Pagination styles */
@@ -140,12 +149,12 @@
 }
 
 .pagination a, .pagination span {
-    @apply px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm
-           text-gray-400 hover:bg-gray-700 hover:text-white transition-colors;
+    @apply px-3 py-2 bg-slate-800 border border-slate-700 rounded text-sm
+           text-slate-400 hover:bg-slate-700 hover:text-white transition-colors;
 }
 
 .pagination .active span {
-    @apply bg-primary text-gray-950 border-primary;
+    @apply bg-cyan-500 text-white border-cyan-500;
 }
 
 /* Dropdown styles */
@@ -154,12 +163,12 @@
 }
 
 .dropdown-menu {
-    @apply absolute right-0 mt-2 w-56 rounded-lg bg-gray-800 shadow-xl
+    @apply absolute right-0 mt-2 w-56 rounded-lg bg-slate-800 shadow-xl
            ring-1 ring-black ring-opacity-5 focus:outline-none z-50;
 }
 
 .dropdown-item {
-    @apply block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700
+    @apply block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700
            hover:text-white transition-colors;
 }
 
@@ -173,26 +182,26 @@
 }
 
 .modal-content {
-    @apply relative bg-gray-800 rounded-xl shadow-xl max-w-lg mx-auto mt-20 p-6;
+    @apply relative bg-slate-800 rounded-xl shadow-xl max-w-lg mx-auto mt-20 p-6;
 }
 
 /* Tab styles */
 .tabs {
-    @apply flex space-x-1 border-b border-gray-700;
+    @apply flex space-x-1 border-b border-slate-700;
 }
 
 .tab {
-    @apply px-4 py-2 text-sm font-medium text-gray-400 hover:text-white
-           hover:bg-gray-800 rounded-t-lg transition-colors;
+    @apply px-4 py-2 text-sm font-medium text-slate-400 hover:text-white
+           hover:bg-slate-800 rounded-t-lg transition-colors;
 }
 
 .tab.active {
-    @apply text-primary bg-gray-800 border-b-2 border-primary;
+    @apply text-cyan-400 bg-slate-800 border-b-2 border-cyan-400;
 }
 
 /* Tooltip styles */
 .tooltip {
-    @apply absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg;
+    @apply absolute z-50 px-2 py-1 text-xs text-white bg-slate-900 rounded shadow-lg;
 }
 
 /* Animation classes */
@@ -234,3 +243,23 @@
         display: block !important;
     }
 }
+
+/* Line clamp utility */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Gradient text animation */
+.gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400;
+}
+
+/* Delay utilities for animations */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-1000 { animation-delay: 1000ms; }
