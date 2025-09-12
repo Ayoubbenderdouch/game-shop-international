@@ -13,6 +13,28 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+        'scheme' => 'https',
+    ],
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'likecard' => [
+        'api_url' => env('LIKECARD_API_URL', 'https://taxes.like4app.com/online'),
+        'device_id' => env('LIKECARD_DEVICE_ID'),
+        'email' => env('LIKECARD_EMAIL'),
+        'security_code' => env('LIKECARD_SECURITY_CODE'),
+        'phone' => env('LIKECARD_PHONE'),
+        'key' => env('LIKECARD_KEY'),
+        'secret_key' => env('LIKECARD_SECRET_KEY'),
+        'secret_iv' => env('LIKECARD_SECRET_IV'),
+    ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),

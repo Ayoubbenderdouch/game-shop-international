@@ -1,3 +1,236 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+}
+
+/* Neon button styles */
+.neon-button {
+    @apply bg-gradient-to-r from-primary to-primary-dark text-gray-950 font-semibold
+           transition-all duration-300 shadow-lg hover:shadow-primary/50 hover:-translate-y-0.5;
+}
+
+/* Glass card effect */
+.glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl;
+}
+
+/* Category card hover effect */
+.category-card {
+    @apply bg-white/[0.03] backdrop-blur border border-primary/20 rounded-2xl p-6
+           text-center transition-all duration-300 hover:bg-primary/10 hover:border-primary/40
+           hover:-translate-y-1;
+}
+
+/* Product card styles */
+.product-card {
+    @apply bg-gray-800/50 rounded-xl overflow-hidden transition-all duration-300
+           hover:-translate-y-1 hover:shadow-2xl;
+}
+
+/* Form input styles */
+.form-input {
+    @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2
+           text-white placeholder-gray-400 focus:outline-none focus:border-primary
+           focus:ring-2 focus:ring-primary/20 transition-all duration-200;
+}
+
+/* Stats card animation */
+.stats-card {
+    @apply transform transition-all duration-300 hover:scale-105;
+}
+
+/* Mobile menu animation */
+.mobile-menu {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.active {
+    transform: translateX(0);
+}
+
+/* Loading spinner */
+.spinner {
+    @apply inline-block w-8 h-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin;
+}
+
+/* Alert styles */
+.alert {
+    @apply p-4 rounded-lg mb-4;
+}
+
+.alert-success {
+    @apply bg-green-500/20 border border-green-500 text-green-400;
+}
+
+.alert-error {
+    @apply bg-red-500/20 border border-red-500 text-red-400;
+}
+
+.alert-warning {
+    @apply bg-yellow-500/20 border border-yellow-500 text-yellow-400;
+}
+
+.alert-info {
+    @apply bg-blue-500/20 border border-blue-500 text-blue-400;
+}
+
+/* Badge styles */
+.badge {
+    @apply inline-block px-2 py-1 text-xs font-semibold rounded-full;
+}
+
+.badge-primary {
+    @apply bg-primary/20 text-primary;
+}
+
+.badge-success {
+    @apply bg-green-500/20 text-green-500;
+}
+
+.badge-danger {
+    @apply bg-red-500/20 text-red-500;
+}
+
+.badge-warning {
+    @apply bg-yellow-500/20 text-yellow-500;
+}
+
+/* Table styles */
+.data-table {
+    @apply w-full bg-gray-800 rounded-lg overflow-hidden;
+}
+
+.data-table thead {
+    @apply bg-gray-900;
+}
+
+.data-table th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider;
+}
+
+.data-table td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-300;
+}
+
+.data-table tbody tr {
+    @apply border-t border-gray-700 hover:bg-gray-700/50 transition-colors;
+}
+
+/* Pagination styles */
+.pagination {
+    @apply flex items-center justify-center space-x-2 mt-8;
+}
+
+.pagination a, .pagination span {
+    @apply px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm
+           text-gray-400 hover:bg-gray-700 hover:text-white transition-colors;
+}
+
+.pagination .active span {
+    @apply bg-primary text-gray-950 border-primary;
+}
+
+/* Dropdown styles */
+.dropdown {
+    @apply relative inline-block text-left;
+}
+
+.dropdown-menu {
+    @apply absolute right-0 mt-2 w-56 rounded-lg bg-gray-800 shadow-xl
+           ring-1 ring-black ring-opacity-5 focus:outline-none z-50;
+}
+
+.dropdown-item {
+    @apply block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700
+           hover:text-white transition-colors;
+}
+
+/* Modal styles */
+.modal {
+    @apply fixed inset-0 z-50 overflow-y-auto;
+}
+
+.modal-backdrop {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+}
+
+.modal-content {
+    @apply relative bg-gray-800 rounded-xl shadow-xl max-w-lg mx-auto mt-20 p-6;
+}
+
+/* Tab styles */
+.tabs {
+    @apply flex space-x-1 border-b border-gray-700;
+}
+
+.tab {
+    @apply px-4 py-2 text-sm font-medium text-gray-400 hover:text-white
+           hover:bg-gray-800 rounded-t-lg transition-colors;
+}
+
+.tab.active {
+    @apply text-primary bg-gray-800 border-b-2 border-primary;
+}
+
+/* Tooltip styles */
+.tooltip {
+    @apply absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg;
+}
+
+/* Animation classes */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(73, 186, 238, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(73, 186, 238, 0.8); }
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+    .mobile-only {
+        display: block !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+@media (min-width: 641px) {
+    .mobile-only {
+        display: none !important;
+    }
+
+    .desktop-only {
+        display: block !important;
+    }
+}
