@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'brevo'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,6 +36,17 @@ return [
     */
 
     'mailers' => [
+
+        'brevo' => [
+            'transport' => 'smtp',
+            'host' => env('BREVO_HOST', 'smtp-relay.brevo.com'),
+            'port' => env('BREVO_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('BREVO_USERNAME', '96ea70001@smtp-brevo.com'),
+            'password' => env('BREVO_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
 
         'smtp' => [
             'transport' => 'smtp',
@@ -82,6 +93,7 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'brevo',
                 'smtp',
                 'log',
             ],
@@ -90,8 +102,8 @@ return [
         'roundrobin' => [
             'transport' => 'roundrobin',
             'mailers' => [
-                'ses',
-                'postmark',
+                'brevo',
+                'smtp',
             ],
         ],
 
@@ -109,8 +121,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'noreply@yourstore.com'),
+        'name' => env('MAIL_FROM_NAME', 'GameStore'),
     ],
 
 ];

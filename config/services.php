@@ -13,11 +13,14 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-    'mailgun' => [
-        'domain' => env('MAILGUN_DOMAIN'),
-        'secret' => env('MAILGUN_SECRET'),
-        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
-        'scheme' => 'https',
+    'brevo' => [
+        'api_key' => env('BREVO_API_KEY'),
+        'smtp_username' => env('BREVO_USERNAME', '96ea70001@smtp-brevo.com'),
+        'smtp_password' => env('BREVO_PASSWORD'),
+        'smtp_host' => env('BREVO_HOST', 'smtp-relay.brevo.com'),
+        'smtp_port' => env('BREVO_PORT', 587),
+        'sms_sender' => env('BREVO_SMS_SENDER', 'GameStore'),
+        'list_id' => env('BREVO_LIST_ID'),
     ],
     'stripe' => [
         'key' => env('STRIPE_KEY'),
