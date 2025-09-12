@@ -3,16 +3,33 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 
-class CustomVerifyEmail extends Notification implements ShouldQueue
+class CustomVerifyEmail extends Notification
 {
     use Queueable;
+
+    /**
+     * The mailer to use for this notification.
+     *
+     * @var string|null
+     */
+    protected $mailer;
+
+    /**
+     * Create a new notification instance.
+     *
+     * @param string|null $mailer
+     */
+    public function __construct($mailer = null)
+    {
+        $this->mailer = $mailer ?? 'brevo';
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -35,7 +52,16 @@ class CustomVerifyEmail extends Notification implements ShouldQueue
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
+        Log::info('Generating verification email', [
+            'user_id' => $notifiable->id,
+            'email' => $notifiable->email,
+            'url' => $verificationUrl,
+            'app_url' => config('app.url'),
+            'mailer' => $this->mailer
+        ]);
+
         return (new MailMessage)
+            ->mailer($this->mailer)
             ->subject('Verify Your Email Address - ' . config('app.name'))
             ->greeting('Hello ' . $notifiable->name . '!')
             ->line('Welcome to ' . config('app.name') . '! We\'re excited to have you on board.')
@@ -54,14 +80,32 @@ class CustomVerifyEmail extends Notification implements ShouldQueue
      */
     protected function verificationUrl($notifiable)
     {
-        return URL::temporarySignedRoute(
+        // Force the URL to use the correct domain from APP_URL
+        $appUrl = rtrim(config('app.url'), '/');
+
+        // Generate the signed URL
+        $url = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),
-            ]
+            ],
+            false // Generate relative URL
         );
+
+        // If URL is relative, prepend the app URL
+        if (!str_starts_with($url, 'http')) {
+            $url = $appUrl . $url;
+        }
+
+        Log::info('Generated verification URL', [
+            'user_id' => $notifiable->id,
+            'generated_url' => $url,
+            'app_url' => $appUrl
+        ]);
+
+        return $url;
     }
 
     /**
