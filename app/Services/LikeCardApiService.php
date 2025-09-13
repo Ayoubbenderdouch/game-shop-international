@@ -213,39 +213,95 @@ class LikeCardApiService
     }
 
     /**
+     * Generate unique slug for category
+     */
+    protected function generateUniqueSlug($name, $apiId)
+    {
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Check if slug exists for a different api_id
+        while (Category::where('slug', $slug)
+            ->where('api_id', '!=', $apiId)
+            ->exists()) {
+            // Try with API ID first for better uniqueness
+            if ($counter == 1 && $apiId) {
+                $slug = $baseSlug . '-' . $apiId;
+            } else {
+                $slug = $baseSlug . '-' . $counter;
+            }
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
      * Process categories recursively
      */
     protected function processCategoriesRecursively($categories, $parentId = null)
     {
         foreach ($categories as $categoryData) {
-            // Find parent category if parentId is provided
-            $parentCategory = null;
-            if ($parentId) {
-                $parentCategory = Category::where('api_id', $parentId)->first();
-            }
+            try {
+                // Find parent category if parentId is provided
+                $parentCategory = null;
+                if ($parentId) {
+                    $parentCategory = Category::where('api_id', $parentId)->first();
+                }
 
-            $category = Category::updateOrCreate(
-                ['api_id' => $categoryData['id']],
-                [
-                    'parent_id' => $parentCategory ? $parentCategory->id : null,
+                // Check if category already exists
+                $existingCategory = Category::where('api_id', $categoryData['id'])->first();
+
+                if ($existingCategory) {
+                    // Update existing category but keep the existing slug to avoid breaking URLs
+                    $existingCategory->update([
+                        'parent_id' => $parentCategory ? $parentCategory->id : null,
+                        'name' => $categoryData['categoryName'],
+                        'image' => $categoryData['amazonImage'] ?? null,
+                        'is_active' => true,
+                        'metadata' => json_encode([
+                            'original_data' => $categoryData
+                        ])
+                    ]);
+
+                    $category = $existingCategory;
+                    $slug = $existingCategory->slug;
+                } else {
+                    // Generate unique slug for new category
+                    $slug = $this->generateUniqueSlug($categoryData['categoryName'], $categoryData['id']);
+
+                    $category = Category::create([
+                        'api_id' => $categoryData['id'],
+                        'parent_id' => $parentCategory ? $parentCategory->id : null,
+                        'name' => $categoryData['categoryName'],
+                        'image' => $categoryData['amazonImage'] ?? null,
+                        'is_active' => true,
+                        'slug' => $slug,
+                        'metadata' => json_encode([
+                            'original_data' => $categoryData
+                        ])
+                    ]);
+                }
+
+                Log::info('Category synced', [
+                    'api_id' => $categoryData['id'],
                     'name' => $categoryData['categoryName'],
-                    'image' => $categoryData['amazonImage'] ?? null,
-                    'is_active' => true,
-                    'slug' => Str::slug($categoryData['categoryName']),
-                    'metadata' => json_encode([
-                        'original_data' => $categoryData
-                    ])
-                ]
-            );
+                    'slug' => $slug
+                ]);
 
-            Log::info('Category synced', [
-                'api_id' => $categoryData['id'],
-                'name' => $categoryData['categoryName']
-            ]);
-
-            // Process child categories
-            if (!empty($categoryData['childs'])) {
-                $this->processCategoriesRecursively($categoryData['childs'], $categoryData['id']);
+                // Process child categories
+                if (!empty($categoryData['childs'])) {
+                    $this->processCategoriesRecursively($categoryData['childs'], $categoryData['id']);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to sync category', [
+                    'category' => $categoryData['categoryName'],
+                    'api_id' => $categoryData['id'],
+                    'error' => $e->getMessage()
+                ]);
+                // Continue with next category even if one fails
+                continue;
             }
         }
     }
@@ -278,7 +334,8 @@ class LikeCardApiService
                 $response = $this->makeRequest('products', $params);
 
                 if (!$response || !isset($response['data'])) {
-                    throw new \Exception('Failed to fetch products');
+                    Log::warning('No products found for category', ['categoryId' => $categoryId]);
+                    return true; // Return true even if no products found
                 }
 
                 $products = $response['data'];
@@ -290,7 +347,10 @@ class LikeCardApiService
                 $this->syncProductToDatabase($productData);
             }
 
-            Log::info('Products synced successfully', ['count' => count($products)]);
+            Log::info('Products synced successfully', [
+                'category' => $categoryId,
+                'count' => count($products)
+            ]);
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to sync products', ['error' => $e->getMessage()]);
@@ -305,20 +365,67 @@ class LikeCardApiService
     {
         try {
             $categories = Category::where('is_active', true)->get();
+            $successful = 0;
+            $failed = 0;
 
             foreach ($categories as $category) {
                 if ($category->api_id) {
                     Log::info('Syncing products for category', ['category' => $category->name]);
-                    $this->syncProducts($category->api_id);
+
+                    try {
+                        $result = $this->syncProducts($category->api_id);
+                        if ($result) {
+                            $successful++;
+                        } else {
+                            $failed++;
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Failed to sync products for category', [
+                            'category' => $category->name,
+                            'error' => $e->getMessage()
+                        ]);
+                        $failed++;
+                    }
+
                     sleep(1); // Avoid rate limiting
                 }
             }
+
+            Log::info('All products sync completed', [
+                'successful' => $successful,
+                'failed' => $failed
+            ]);
 
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to sync all products', ['error' => $e->getMessage()]);
             return false;
         }
+    }
+
+    /**
+     * Generate unique slug for product
+     */
+    protected function generateUniqueProductSlug($name, $apiId)
+    {
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Check if slug exists for a different api_id
+        while (Product::where('slug', $slug)
+            ->where('api_id', '!=', $apiId)
+            ->exists()) {
+            // Try with API ID first for better uniqueness
+            if ($counter == 1 && $apiId) {
+                $slug = $baseSlug . '-' . $apiId;
+            } else {
+                $slug = $baseSlug . '-' . $counter;
+            }
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**
@@ -354,12 +461,14 @@ class LikeCardApiService
                 $sellPrice = $costPrice * 1.1; // 10% default margin
             }
 
-            $product = Product::updateOrCreate(
-                ['api_id' => $productData['productId']],
-                [
+            // Check if product already exists
+            $existingProduct = Product::where('api_id', $productData['productId'])->first();
+
+            if ($existingProduct) {
+                // Update existing product but keep the existing slug to avoid breaking URLs
+                $existingProduct->update([
                     'category_id' => $category->id,
                     'name' => $productData['productName'],
-                    'slug' => Str::slug($productData['productName']),
                     'description' => $productData['productName'], // API doesn't provide description
                     'image' => $productData['productImage'] ?? null,
                     'cost_price' => $costPrice,
@@ -373,13 +482,39 @@ class LikeCardApiService
                         'optional_fields_exist' => $productData['optionalFieldsExist'] ?? 0,
                         'original_data' => $productData
                     ])
-                ]
-            );
+                ]);
+
+                $slug = $existingProduct->slug;
+            } else {
+                // Generate unique slug for new product
+                $slug = $this->generateUniqueProductSlug($productData['productName'], $productData['productId']);
+
+                Product::create([
+                    'api_id' => $productData['productId'],
+                    'category_id' => $category->id,
+                    'name' => $productData['productName'],
+                    'slug' => $slug,
+                    'description' => $productData['productName'], // API doesn't provide description
+                    'image' => $productData['productImage'] ?? null,
+                    'cost_price' => $costPrice,
+                    'selling_price' => $sellPrice,
+                    'currency' => $productData['productCurrency'] ?? 'USD',
+                    'is_available' => $productData['available'] ?? true,
+                    'is_active' => true,
+                    'vat_percentage' => $productData['vatPercentage'] ?? 0,
+                    'optional_fields' => json_encode($productData['productOptionalFields'] ?? []),
+                    'metadata' => json_encode([
+                        'optional_fields_exist' => $productData['optionalFieldsExist'] ?? 0,
+                        'original_data' => $productData
+                    ])
+                ]);
+            }
 
             Log::info('Product synced', [
                 'api_id' => $productData['productId'],
                 'name' => $productData['productName'],
-                'category' => $category->name
+                'category' => $category->name,
+                'slug' => $slug
             ]);
 
         } catch (\Exception $e) {
