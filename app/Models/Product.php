@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -19,6 +20,7 @@ class Product extends Model
         'image',
         'cost_price',
         'selling_price',
+        'original_price',
         'margin_amount',
         'margin_percentage',
         'margin_type',
@@ -26,6 +28,7 @@ class Product extends Model
         'is_available',
         'is_active',
         'stock_quantity',
+        'sku',
         'optional_fields',
         'forbidden_countries',
         'redemption_instructions',
@@ -38,6 +41,7 @@ class Product extends Model
     protected $casts = [
         'cost_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
+        'original_price' => 'decimal:2',
         'margin_amount' => 'decimal:2',
         'margin_percentage' => 'decimal:2',
         'vat_percentage' => 'decimal:2',
@@ -46,6 +50,8 @@ class Product extends Model
         'optional_fields' => 'array',
         'forbidden_countries' => 'array',
         'metadata' => 'array',
+        'stock_quantity' => 'integer',
+        'sales_count' => 'integer',
     ];
 
     protected static function boot()
@@ -55,6 +61,12 @@ class Product extends Model
         static::creating(function ($product) {
             if (empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
+
+                // Ensure unique slug
+                $count = static::whereRaw("slug RLIKE '^{$product->slug}(-[0-9]+)?$'")->count();
+                if ($count > 0) {
+                    $product->slug = $product->slug . '-' . ($count + 1);
+                }
             }
             $product->calculateSellingPrice();
         });
@@ -119,57 +131,38 @@ class Product extends Model
         if ($this->margin_type === 'percentage') {
             $this->margin_amount = $this->cost_price * ($this->margin_percentage / 100);
             $this->selling_price = $this->cost_price + $this->margin_amount;
-        } else {
+        } elseif ($this->margin_type === 'fixed') {
             $this->selling_price = $this->cost_price + $this->margin_amount;
             if ($this->cost_price > 0) {
                 $this->margin_percentage = ($this->margin_amount / $this->cost_price) * 100;
             }
+        } else {
+            $this->selling_price = $this->cost_price;
+        }
+
+        // Apply VAT if applicable
+        if ($this->vat_percentage > 0) {
+            $this->selling_price = $this->selling_price * (1 + $this->vat_percentage / 100);
         }
     }
 
     public function applyPricingRules()
     {
-        $rules = PricingRule::active()
-            ->where(function ($query) {
-                $query->where('apply_to', 'all')
-                    ->orWhere(function ($q) {
-                        $q->where('apply_to', 'category')
-                          ->where('category_id', $this->category_id);
-                    })
-                    ->orWhere(function ($q) {
-                        $q->where('apply_to', 'product')
-                          ->where('product_id', $this->id);
-                    });
-            })
-            ->orderBy('priority', 'desc')
-            ->first();
+        $rules = $this->pricingRules()->active()->orderBy('priority')->get();
 
-        if ($rules) {
-            if ($rules->type === 'percentage') {
-                $this->margin_percentage = $rules->value;
-                $this->margin_type = 'percentage';
-            } else {
-                $this->margin_amount = $rules->value;
-                $this->margin_type = 'fixed';
+        foreach ($rules as $rule) {
+            if ($rule->isApplicable($this)) {
+                $rule->apply($this);
             }
-            $this->calculateSellingPrice();
-            $this->save();
         }
     }
 
-    public function getAverageRating()
+    public function getDiscountPercentage()
     {
-        return $this->reviews()->where('is_approved', true)->avg('rating') ?? 0;
-    }
-
-    public function getReviewsCount()
-    {
-        return $this->reviews()->where('is_approved', true)->count();
-    }
-
-    public function isInStock()
-    {
-        return is_null($this->stock_quantity) || $this->stock_quantity > 0;
+        if ($this->original_price && $this->original_price > $this->selling_price) {
+            return round((($this->original_price - $this->selling_price) / $this->original_price) * 100);
+        }
+        return 0;
     }
 
     public function isForbiddenInCountry($country)
@@ -177,7 +170,7 @@ class Product extends Model
         if (empty($this->forbidden_countries)) {
             return false;
         }
-        return in_array(strtoupper($country), array_map('strtoupper', $this->forbidden_countries));
+        return in_array($country, $this->forbidden_countries);
     }
 
     public function hasOptionalFields()
@@ -187,12 +180,70 @@ class Product extends Model
 
     public function getRequiredOptionalFields()
     {
-        if (empty($this->optional_fields)) {
+        if (!$this->hasOptionalFields()) {
             return [];
         }
 
-        return collect($this->optional_fields)->filter(function ($field) {
-            return isset($field['required']) && $field['required'] == '1';
-        })->values()->toArray();
+        return array_filter($this->optional_fields, function ($field) {
+            return isset($field['required']) && $field['required'] === true;
+        });
+    }
+
+    public function updateAverageRating()
+    {
+        $avgRating = $this->reviews()
+            ->where('is_approved', true)
+            ->avg('rating');
+
+        $this->update([
+            'metadata' => array_merge($this->metadata ?? [], [
+                'average_rating' => $avgRating,
+                'total_reviews' => $this->reviews()->where('is_approved', true)->count()
+            ])
+        ]);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->metadata['average_rating'] ?? 0;
+    }
+
+    public function getTotalReviewsAttribute()
+    {
+        return $this->metadata['total_reviews'] ?? 0;
+    }
+
+    public function incrementSalesCount($quantity = 1)
+    {
+        $this->increment('sales_count', $quantity);
+    }
+
+    public function decrementStock($quantity = 1)
+    {
+        if ($this->stock_quantity !== null) {
+            $this->decrement('stock_quantity', $quantity);
+        }
+    }
+
+    public function restoreStock($quantity = 1)
+    {
+        if ($this->stock_quantity !== null) {
+            $this->increment('stock_quantity', $quantity);
+        }
+    }
+
+    public function isInStock()
+    {
+        return $this->stock_quantity === null || $this->stock_quantity > 0;
+    }
+
+    public function getFormattedPriceAttribute()
+    {
+        return '$' . number_format($this->selling_price, 2);
+    }
+
+    public function getFormattedOriginalPriceAttribute()
+    {
+        return $this->original_price ? '$' . number_format($this->original_price, 2) : null;
     }
 }
