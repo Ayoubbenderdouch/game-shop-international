@@ -29,14 +29,39 @@ return [
     ],
 
     'likecard' => [
+        // API Base URL
         'api_url' => env('LIKECARD_API_URL', 'https://taxes.like4app.com/online'),
+
+        // Authentication Credentials
         'device_id' => env('LIKECARD_DEVICE_ID'),
         'email' => env('LIKECARD_EMAIL'),
         'security_code' => env('LIKECARD_SECURITY_CODE'),
         'phone' => env('LIKECARD_PHONE'),
+
+        // Hash Generation Key
         'key' => env('LIKECARD_KEY'),
+
+        // Encryption Keys for Serial Decryption
         'secret_key' => env('LIKECARD_SECRET_KEY'),
         'secret_iv' => env('LIKECARD_SECRET_IV'),
+
+        // Default Language (1 = English, 2 = Arabic)
+        'default_lang_id' => env('LIKECARD_LANG_ID', 1),
+
+        // Cache Settings (in minutes)
+        'cache_categories' => 300, // 5 hours = 300 minutes
+        'cache_products' => 30,    // 30 minutes
+
+        // Sync Settings
+        'sync_batch_size' => env('LIKECARD_SYNC_BATCH_SIZE', 20),
+        'sync_delay_ms' => env('LIKECARD_SYNC_DELAY_MS', 500), // milliseconds between API calls
+
+        // Retry Settings
+        'max_retries' => env('LIKECARD_MAX_RETRIES', 6),
+        'retry_delay' => env('LIKECARD_RETRY_DELAY', 10), // seconds
+
+        // Default Margin (percentage to add to cost price)
+        'default_margin' => env('LIKECARD_DEFAULT_MARGIN', 10), 
     ],
 
     'postmark' => [

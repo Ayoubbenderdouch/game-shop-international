@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class LikeCardApiService
 {
@@ -61,54 +62,51 @@ class LikeCardApiService
         while ($attempt < $retries) {
             try {
                 Log::info('LikeCard API Request', [
-                    'endpoint' => $endpoint,
-                    'attempt' => $attempt + 1,
-                    'params' => array_diff_key($params, array_flip(['securityCode', 'deviceId']))
+                    'url' => $url,
+                    'method' => $method,
+                    'attempt' => $attempt + 1
                 ]);
 
-                $response = Http::timeout(30)
-                    ->asMultipart()
-                    ->post($url, $this->convertToMultipart($params));
+                $response = Http::asMultipart()
+                    ->timeout(30)
+                    ->retry(3, 100)
+                    ->post($url, $this->formatMultipartData($params));
 
-                $responseData = $response->json();
+                $data = $response->json();
 
                 Log::info('LikeCard API Response', [
-                    'endpoint' => $endpoint,
                     'status' => $response->status(),
-                    'response' => $responseData
+                    'response' => $data
                 ]);
 
-                if ($response->successful() && isset($responseData['response']) && $responseData['response'] == 1) {
-                    return $responseData;
+                if ($response->successful() && isset($data['response']) && $data['response'] == 1) {
+                    return $data;
                 }
 
-                // Check for specific error codes
-                if (isset($responseData['response']) && $responseData['response'] == 1020) {
-                    Log::error('LikeCard API: Blocked IP - Contact account manager');
-                    throw new \Exception('API Access Blocked: Please contact your account manager');
-                }
-
-                if ($response->status() == 408) {
-                    Log::warning('LikeCard API: Request timeout, retrying...');
+                if ($response->status() === 408) {
+                    // Timeout error - retry
                     $attempt++;
-                    sleep(2); // Wait before retry
+                    sleep(10); // Wait 10 seconds before retry
                     continue;
                 }
 
-                throw new \Exception('API request failed: ' . json_encode($responseData));
-
-            } catch (\Exception $e) {
                 Log::error('LikeCard API Error', [
-                    'endpoint' => $endpoint,
-                    'attempt' => $attempt + 1,
-                    'error' => $e->getMessage()
+                    'status' => $response->status(),
+                    'response' => $data
+                ]);
+
+                return null;
+            } catch (\Exception $e) {
+                Log::error('LikeCard API Exception', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
                 ]);
 
                 $attempt++;
                 if ($attempt >= $retries) {
                     throw $e;
                 }
-                sleep(2); // Wait before retry
+                sleep(5);
             }
         }
 
@@ -116,68 +114,55 @@ class LikeCardApiService
     }
 
     /**
-     * Convert parameters to multipart format
+     * Format data for multipart request
      */
-    protected function convertToMultipart($params)
+    protected function formatMultipartData($params)
     {
-        $multipart = [];
+        $formatted = [];
         foreach ($params as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $item) {
-                    $multipart[] = [
+                    $formatted[] = [
                         'name' => $key . '[]',
                         'contents' => $item
                     ];
                 }
             } else {
-                $multipart[] = [
+                $formatted[] = [
                     'name' => $key,
                     'contents' => $value
                 ];
             }
         }
-        return $multipart;
+        return $formatted;
     }
 
     /**
-     * Generate hash for order creation
+     * Check API health
      */
-    protected function generateHash($timestamp)
-    {
-        $email = strtolower($this->email);
-        return hash('sha256', $timestamp . $email . $this->phone . $this->key);
-    }
-
-    /**
-     * Decrypt serial code
-     */
-    public function decryptSerial($encryptedText)
+    public function isApiHealthy()
     {
         try {
-            $encryptMethod = 'AES-256-CBC';
-            $key = hash('sha256', $this->secretKey);
-            $iv = substr(hash('sha256', $this->secretIv), 0, 16);
-
-            return openssl_decrypt(base64_decode($encryptedText), $encryptMethod, $key, 0, $iv);
+            $response = $this->makeRequest('check_balance');
+            return $response !== null;
         } catch (\Exception $e) {
-            Log::error('Serial decryption failed', ['error' => $e->getMessage()]);
-            return null;
+            return false;
         }
     }
 
     /**
-     * Check account balance
+     * Get account balance
      */
     public function getBalance()
     {
         try {
             $response = $this->makeRequest('check_balance');
 
-            if ($response && isset($response['balance'])) {
+            if ($response && isset($response['response']) && $response['response'] == 1) {
                 return [
                     'success' => true,
-                    'balance' => $response['balance'],
-                    'currency' => $response['currency'] ?? 'USD',
+                    'balance' => $response['balance'] ?? 0,
+                    'currency' => strtoupper($response['currency'] ?? 'USD'),
                     'userId' => $response['userId'] ?? null
                 ];
             }
@@ -205,7 +190,7 @@ class LikeCardApiService
             $cacheKey = 'likecard_categories';
             $categories = Cache::get($cacheKey);
 
-            if (!$categories) {
+            if (!$categories || request()->has('force_refresh')) {
                 $response = $this->makeRequest('categories');
 
                 if (!$response || !isset($response['data'])) {
@@ -219,6 +204,7 @@ class LikeCardApiService
             // Sync categories to database
             $this->processCategoriesRecursively($categories);
 
+            Log::info('Categories synced successfully', ['count' => count($categories)]);
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to sync categories', ['error' => $e->getMessage()]);
@@ -232,18 +218,30 @@ class LikeCardApiService
     protected function processCategoriesRecursively($categories, $parentId = null)
     {
         foreach ($categories as $categoryData) {
+            // Find parent category if parentId is provided
+            $parentCategory = null;
+            if ($parentId) {
+                $parentCategory = Category::where('api_id', $parentId)->first();
+            }
+
             $category = Category::updateOrCreate(
                 ['api_id' => $categoryData['id']],
                 [
-                    'parent_id' => $categoryData['categoryParentId'] ?? $parentId,
+                    'parent_id' => $parentCategory ? $parentCategory->id : null,
                     'name' => $categoryData['categoryName'],
                     'image' => $categoryData['amazonImage'] ?? null,
                     'is_active' => true,
-                    'metadata' => [
+                    'slug' => Str::slug($categoryData['categoryName']),
+                    'metadata' => json_encode([
                         'original_data' => $categoryData
-                    ]
+                    ])
                 ]
             );
+
+            Log::info('Category synced', [
+                'api_id' => $categoryData['id'],
+                'name' => $categoryData['categoryName']
+            ]);
 
             // Process child categories
             if (!empty($categoryData['childs'])) {
@@ -264,7 +262,7 @@ class LikeCardApiService
             // Check cache (cache for 30 minutes as per API recommendation)
             $products = Cache::get($cacheKey);
 
-            if (!$products) {
+            if (!$products || request()->has('force_refresh')) {
                 $params = [];
 
                 if ($categoryId) {
@@ -272,7 +270,9 @@ class LikeCardApiService
                 }
 
                 if (!empty($productIds)) {
-                    $params['ids'] = $productIds;
+                    foreach ($productIds as $id) {
+                        $params['ids'][] = $id;
+                    }
                 }
 
                 $response = $this->makeRequest('products', $params);
@@ -290,9 +290,33 @@ class LikeCardApiService
                 $this->syncProductToDatabase($productData);
             }
 
+            Log::info('Products synced successfully', ['count' => count($products)]);
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to sync products', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Sync all products for all categories
+     */
+    public function syncAllProducts()
+    {
+        try {
+            $categories = Category::where('is_active', true)->get();
+
+            foreach ($categories as $category) {
+                if ($category->api_id) {
+                    Log::info('Syncing products for category', ['category' => $category->name]);
+                    $this->syncProducts($category->api_id);
+                    sleep(1); // Avoid rate limiting
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to sync all products', ['error' => $e->getMessage()]);
             return false;
         }
     }
@@ -302,38 +326,68 @@ class LikeCardApiService
      */
     protected function syncProductToDatabase($productData)
     {
-        // Find category by API ID
-        $category = Category::where('api_id', $productData['categoryId'])->first();
+        try {
+            // Find category by API ID
+            $category = Category::where('api_id', $productData['categoryId'])->first();
 
-        if (!$category) {
-            Log::warning('Category not found for product', ['category_id' => $productData['categoryId']]);
-            return;
-        }
+            if (!$category) {
+                Log::warning('Category not found for product', [
+                    'category_id' => $productData['categoryId'],
+                    'product' => $productData['productName']
+                ]);
 
-        $product = Product::updateOrCreate(
-            ['api_id' => $productData['productId']],
-            [
-                'category_id' => $category->id,
-                'name' => $productData['productName'],
-                'description' => $productData['productName'], // API doesn't provide description
-                'image' => $productData['productImage'] ?? null,
-                'cost_price' => $productData['productPrice'],
-                'selling_price' => $productData['sellPrice'] ?? $productData['productPrice'],
-                'currency' => $productData['productCurrency'] ?? 'USD',
-                'is_available' => $productData['available'] ?? true,
-                'is_active' => true,
-                'vat_percentage' => $productData['vatPercentage'] ?? 0,
-                'optional_fields' => $productData['productOptionalFields'] ?? [],
-                'metadata' => [
-                    'optional_fields_exist' => $productData['optionalFieldsExist'] ?? 0,
-                    'original_data' => $productData
+                // Try to sync categories first
+                $this->syncCategories();
+                $category = Category::where('api_id', $productData['categoryId'])->first();
+
+                if (!$category) {
+                    return;
+                }
+            }
+
+            // Calculate selling price with margin
+            $costPrice = floatval($productData['productPrice']);
+            $sellPrice = floatval($productData['sellPrice'] ?? $productData['productPrice']);
+
+            // Add a default margin if sell price equals cost price
+            if ($sellPrice <= $costPrice) {
+                $sellPrice = $costPrice * 1.1; // 10% default margin
+            }
+
+            $product = Product::updateOrCreate(
+                ['api_id' => $productData['productId']],
+                [
+                    'category_id' => $category->id,
+                    'name' => $productData['productName'],
+                    'slug' => Str::slug($productData['productName']),
+                    'description' => $productData['productName'], // API doesn't provide description
+                    'image' => $productData['productImage'] ?? null,
+                    'cost_price' => $costPrice,
+                    'selling_price' => $sellPrice,
+                    'currency' => $productData['productCurrency'] ?? 'USD',
+                    'is_available' => $productData['available'] ?? true,
+                    'is_active' => true,
+                    'vat_percentage' => $productData['vatPercentage'] ?? 0,
+                    'optional_fields' => json_encode($productData['productOptionalFields'] ?? []),
+                    'metadata' => json_encode([
+                        'optional_fields_exist' => $productData['optionalFieldsExist'] ?? 0,
+                        'original_data' => $productData
+                    ])
                 ]
-            ]
-        );
+            );
 
-        // Calculate margin
-        $product->calculateSellingPrice();
-        $product->save();
+            Log::info('Product synced', [
+                'api_id' => $productData['productId'],
+                'name' => $productData['productName'],
+                'category' => $category->name
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to sync product to database', [
+                'error' => $e->getMessage(),
+                'product' => $productData
+            ]);
+        }
     }
 
     /**
@@ -389,27 +443,16 @@ class LikeCardApiService
             }
 
             $params = [];
-
             if ($orderId) {
                 $params['orderId'] = $orderId;
             }
-
             if ($referenceId) {
                 $params['referenceId'] = $referenceId;
             }
 
             $response = $this->makeRequest('orders/details', $params);
 
-            if ($response && isset($response['orderNumber'])) {
-                // Decrypt serial codes if present
-                if (isset($response['serials']) && is_array($response['serials'])) {
-                    foreach ($response['serials'] as &$serial) {
-                        if (isset($serial['serialCode'])) {
-                            $serial['decryptedCode'] = $this->decryptSerial($serial['serialCode']);
-                        }
-                    }
-                }
-
+            if ($response && isset($response['response']) && $response['response'] == 1) {
                 return [
                     'success' => true,
                     'order' => $response
@@ -430,101 +473,87 @@ class LikeCardApiService
     }
 
     /**
-     * Create an order
+     * Create order
      */
-    public function createOrder($productId, $referenceId, $quantity = 1, $optionalFields = [])
+    public function createOrder($productId, $quantity = 1, $optionalFields = [], $referenceId = null)
     {
         try {
-            $timestamp = time();
-            $hash = $this->generateHash($timestamp);
+            $referenceId = $referenceId ?: 'ORDER_' . time() . '_' . uniqid();
+            $time = time();
+            $hash = $this->generateHash($time);
 
             $params = [
                 'productId' => $productId,
+                'quantity' => $quantity,
                 'referenceId' => $referenceId,
-                'time' => $timestamp,
-                'hash' => $hash,
-                'quantity' => $quantity
+                'time' => $time,
+                'hash' => $hash
             ];
 
             if (!empty($optionalFields)) {
                 $params['optionalFields'] = json_encode($optionalFields);
             }
 
-            // Implement retry logic for timeout handling
+            // Implement retry logic for timeout errors
             $maxRetries = 6;
             $retryDelay = 10; // seconds
-            $attempt = 0;
 
-            while ($attempt < $maxRetries) {
-                try {
-                    $response = $this->makeRequest('create_order', $params, 'POST', 1);
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                Log::info('Creating order attempt', [
+                    'attempt' => $attempt,
+                    'referenceId' => $referenceId
+                ]);
 
-                    if ($response && isset($response['orderId'])) {
-                        // Decrypt serial codes if present
-                        if (isset($response['serials']) && is_array($response['serials'])) {
-                            foreach ($response['serials'] as &$serial) {
-                                if (isset($serial['serialCode'])) {
-                                    $serial['decryptedCode'] = $this->decryptSerial($serial['serialCode']);
-                                }
-                            }
-                        }
+                $response = $this->makeRequest('create_order', $params);
 
+                if ($response && isset($response['response']) && $response['response'] == 1) {
+                    // Order created successfully
+                    return [
+                        'success' => true,
+                        'orderId' => $response['orderId'],
+                        'orderPrice' => $response['orderPrice'],
+                        'orderPriceWithoutVat' => $response['orderPriceWithoutVat'],
+                        'vatAmount' => $response['vatAmount'],
+                        'vatPercentage' => $response['vatPercentage'],
+                        'productName' => $response['productName'],
+                        'productImage' => $response['productImage'],
+                        'serials' => $response['serials'],
+                        'referenceId' => $referenceId
+                    ];
+                }
+
+                // Check if it's a timeout error
+                if ($response === null || (isset($response['response']) && $response['response'] == 408)) {
+                    // Try to get order details using reference ID
+                    $orderDetails = $this->getOrderDetails(null, $referenceId);
+
+                    if ($orderDetails['success']) {
+                        // Order was created despite timeout
                         return [
                             'success' => true,
-                            'orderId' => $response['orderId'],
-                            'orderPrice' => $response['orderPrice'] ?? null,
-                            'orderPriceWithoutVat' => $response['orderPriceWithoutVat'] ?? null,
-                            'vatAmount' => $response['vatAmount'] ?? null,
-                            'vatPercentage' => $response['vatPercentage'] ?? null,
-                            'productName' => $response['productName'] ?? null,
-                            'productImage' => $response['productImage'] ?? null,
-                            'serials' => $response['serials'] ?? []
+                            'orderId' => $orderDetails['order']['orderNumber'],
+                            'order' => $orderDetails['order'],
+                            'referenceId' => $referenceId
                         ];
                     }
 
-                    // If response doesn't have orderId, check using referenceId
-                    $orderDetails = $this->getOrderDetails(null, $referenceId);
-                    if ($orderDetails['success']) {
-                        return $orderDetails;
+                    if ($attempt < $maxRetries) {
+                        sleep($retryDelay);
+                        continue;
                     }
-
-                } catch (\Exception $e) {
-                    if (strpos($e->getMessage(), 'timeout') !== false || strpos($e->getMessage(), '408') !== false) {
-                        $attempt++;
-                        Log::warning('Create order timeout, retrying...', [
-                            'attempt' => $attempt,
-                            'referenceId' => $referenceId
-                        ]);
-
-                        if ($attempt < $maxRetries) {
-                            sleep($retryDelay);
-
-                            // Try to get order details with referenceId
-                            $orderDetails = $this->getOrderDetails(null, $referenceId);
-                            if ($orderDetails['success']) {
-                                return $orderDetails;
-                            }
-                            continue;
-                        }
-                    }
-                    throw $e;
                 }
-            }
 
-            // If all retries failed, implement health check
-            $this->performHealthCheck($referenceId);
+                // Other error
+                break;
+            }
 
             return [
                 'success' => false,
-                'message' => 'Failed to create order after multiple attempts'
+                'message' => 'Failed to create order after ' . $maxRetries . ' attempts'
             ];
 
         } catch (\Exception $e) {
-            Log::error('Failed to create order', [
-                'error' => $e->getMessage(),
-                'productId' => $productId,
-                'referenceId' => $referenceId
-            ]);
+            Log::error('Failed to create order', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -533,42 +562,32 @@ class LikeCardApiService
     }
 
     /**
-     * Perform health check when order creation fails
+     * Generate hash for order creation
      */
-    protected function performHealthCheck($referenceId)
+    protected function generateHash($time)
     {
-        Log::warning('Performing health check for order', ['referenceId' => $referenceId]);
+        $email = strtolower($this->email);
+        $phone = $this->phone;
+        $key = $this->key;
 
-        // Set a flag to pause new orders
-        Cache::put('likecard_api_health_check', true, now()->addMinutes(10));
-
-        // Schedule a job to check order status every 60 seconds
-        dispatch(function () use ($referenceId) {
-            $maxAttempts = 10;
-            $attempt = 0;
-
-            while ($attempt < $maxAttempts) {
-                sleep(60);
-
-                $orderDetails = $this->getOrderDetails(null, $referenceId);
-                if ($orderDetails['success']) {
-                    // API is responsive, remove health check flag
-                    Cache::forget('likecard_api_health_check');
-                    Log::info('Health check passed, API is responsive');
-                    break;
-                }
-
-                $attempt++;
-            }
-        })->afterResponse();
+        return hash('sha256', $time . $email . $phone . $key);
     }
 
     /**
-     * Check if API is healthy
+     * Decrypt serial code
      */
-    public function isApiHealthy()
+    public function decryptSerial($encryptedText)
     {
-        return !Cache::has('likecard_api_health_check');
+        try {
+            $encryptMethod = 'AES-256-CBC';
+            $key = hash('sha256', $this->secretKey);
+            $iv = substr(hash('sha256', $this->secretIv), 0, 16);
+
+            return openssl_decrypt(base64_decode($encryptedText), $encryptMethod, $key, 0, $iv);
+        } catch (\Exception $e) {
+            Log::error('Failed to decrypt serial', ['error' => $e->getMessage()]);
+            return null;
+        }
     }
 
     /**
@@ -577,62 +596,37 @@ class LikeCardApiService
     public function checkProductAvailability($productId)
     {
         try {
-            $params = ['ids' => [$productId]];
-            $response = $this->makeRequest('products', $params);
+            $response = $this->syncProducts(null, [$productId]);
 
-            if ($response && isset($response['data']) && count($response['data']) > 0) {
-                $product = $response['data'][0];
-                return [
-                    'success' => true,
-                    'available' => $product['available'] ?? false,
-                    'price' => $product['productPrice'] ?? null,
-                    'sellPrice' => $product['sellPrice'] ?? null,
-                    'vatPercentage' => $product['vatPercentage'] ?? 0
-                ];
+            if ($response) {
+                $product = Product::where('api_id', $productId)->first();
+                return $product && $product->is_available;
             }
 
-            return [
-                'success' => false,
-                'available' => false,
-                'message' => 'Product not found'
-            ];
+            return false;
         } catch (\Exception $e) {
-            Log::error('Failed to check product availability', [
-                'error' => $e->getMessage(),
-                'productId' => $productId
-            ]);
-            return [
-                'success' => false,
-                'available' => false,
-                'message' => $e->getMessage()
-            ];
+            Log::error('Failed to check product availability', ['error' => $e->getMessage()]);
+            return false;
         }
     }
 
     /**
-     * Validate API configuration
+     * Validate API credentials
      */
-    public function validateConfiguration()
+    public function validateCredentials()
     {
-        $required = [
-            'deviceId' => $this->deviceId,
-            'email' => $this->email,
-            'securityCode' => $this->securityCode,
-            'phone' => $this->phone,
-            'key' => $this->key,
-            'secretKey' => $this->secretKey,
-            'secretIv' => $this->secretIv
-        ];
-
         $missing = [];
-        foreach ($required as $key => $value) {
-            if (empty($value)) {
-                $missing[] = $key;
-            }
-        }
+
+        if (!$this->deviceId) $missing[] = 'LIKECARD_DEVICE_ID';
+        if (!$this->email) $missing[] = 'LIKECARD_EMAIL';
+        if (!$this->securityCode) $missing[] = 'LIKECARD_SECURITY_CODE';
+        if (!$this->phone) $missing[] = 'LIKECARD_PHONE';
+        if (!$this->key) $missing[] = 'LIKECARD_KEY';
+        if (!$this->secretKey) $missing[] = 'LIKECARD_SECRET_KEY';
+        if (!$this->secretIv) $missing[] = 'LIKECARD_SECRET_IV';
 
         if (!empty($missing)) {
-            throw new \Exception('Missing required configuration: ' . implode(', ', $missing));
+            throw new \Exception('Missing API credentials: ' . implode(', ', $missing));
         }
 
         return true;
@@ -668,7 +662,13 @@ class LikeCardApiService
     public function clearCaches()
     {
         Cache::forget('likecard_categories');
-        Cache::tags(['likecard_products'])->flush();
+
+        // Clear all product caches
+        $keys = Cache::get('likecard_product_cache_keys', []);
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
+
         Log::info('LikeCard API caches cleared');
     }
 
