@@ -8,14 +8,25 @@ use App\Services\LikeCardApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CheckoutController extends Controller
+class CheckoutController extends Controller implements HasMiddleware
 {
     protected $likeCardService;
 
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth'),
+        ];
+    }
+
     public function __construct(LikeCardApiService $likeCardService)
     {
-        $this->middleware('auth');
         $this->likeCardService = $likeCardService;
     }
 
@@ -42,7 +53,7 @@ class CheckoutController extends Controller
 
         $total = $subtotal + $vatAmount;
 
-        return view('checkout', compact('cartItems', 'subtotal', 'vatAmount', 'total'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'vatAmount', 'total'));
     }
 
     public function process(Request $request)
