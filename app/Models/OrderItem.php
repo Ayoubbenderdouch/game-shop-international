@@ -5,6 +5,48 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $order_id
+ * @property int $product_id
+ * @property string $product_name
+ * @property string $product_api_id
+ * @property int $quantity
+ * @property numeric $cost_price
+ * @property numeric $selling_price
+ * @property numeric $total_price
+ * @property array<array-key, mixed>|null $optional_fields_data
+ * @property array<array-key, mixed>|null $serials
+ * @property string|null $serial_code
+ * @property string|null $serial_number
+ * @property \Illuminate\Support\Carbon|null $valid_to
+ * @property string $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Order $order
+ * @property-read \App\Models\Product $product
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCostPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOptionalFieldsData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductApiId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereSellingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereSerialCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereSerialNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereSerials($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereValidTo($value)
+ * @mixin \Eloquent
+ */
 class OrderItem extends Model
 {
     use HasFactory;

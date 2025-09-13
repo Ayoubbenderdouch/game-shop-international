@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShopController extends Controller
 {
@@ -82,9 +83,11 @@ class ShopController extends Controller
         $canReview = false;
         $hasReviewed = false;
 
-        if (auth()->check()) {
-            $canReview = auth()->user()->canReview($product->id);
-            $hasReviewed = auth()->user()->hasReviewed($product->id);
+        // Use Auth facade to avoid Intelephense warnings
+        if (Auth::check()) {
+            $user = Auth::user();
+            $canReview = $user->canReview($product->id);
+            $hasReviewed = $user->hasReviewed($product->id);
         }
 
         return view('product', compact('product', 'relatedProducts', 'canReview', 'hasReviewed'));

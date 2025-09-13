@@ -7,6 +7,80 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $id
+ * @property string $api_id
+ * @property int $category_id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string|null $image
+ * @property numeric $cost_price
+ * @property numeric $selling_price
+ * @property numeric $margin_amount
+ * @property numeric $margin_percentage
+ * @property string $margin_type
+ * @property string $currency
+ * @property bool $is_available
+ * @property bool $is_active
+ * @property int|null $stock_quantity
+ * @property array<array-key, mixed>|null $optional_fields
+ * @property array<array-key, mixed>|null $forbidden_countries
+ * @property string|null $redemption_instructions
+ * @property int $sort_order
+ * @property int $sales_count
+ * @property numeric $vat_percentage
+ * @property array<array-key, mixed>|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $cartItems
+ * @property-read int|null $cart_items_count
+ * @property-read \App\Models\Category $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Favorite> $favorites
+ * @property-read int|null $favorites_count
+ * @property-read mixed $average_rating
+ * @property-read mixed $formatted_original_price
+ * @property-read mixed $formatted_price
+ * @property-read mixed $total_reviews
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $orderItems
+ * @property-read int|null $order_items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PricingRule> $pricingRules
+ * @property-read int|null $pricing_rules_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Review> $reviews
+ * @property-read int|null $reviews_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product available()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product inStock()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereApiId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCostPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereForbiddenCountries($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereIsAvailable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereMarginAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereMarginPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereMarginType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereOptionalFields($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereRedemptionInstructions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSalesCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSellingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSortOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereStockQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereVatPercentage($value)
+ * @mixin \Eloquent
+ */
 class Product extends Model
 {
     use HasFactory;
