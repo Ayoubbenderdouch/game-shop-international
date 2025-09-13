@@ -130,10 +130,6 @@
                     {{ $category->name }}
                 </a>
                 @endforeach
-                <a href="{{ route('pubg-uc') }}"
-                   class="flex-shrink-0 px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all animate-pulse">
-                    🔥 PUBG UC
-                </a>
             </div>
         </div>
     </section>

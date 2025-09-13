@@ -18,9 +18,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// API Routes for AJAX calls - Using web auth instead of sanctum for session-based auth
+// Cart count endpoint - handles both authenticated and non-authenticated users
+Route::middleware(['web'])->get('/cart/count', function() {
+    if (auth()->check()) {
+        $count = auth()->user()->cartItems()->sum('quantity');
+        return response()->json([
+            'count' => $count,
+            'success' => true
+        ]);
+    }
+
+    // Return 0 for non-authenticated users instead of 401
+    return response()->json([
+        'count' => 0,
+        'success' => true
+    ]);
+})->name('api.cart.count');
+
+// Authenticated API routes for favorites
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::get('/cart/count', [App\Http\Controllers\CartController::class, 'getCount'])->name('api.cart.count');
     Route::post('/favorites/check', [App\Http\Controllers\FavoriteController::class, 'check'])->name('api.favorites.check');
 });
 

@@ -21,7 +21,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
 Route::get('/category/{slug}', [ShopController::class, 'category'])->name('category.show');
-Route::get('/pubg-uc', [ShopController::class, 'pubgUc'])->name('pubg-uc');
 Route::post('/set-locale', [HomeController::class, 'setLocale'])->name('set-locale');
 
 // Search and Filter Routes

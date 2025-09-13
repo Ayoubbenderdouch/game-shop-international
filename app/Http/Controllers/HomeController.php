@@ -21,7 +21,7 @@ class HomeController extends Controller
                 }])
                 ->orderBy('sort_order')
                 ->orderBy('name')
-                ->limit(7) // Leave room for PUBG UC special category
+                ->limit(12)
                 ->get();
         });
 
@@ -38,7 +38,7 @@ class HomeController extends Controller
                 ->withAvg('reviews', 'rating')
                 ->orderByDesc('sales_count')
                 ->orderByDesc('reviews_avg_rating')
-                ->limit(8)
+                ->limit(12)
                 ->get()
                 ->map(function ($product) {
                     // Calculate discount percentage if original price exists

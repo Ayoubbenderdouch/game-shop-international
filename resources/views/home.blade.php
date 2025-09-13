@@ -240,20 +240,7 @@
             </a>
             @endforeach
 
-            <!-- Special PUBG UC Category -->
-            <a href="{{ route('pubg-uc') }}"
-               class="group relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity animate-pulse"></div>
-                <div class="relative bg-gradient-to-br from-yellow-900/30 to-orange-900/30 backdrop-blur-sm border-2 border-yellow-500/50 rounded-2xl p-6 text-center hover:border-yellow-400 transition-all hover:scale-105">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-yellow-400 mb-1">{{ __('app.categories.pubg_uc_topup') }}</h3>
-                    <p class="text-yellow-300/70 text-sm">{{ __('app.categories.instant_uc_delivery') }}</p>
-                </div>
-            </a>
+
         </div>
     </section>
 

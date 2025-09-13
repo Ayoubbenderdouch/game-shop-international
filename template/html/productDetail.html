@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - GameShop</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#45F882',
+                        'primary-black': '#000000',
+                        'primary-border': '#23262B',
+                        'primary-border-secondary': '#3C3E42'
+                    },
+                    fontFamily: {
+                        'urbanist': ['Urbanist', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0b0e13] text-[#e5e7eb] font-urbanist">
+
+    <!-- Header -->
+    <header class="bg-black sticky top-0 z-50">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="h-[80px] flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <img src="assets/img/logo.png" alt="GameShop" class="h-[38px]">
+                    </a>
+                </div>
+
+                <nav class="hidden lg:flex items-center space-x-8">
+                    <a href="index.html" class="text-white hover:text-primary-blue transition-all duration-300">Home</a>
+                    <a href="products.html" class="text-white hover:text-primary-blue transition-all duration-300">Products</a>
+                    <a href="about.html" class="text-white hover:text-primary-blue transition-all duration-300">About</a>
+                    <a href="cart.html" class="text-white hover:text-primary-blue transition-all duration-300">Cart</a>
+                    <a href="contact.html" class="text-white hover:text-primary-blue transition-all duration-300">Contact</a>
+                </nav>
+
+                <div class="flex items-center space-x-6">
+                    <a href="favorites.html" class="text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 3.70259L11.6851 3.00005C13.816 0.814763 17.2709 0.814761 19.4018 3.00005C21.4755 5.12665 21.5392 8.55385 19.5461 10.76L13.8197 17.0982C12.2984 18.782 9.70154 18.782 8.18026 17.0982L2.45393 10.76C0.460783 8.55388 0.5245 5.12667 2.5982 3.00007C4.72912 0.814774 8.18404 0.814776 10.315 3.00007L11 3.70259Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </a>
+
+                    <a href="cart.html" class="relative text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 4H18C20.2091 4 22 5.79086 22 8V13C22 15.2091 20.2091 17 18 17H10C7.79086 17 6 15.2091 6 13V4ZM6 4C6 2.89543 5.10457 2 4 2H2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span class="absolute -top-2 -right-2 bg-primary-blue text-black text-xs w-5 h-5 rounded-full flex items-center justify-center" id="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <section class="py-4 border-b border-[#23262B]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <nav class="flex items-center space-x-2 text-sm">
+                <a href="index.html" class="text-gray-400 hover:text-white transition-all">Home</a>
+                <span class="text-gray-400">/</span>
+                <a href="products.html" class="text-gray-400 hover:text-white transition-all">Products</a>
+                <span class="text-gray-400">/</span>
+                <span class="text-white" id="breadcrumb-name">Game Title</span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Product Details Section -->
+    <section class="w-full py-[60px]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="lg:flex lg:space-x-[30px]">
+                <!-- Product Images -->
+                <div class="lg:w-[570px] mb-8 lg:mb-0">
+                    <!-- Main Image -->
+                    <div class="bg-black border border-[#23262B] rounded-lg p-4 mb-4">
+                        <div class="relative group">
+                            <img id="main-product-image" src="assets/img/products/game-1.jpg" alt="Product" class="w-full h-[500px] object-cover rounded-lg">
+
+                            <!-- Discount Badge -->
+                            <span id="discount-badge" class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-md text-sm font-semibold">
+                                -20% OFF
+                            </span>
+
+                            <!-- Zoom Icon -->
+                            <button onclick="openImageModal()" class="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Images -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="changeImage(0)" class="thumbnail-btn border-2 border-primary-blue rounded-lg overflow-hidden">
+                            <img src="assets/img/products/game-1.jpg" alt="Thumbnail" class="w-full h-[100px] object-cover">
+                        </button>
+                        <button onclick="changeImage(1)" class="thumbnail-btn border-2 border-transparent hover:border-primary-blue rounded-lg overflow-hidden transition-all">
+                            <img src="assets/img/products/game-2.jpg" alt="Thumbnail" class="w-full h-[100px] object-cover">
+                        </button>
+                        <button onclick="changeImage(2)" class="thumbnail-btn border-2 border-transparent hover:border-primary-blue rounded-lg overflow-hidden transition-all">
+                            <img src="assets/img/products/game-3.jpg" alt="Thumbnail" class="w-full h-[100px] object-cover">
+                        </button>
+                        <button onclick="changeImage(3)" class="thumbnail-btn border-2 border-transparent hover:border-primary-blue rounded-lg overflow-hidden transition-all">
+                            <img src="assets/img/products/game-4.jpg" alt="Thumbnail" class="w-full h-[100px] object-cover">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="flex-1">
+                    <div class="bg-black border border-[#23262B] rounded-lg p-6">
+                        <!-- Title and Rating -->
+                        <h1 id="product-name" class="text-3xl font-bold text-white mb-4">Call of Duty: Modern Warfare III</h1>
+
+                        <div class="flex items-center space-x-4 mb-6">
+                            <div class="flex items-center space-x-1" id="rating-stars">
+                                <!-- Stars will be loaded here -->
+                            </div>
+                            <span class="text-gray-400">(<span id="total-reviews">256</span> Reviews)</span>
+                            <span class="text-gray-400">|</span>
+                            <span class="text-green-500">In Stock</span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-6">
+                            <div class="flex items-center space-x-4">
+                                <span id="offer-price" class="text-4xl font-bold text-primary-blue">$59.99</span>
+                                <span id="regular-price" class="text-2xl text-gray-500 line-through">$69.99</span>
+                                <span class="bg-red-500 text-white px-2 py-1 rounded text-sm">Save $10</span>
+                            </div>
+                        </div>
+
+                        <!-- Short Description -->
+                        <p id="short-description" class="text-gray-400 mb-6">
+                            Experience the ultimate modern warfare with stunning graphics, immersive gameplay, and an epic campaign that will keep you on the edge of your seat.
+                        </p>
+
+                        <!-- Product Options -->
+                        <div class="mb-6">
+                            <h3 class="text-white font-semibold mb-3">Platform:</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="selectPlatform('pc')" class="platform-btn px-4 py-2 border border-primary-blue bg-primary-blue text-black rounded-md transition-all">
+                                    PC
+                                </button>
+                                <button onclick="selectPlatform('ps5')" class="platform-btn px-4 py-2 border border-[#23262B] text-white rounded-md hover:border-primary-blue transition-all">
+                                    PlayStation 5
+                                </button>
+                                <button onclick="selectPlatform('xbox')" class="platform-btn px-4 py-2 border border-[#23262B] text-white rounded-md hover:border-primary-blue transition-all">
+                                    Xbox Series X
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Edition Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-white font-semibold mb-3">Edition:</h3>
+                            <select id="edition-select" class="w-full bg-transparent border border-[#23262B] text-white px-4 py-2 rounded-md outline-none focus:border-primary-blue">
+                                <option value="standard">Standard Edition - $59.99</option>
+                                <option value="deluxe">Deluxe Edition - $79.99</option>
+                                <option value="ultimate">Ultimate Edition - $99.99</option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity and Add to Cart -->
+                        <div class="flex items-center space-x-4 mb-6">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="decreaseQuantity()" class="w-10 h-10 bg-[#1a1a1a] text-white rounded hover:bg-primary-blue hover:text-black transition-all">
+                                    -
+                                </button>
+                                <input type="number" id="quantity" value="1" min="1" class="w-16 text-center bg-transparent border border-[#23262B] text-white rounded px-2 py-2">
+                                <button onclick="increaseQuantity()" class="w-10 h-10 bg-[#1a1a1a] text-white rounded hover:bg-primary-blue hover:text-black transition-all">
+                                    +
+                                </button>
+                            </div>
+                            <button onclick="addProductToCart()" class="flex-1 bg-primary-blue text-black py-3 rounded-md hover:bg-white transition-all font-semibold flex items-center justify-center space-x-2">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"></path>
+                                </svg>
+                                <span>Add to Cart</span>
+                            </button>
+                        </div>
+
+                        <!-- Wishlist and Share -->
+                        <div class="flex items-center space-x-4 mb-6">
+                            <button onclick="toggleProductWishlist()" class="flex-1 border border-[#23262B] text-white py-3 rounded-md hover:border-primary-blue transition-all font-semibold flex items-center justify-center space-x-2">
+                                <svg width="20" height="18" fill="none" stroke="currentColor" viewBox="0 0 20 18">
+                                    <path d="M10 3L9.35 2.35C7.82 0.82 5.36 0.82 3.83 2.35C2.3 3.88 2.3 6.34 3.83 7.87L10 14L16.17 7.87C17.7 6.34 17.7 3.88 16.17 2.35C14.64 0.82 12.18 0.82 10.65 2.35L10 3Z" stroke-width="2"/>
+                                </svg>
+                                <span>Add to Wishlist</span>
+                            </button>
+                            <button onclick="shareProduct()" class="px-6 py-3 border border-[#23262B] text-white rounded-md hover:border-primary-blue transition-all">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Product Meta -->
+                        <div class="border-t border-[#23262B] pt-6 space-y-2">
+                            <p class="text-gray-400"><span class="text-white font-semibold">SKU:</span> <span id="product-sku">COD-MW3-2023</span></p>
+                            <p class="text-gray-400"><span class="text-white font-semibold">Category:</span> <span id="product-category">Action, FPS</span></p>
+                            <p class="text-gray-400"><span class="text-white font-semibold">Tags:</span> Multiplayer, Campaign, Zombies</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Tabs -->
+            <div class="mt-12">
+                <div class="border-b border-[#23262B]">
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="switchTab('description')" class="tab-btn px-6 py-3 text-white border-b-2 border-primary-blue font-semibold transition-all">
+                            Description
+                        </button>
+                        <button onclick="switchTab('specifications')" class="tab-btn px-6 py-3 text-gray-400 border-b-2 border-transparent hover:text-white transition-all">
+                            Specifications
+                        </button>
+                        <button onclick="switchTab('reviews')" class="tab-btn px-6 py-3 text-gray-400 border-b-2 border-transparent hover:text-white transition-all">
+                            Reviews (<span id="review-count">256</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="mt-8">
+                    <!-- Description Tab -->
+                    <div id="description-tab" class="tab-content">
+                        <div class="bg-black border border-[#23262B] rounded-lg p-6">
+                            <h2 class="text-2xl font-bold text-white mb-4">Game Description</h2>
+                            <div class="prose prose-invert max-w-none">
+                                <p class="text-gray-400 mb-4">
+                                    Call of Duty: Modern Warfare III is the twentieth game in the Call of Duty series, and the third entry in the rebooted Modern Warfare sub-series. The game features a campaign mode, multiplayer mode, and a cooperative zombies mode.
+                                </p>
+                                <h3 class="text-xl font-semibold text-white mb-3">Key Features:</h3>
+                                <ul class="list-disc list-inside text-gray-400 space-y-2 mb-4">
+                                    <li>Epic single-player campaign continuing the Modern Warfare storyline</li>
+                                    <li>Massive multiplayer with new maps, modes, and gameplay innovations</li>
+                                    <li>Open-world Zombies mode for the first time in Modern Warfare</li>
+                                    <li>Cross-platform play and progression</li>
+                                    <li>Advanced graphics powered by next-gen technology</li>
+                                    <li>Tactical gameplay with enhanced movement and combat mechanics</li>
+                                </ul>
+                                <h3 class="text-xl font-semibold text-white mb-3">What's Included:</h3>
+                                <ul class="list-disc list-inside text-gray-400 space-y-2">
+                                    <li>Full game download</li>
+                                    <li>Day one access to all game modes</li>
+                                    <li>Exclusive operator skins</li>
+                                    <li>Double XP tokens</li>
+                                    <li>Battle Pass tier skips</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specifications Tab -->
+                    <div id="specifications-tab" class="tab-content hidden">
+                        <div class="bg-black border border-[#23262B] rounded-lg p-6">
+                            <h2 class="text-2xl font-bold text-white mb-4">System Requirements</h2>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-primary-blue mb-4">Minimum Requirements</h3>
+                                    <table class="w-full">
+                                        <tbody class="space-y-2">
+                                            <tr>
+                                                <td class="text-gray-400 py-2">OS:</td>
+                                                <td class="text-white py-2">Windows 10 64-bit</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Processor:</td>
+                                                <td class="text-white py-2">Intel Core i5-6600K</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Memory:</td>
+                                                <td class="text-white py-2">8 GB RAM</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Graphics:</td>
+                                                <td class="text-white py-2">NVIDIA GeForce GTX 960</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">DirectX:</td>
+                                                <td class="text-white py-2">Version 12</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Storage:</td>
+                                                <td class="text-white py-2">125 GB available space</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-primary-blue mb-4">Recommended Requirements</h3>
+                                    <table class="w-full">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">OS:</td>
+                                                <td class="text-white py-2">Windows 11 64-bit</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Processor:</td>
+                                                <td class="text-white py-2">Intel Core i7-8700K</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Memory:</td>
+                                                <td class="text-white py-2">16 GB RAM</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Graphics:</td>
+                                                <td class="text-white py-2">NVIDIA GeForce RTX 3060</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">DirectX:</td>
+                                                <td class="text-white py-2">Version 12</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-gray-400 py-2">Storage:</td>
+                                                <td class="text-white py-2">125 GB SSD space</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div id="reviews-tab" class="tab-content hidden">
+                        <div class="bg-black border border-[#23262B] rounded-lg p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-white">Customer Reviews</h2>
+                                <button onclick="openReviewModal()" class="bg-primary-blue text-black px-4 py-2 rounded-md hover:bg-white transition-all font-semibold">
+                                    Write a Review
+                                </button>
+                            </div>
+
+                            <!-- Review Summary -->
+                            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                                <div class="text-center">
+                                    <div class="text-5xl font-bold text-primary-blue mb-2">4.5</div>
+                                    <div class="flex justify-center mb-2">
+                                        <div class="flex space-x-1">
+                                            <span class="text-yellow-400">★★★★★</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400">Based on 256 reviews</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm text-gray-400 w-12">5★</span>
+                                            <div class="flex-1 h-2 bg-[#1a1a1a] rounded">
+                                                <div class="h-full bg-primary-blue rounded" style="width: 60%"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-400 w-12">60%</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm text-gray-400 w-12">4★</span>
+                                            <div class="flex-1 h-2 bg-[#1a1a1a] rounded">
+                                                <div class="h-full bg-primary-blue rounded" style="width: 25%"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-400 w-12">25%</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm text-gray-400 w-12">3★</span>
+                                            <div class="flex-1 h-2 bg-[#1a1a1a] rounded">
+                                                <div class="h-full bg-primary-blue rounded" style="width: 10%"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-400 w-12">10%</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm text-gray-400 w-12">2★</span>
+                                            <div class="flex-1 h-2 bg-[#1a1a1a] rounded">
+                                                <div class="h-full bg-primary-blue rounded" style="width: 3%"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-400 w-12">3%</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm text-gray-400 w-12">1★</span>
+                                            <div class="flex-1 h-2 bg-[#1a1a1a] rounded">
+                                                <div class="h-full bg-primary-blue rounded" style="width: 2%"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-400 w-12">2%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Individual Reviews -->
+                            <div class="space-y-6" id="reviews-list">
+                                <!-- Reviews will be loaded here -->
+                            </div>
+
+                            <!-- Load More Reviews -->
+                            <div class="text-center mt-8">
+                                <button onclick="loadMoreReviews()" class="bg-[#1a1a1a] text-white px-6 py-2 rounded-md hover:bg-primary-blue hover:text-black transition-all">
+                                    Load More Reviews
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Products -->
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold text-white mb-6">Related Products</h2>
+                <div class="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-6" id="related-products">
+                    <!-- Related products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-primary-blue transition-all">
+            <svg width="30" height="30" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+        <img id="modal-image" src="" alt="Product" class="max-w-full max-h-full">
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-[#1A1A1A]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0 py-[60px]">
+            <div class="border-t border-[#1A1A1A] w-full sm:h-[50px] h-[70px] flex sm:flex-row flex-col-reverse sm:justify-between justify-center items-center pt-5">
+                <div>
+                    <p class="text-base leading-7 text-white font-semibold">© 2024 GameShop. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-7 items-center">
+                    <a href="privacy-policy.html" class="text-base hover:text-primary-blue text-white transition-all duration-300">Privacy Policy</a>
+                    <span class="text-base">|</span>
+                    <a href="terms-conditions.html" class="text-base hover:text-primary-blue text-white transition-all duration-300">Terms & Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Main JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/product-detail.js"></script>
+</body>
+</html>

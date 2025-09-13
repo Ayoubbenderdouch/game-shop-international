@@ -375,25 +375,64 @@ function decreaseQuantity() {
     }
 }
 
+// FIXED: Correct URL and request format for favorites toggle
 function toggleFavorite(productId) {
-    fetch(`/favorites/toggle/${productId}`, {
+    const button = document.getElementById(`favorite-btn-${productId}`);
+    if (!button) return;
+
+    // Disable button during request
+    button.disabled = true;
+
+    // Create form data with product_id in the body
+    const formData = new FormData();
+    formData.append('product_id', productId);
+
+    fetch('/favorites/toggle', {  // Fixed: Correct URL without product ID in path
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData,
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.status === 401) {
+            throw new Error('Please login to add favorites');
+        }
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const btn = document.getElementById(`favorite-btn-${productId}`);
+            if (data.is_favorited) {
+                btn.classList.add('bg-red-500', 'border-red-500');
+                btn.classList.remove('bg-slate-800', 'border-slate-700');
+                btn.innerHTML = '<svg class="w-5 h-5 inline-block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>';
+            } else {
+                btn.classList.remove('bg-red-500', 'border-red-500');
+                btn.classList.add('bg-slate-800', 'border-slate-700');
+                btn.innerHTML = '<svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
+            }
+
+            // Show notification if available
+            if (window.showNotification) {
+                window.showNotification(data.message || (data.is_favorited ? 'Added to favorites!' : 'Removed from favorites!'), 'success');
+            }
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        const btn = document.getElementById(`favorite-btn-${productId}`);
-        if (data.favorited) {
-            btn.classList.add('bg-red-500');
-            btn.classList.remove('bg-slate-800');
-        } else {
-            btn.classList.remove('bg-red-500');
-            btn.classList.add('bg-slate-800');
+    .catch(error => {
+        console.error('Error:', error);
+        if (window.showNotification) {
+            window.showNotification(error.message || 'An error occurred', 'error');
         }
+    })
+    .finally(() => {
+        button.disabled = false;
     });
 }
 
@@ -414,4 +453,3 @@ document.querySelectorAll('.star-rating').forEach(star => {
 });
 </script>
 @endpush
-@endsection

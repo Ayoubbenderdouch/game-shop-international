@@ -113,9 +113,7 @@ window.handleAddToCart = function(event) {
         showNotification('An error occurred. Please try again.', 'error');
     })
     .finally(() => {
-        // Re-enable button and restore text
         button.disabled = false;
-        button.innerHTML = originalText;
     });
 };
 
@@ -164,40 +162,38 @@ window.toggleFavorite = function(productId) {
             }
 
             // Show notification
-            showNotification(data.message || (data.is_favorited ? 'Added to favorites!' : 'Removed from favorites'), 'success');
-
-            // Animate the heart
-            button.classList.add('scale-125');
-            setTimeout(() => {
-                button.classList.remove('scale-125');
-            }, 200);
-        } else {
-            showNotification(data.message || 'Failed to update favorites', 'error');
+            showNotification(data.message || (data.is_favorited ? 'Added to favorites!' : 'Removed from favorites!'), 'success');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        if (error.message === 'Please login to add favorites') {
-            showNotification('Please login to add favorites', 'error');
-            // Optionally redirect to login
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 2000);
-        } else {
-            showNotification('An error occurred. Please try again.', 'error');
-        }
+        showNotification('An error occurred. Please try again.', 'error');
     })
     .finally(() => {
         button.disabled = false;
     });
 };
 
-// Update cart count - FIXED with proper authentication
+// Update cart count - FIXED with proper authentication check
 window.updateCartCount = function() {
-    // Check if user is authenticated by looking for the cart icon
+    // First check if we have authentication meta tag and cart element
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
     const cartCountElement = document.getElementById('cart-count');
+
+    // If no cart count element exists, user is likely not authenticated or on a page without cart
     if (!cartCountElement) {
-        // User is not logged in, skip cart count update
+        return;
+    }
+
+    // Check if we have a user meta tag or any authentication indicator
+    const userMeta = document.querySelector('meta[name="user"]');
+    const isAuthenticated = document.body.dataset.authenticated === 'true' ||
+                           document.documentElement.dataset.authenticated === 'true' ||
+                           !!userMeta;
+
+    // If clearly not authenticated, don't make the request
+    if (!csrfToken && !isAuthenticated) {
+        cartCountElement.classList.add('hidden');
         return;
     }
 
@@ -206,7 +202,7 @@ window.updateCartCount = function() {
         headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : '',
         },
         credentials: 'same-origin' // Important for session cookies
     })
@@ -240,9 +236,11 @@ window.updateCartCount = function() {
         }
     })
     .catch(error => {
-        console.error('Error updating cart count:', error);
+        // Silently fail for 401 errors as they're expected for non-authenticated users
+        if (!error.message || !error.message.includes('401')) {
+            console.error('Error updating cart count:', error);
+        }
         // Hide cart count on error
-        const cartCountElement = document.getElementById('cart-count');
         if (cartCountElement) {
             cartCountElement.classList.add('hidden');
         }
@@ -312,16 +310,18 @@ window.decreaseQuantity = function() {
     }
 };
 
-// Initialize on page load - only for authenticated users
+// FIXED: Only initialize cart count for authenticated users
+// Check multiple indicators for authentication before calling updateCartCount
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-        // Only update cart count if user is authenticated (cart icon exists)
+        // Only update cart count if cart element exists (user likely authenticated)
+        // The cart-count element should only be rendered for authenticated users
         if (document.getElementById('cart-count')) {
             updateCartCount();
         }
     });
 } else {
-    // Only update cart count if user is authenticated (cart icon exists)
+    // Only update cart count if cart element exists (user likely authenticated)
     if (document.getElementById('cart-count')) {
         updateCartCount();
     }

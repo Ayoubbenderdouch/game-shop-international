@@ -121,30 +121,6 @@ class ShopController extends Controller
         return view('shop', compact('categories', 'products', 'category'));
     }
 
-    public function pubgUc()
-    {
-        $category = Category::where('slug', 'pubg-uc')->first();
-
-        if (!$category) {
-            // Create PUBG UC category if it doesn't exist
-            $category = Category::create([
-                'api_id' => 'pubg-uc',
-                'name' => 'PUBG UC',
-                'slug' => 'pubg-uc',
-                'description' => 'PUBG Mobile UC Top-up - Instant Delivery',
-                'is_active' => true,
-            ]);
-        }
-
-        $products = Product::where('category_id', $category->id)
-            ->active()
-            ->available()
-            ->orderBy('cost_price', 'asc')
-            ->get();
-
-        return view('pubg-uc', compact('products'));
-    }
-
     /**
      * Search products (API endpoint for AJAX).
      */

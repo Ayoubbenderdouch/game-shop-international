@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameShop - Your Ultimate Gaming Destination</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#45F882',
+                        'primary-black': '#000000',
+                        'primary-border': '#23262B',
+                        'primary-border-secondary': '#3C3E42'
+                    },
+                    fontFamily: {
+                        'urbanist': ['Urbanist', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0b0e13] text-[#e5e7eb] font-urbanist">
+
+    <!-- Top Bar -->
+    <div class="w-full bg-primary-blue">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="h-[50px] flex justify-between items-center">
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-2">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 18C5.59 18 2 14.41 2 10C2 5.59 5.59 2 10 2C14.41 2 18 5.59 18 10C18 14.41 14.41 18 10 18Z" fill="black"/>
+                        </svg>
+                        <span class="text-black text-sm">Welcome to GameShop</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <select class="bg-transparent text-black text-sm outline-none">
+                        <option>USD</option>
+                        <option>EUR</option>
+                        <option>GBP</option>
+                    </select>
+                    <select class="bg-transparent text-black text-sm outline-none">
+                        <option>English</option>
+                        <option>French</option>
+                        <option>Spanish</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-black sticky top-0 z-50">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="h-[80px] flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <img src="assets/img/logo.png" alt="GameShop" class="h-[38px]">
+                    </a>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden lg:flex items-center space-x-8">
+                    <a href="index.html" class="text-white hover:text-primary-blue transition-all duration-300">Home</a>
+                    <a href="products.html" class="text-white hover:text-primary-blue transition-all duration-300">Products</a>
+                    <a href="about.html" class="text-white hover:text-primary-blue transition-all duration-300">About</a>
+                    <a href="blogs.html" class="text-white hover:text-primary-blue transition-all duration-300">Blogs</a>
+                    <a href="contact.html" class="text-white hover:text-primary-blue transition-all duration-300">Contact</a>
+                </nav>
+
+                <!-- Right Actions -->
+                <div class="flex items-center space-x-6">
+                    <!-- Search -->
+                    <button class="text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+
+                    <!-- Wishlist -->
+                    <a href="favorites.html" class="text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 3.70259L11.6851 3.00005C13.816 0.814763 17.2709 0.814761 19.4018 3.00005C21.4755 5.12665 21.5392 8.55385 19.5461 10.76L13.8197 17.0982C12.2984 18.782 9.70154 18.782 8.18026 17.0982L2.45393 10.76C0.460783 8.55388 0.5245 5.12667 2.5982 3.00007C4.72912 0.814774 8.18404 0.814776 10.315 3.00007L11 3.70259Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </a>
+
+                    <!-- Cart -->
+                    <a href="cart.html" class="relative text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 4H18C20.2091 4 22 5.79086 22 8V13C22 15.2091 20.2091 17 18 17H10C7.79086 17 6 15.2091 6 13V4ZM6 4C6 2.89543 5.10457 2 4 2H2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span class="absolute -top-2 -right-2 bg-primary-blue text-black text-xs w-5 h-5 rounded-full flex items-center justify-center" id="cart-count">0</span>
+                    </a>
+
+                    <!-- Account -->
+                    <a href="login.html" class="text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
+                            <path d="M10 12C4.477 12 0 16.477 0 22H20C20 16.477 15.523 12 10 12Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button class="lg:hidden text-white" id="mobile-menu-toggle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12H21" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 6H21" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 18H21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Slider -->
+    <section class="w-full relative main-hero-slider">
+        <div class="swiper heroSwiper">
+            <div class="swiper-wrapper">
+                <!-- Slide 1 -->
+                <div class="swiper-slide">
+                    <div class="w-full xl:h-[470px] h-[300px] flex items-center relative">
+                        <img src="assets/img/hero-1.jpg" alt="hero" class="w-full h-full absolute left-0 top-0 object-cover">
+                        <div class="w-full relative z-10">
+                            <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+                                <p class="xl:text-2xl text-sm font-medium text-white">20% Off Get Unlimited Offer</p>
+                                <h1 class="text-white xl:text-[54px] font-medium tracking-wide xl:leading-[64px] xl:w-[610px] text-3xl mb-10">
+                                    Unlock surprise game keys at great prices
+                                </h1>
+                                <a href="products.html" class="inline-flex items-center space-x-2.5 py-4 px-[25px] bg-primary-blue text-black hover:bg-white group transition-all duration-300 rounded-[5px]">
+                                    <span class="text-base font-medium">Grab The Offer</span>
+                                    <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.6701 6.19402C17.5805 6.19402 17.4968 6.19402 17.4072 6.19402C11.9868 6.19402 6.56652 6.19402 1.14621 6.19402C1.00278 6.19402 0.859353 6.18894 0.721903 6.21941C0.273696 6.30574 -0.0430371 6.69167 0.00477159 7.07253C0.0585564 7.48894 0.423098 7.78855 0.901186 7.81394C0.996803 7.81902 1.09242 7.81902 1.19401 7.81902C6.5964 7.81902 12.0048 7.81902 17.4072 7.81902C17.4968 7.81902 17.5805 7.81902 17.7299 7.81902C17.6343 7.90535 17.5805 7.95613 17.5207 8.00691C15.9311 9.36277 14.3354 10.7186 12.7458 12.0745C12.3514 12.4096 12.3096 12.8718 12.6442 13.2069C12.9789 13.5471 13.5586 13.5979 13.9709 13.3237C14.0366 13.2831 14.0904 13.2323 14.1502 13.1815C16.3076 11.3483 18.4649 9.51004 20.6163 7.67175C21.1362 7.22996 21.1362 6.78816 20.6163 6.34636C18.447 4.49793 16.2717 2.64949 14.1024 0.795971C13.8155 0.552222 13.4928 0.435425 13.0924 0.531909C12.4351 0.689331 12.1841 1.3698 12.6084 1.81668C12.6621 1.87761 12.7279 1.92839 12.7936 1.98425C14.3713 3.32488 15.943 4.67058 17.5267 6.01121C17.5864 6.06199 17.6641 6.08738 17.7299 6.128C17.706 6.14324 17.688 6.16863 17.6701 6.19402Z" fill="currentColor"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="swiper-slide">
+                    <div class="w-full xl:h-[470px] h-[300px] flex items-center relative">
+                        <img src="assets/img/hero-2.jpg" alt="hero" class="w-full h-full absolute left-0 top-0 object-cover">
+                        <div class="w-full relative z-10">
+                            <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+                                <p class="xl:text-2xl text-sm font-medium text-white">Limited Time Offer</p>
+                                <h1 class="text-white xl:text-[54px] font-medium tracking-wide xl:leading-[64px] xl:w-[610px] text-3xl mb-10">
+                                    Best Gaming Deals of the Season
+                                </h1>
+                                <a href="products.html" class="inline-flex items-center space-x-2.5 py-4 px-[25px] bg-primary-blue text-black hover:bg-white group transition-all duration-300 rounded-[5px]">
+                                    <span class="text-base font-medium">Shop Now</span>
+                                    <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.6701 6.19402C17.5805 6.19402 17.4968 6.19402 17.4072 6.19402C11.9868 6.19402 6.56652 6.19402 1.14621 6.19402C1.00278 6.19402 0.859353 6.18894 0.721903 6.21941C0.273696 6.30574 -0.0430371 6.69167 0.00477159 7.07253C0.0585564 7.48894 0.423098 7.78855 0.901186 7.81394C0.996803 7.81902 1.09242 7.81902 1.19401 7.81902C6.5964 7.81902 12.0048 7.81902 17.4072 7.81902C17.4968 7.81902 17.5805 7.81902 17.7299 7.81902C17.6343 7.90535 17.5805 7.95613 17.5207 8.00691C15.9311 9.36277 14.3354 10.7186 12.7458 12.0745C12.3514 12.4096 12.3096 12.8718 12.6442 13.2069C12.9789 13.5471 13.5586 13.5979 13.9709 13.3237C14.0366 13.2831 14.0904 13.2323 14.1502 13.1815C16.3076 11.3483 18.4649 9.51004 20.6163 7.67175C21.1362 7.22996 21.1362 6.78816 20.6163 6.34636C18.447 4.49793 16.2717 2.64949 14.1024 0.795971C13.8155 0.552222 13.4928 0.435425 13.0924 0.531909C12.4351 0.689331 12.1841 1.3698 12.6084 1.81668C12.6621 1.87761 12.7279 1.92839 12.7936 1.98425C14.3713 3.32488 15.943 4.67058 17.5267 6.01121C17.5864 6.06199 17.6641 6.08738 17.7299 6.128C17.706 6.14324 17.688 6.16863 17.6701 6.19402Z" fill="currentColor"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="w-full py-[60px]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="grid xl:grid-cols-8 lg:grid-cols-6 sm:grid-cols-5 grid-cols-4 sm:gap-5 gap-3" id="categories-grid">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Best Selling Products -->
+    <section class="w-full py-[60px] relative">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0 relative z-10">
+            <div class="w-full">
+                <div class="flex justify-between items-center w-full mb-8">
+                    <div>
+                        <p class="md:text-lg text-sm font-medium text-primary-blue">Top Much</p>
+                        <h2 class="md:text-[36px] md:leading-[56px] text-2xl font-medium text-white tracking-tight">
+                            Best Selling Products
+                        </h2>
+                    </div>
+                    <div class="lg:flex hidden space-x-[14px] items-center" id="category-tabs">
+                        <!-- Category tabs will be loaded here -->
+                    </div>
+                </div>
+                <div class="w-full mt-[30px] lg:flex lg:space-x-[30px] items-stretch">
+                    <div class="flex-1">
+                        <div class="w-full grid md:grid-cols-2 grid-cols-1 gap-6" id="best-selling-grid">
+                            <!-- Products will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="lg:w-[270px] bg-white p-[6px] rounded-lg lg:block hidden">
+                        <img src="assets/img/ad-banner.jpg" alt="Ad" class="w-full h-full object-cover rounded-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute left-0 top-0 w-full h-full">
+            <img src="assets/img/best-selling-product-shape.png" alt="" class="w-full h-full object-cover">
+        </div>
+    </section>
+
+    <!-- Gift Cards Section -->
+    <section class="w-full pt-[60px]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="w-full">
+                <div class="flex justify-between items-center gap-2 flex-wrap w-full mb-8">
+                    <div>
+                        <p class="md:text-lg text-sm font-medium text-primary-blue">Unlimited Offer</p>
+                        <h2 class="md:text-[36px] md:leading-[56px] text-2xl font-medium text-white tracking-tight">
+                            Gift Cards
+                        </h2>
+                    </div>
+                    <a href="products.html" class="inline-flex items-center space-x-2.5 py-4 px-[25px] bg-primary-blue text-black hover:bg-white group transition-all duration-300 rounded-[5px]">
+                        <span class="text-base font-medium">View All</span>
+                        <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.6701 6.19402C17.5805 6.19402 17.4968 6.19402 17.4072 6.19402C11.9868 6.19402 6.56652 6.19402 1.14621 6.19402C1.00278 6.19402 0.859353 6.18894 0.721903 6.21941C0.273696 6.30574 -0.0430371 6.69167 0.00477159 7.07253C0.0585564 7.48894 0.423098 7.78855 0.901186 7.81394C0.996803 7.81902 1.09242 7.81902 1.19401 7.81902C6.5964 7.81902 12.0048 7.81902 17.4072 7.81902C17.4968 7.81902 17.5805 7.81902 17.7299 7.81902C17.6343 7.90535 17.5805 7.95613 17.5207 8.00691C15.9311 9.36277 14.3354 10.7186 12.7458 12.0745C12.3514 12.4096 12.3096 12.8718 12.6442 13.2069C12.9789 13.5471 13.5586 13.5979 13.9709 13.3237C14.0366 13.2831 14.0904 13.2323 14.1502 13.1815C16.3076 11.3483 18.4649 9.51004 20.6163 7.67175C21.1362 7.22996 21.1362 6.78816 20.6163 6.34636C18.447 4.49793 16.2717 2.64949 14.1024 0.795971C13.8155 0.552222 13.4928 0.435425 13.0924 0.531909C12.4351 0.689331 12.1841 1.3698 12.6084 1.81668C12.6621 1.87761 12.7279 1.92839 12.7936 1.98425C14.3713 3.32488 15.943 4.67058 17.5267 6.01121C17.5864 6.06199 17.6641 6.08738 17.7299 6.128C17.706 6.14324 17.688 6.16863 17.6701 6.19402Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 lg:gap-[30px] gap-2.5 mt-[30px] w-full" id="gift-cards-grid">
+                    <!-- Gift cards will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Counter Section -->
+    <section class="w-full pt-[60px]">
+        <div class="w-full h-[204px] bg-primary-blue">
+            <div class="max-w-[1170px] mx-auto px-5 lg:px-0 h-full">
+                <div class="w-full h-full flex justify-between flex-wrap items-center gap-5">
+                    <div class="flex flex-col lg:space-y-3">
+                        <span class="text-black lg:text-[65px] font-semibold tracking-wider lg:leading-[65px] text-3xl">15k</span>
+                        <span class="text-black text-lg">Happy Customers</span>
+                    </div>
+                    <div class="flex flex-col lg:space-y-3">
+                        <span class="text-black lg:text-[65px] font-semibold tracking-wider lg:leading-[65px] text-3xl">2k+</span>
+                        <span class="text-black text-lg">Products</span>
+                    </div>
+                    <div class="flex flex-col lg:space-y-3">
+                        <span class="text-black lg:text-[65px] font-semibold tracking-wider lg:leading-[65px] text-3xl">99%</span>
+                        <span class="text-black text-lg">Satisfaction</span>
+                    </div>
+                    <div class="flex flex-col lg:space-y-3">
+                        <span class="text-black lg:text-[65px] font-semibold tracking-wider lg:leading-[65px] text-3xl">50k</span>
+                        <span class="text-black text-lg">Daily Visitors</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommended Products -->
+    <section class="w-full py-[60px]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+            <div class="w-full">
+                <div class="flex justify-between items-center gap-2 flex-wrap w-full mb-8">
+                    <div>
+                        <p class="md:text-lg text-sm font-medium text-primary-blue">Unlimited Offer</p>
+                        <h2 class="md:text-[36px] md:leading-[56px] text-2xl font-medium text-white tracking-tight">
+                            Recommendation for you
+                        </h2>
+                    </div>
+                    <a href="products.html" class="inline-flex items-center space-x-2.5 py-4 px-[25px] bg-primary-blue text-black hover:bg-white group transition-all duration-300 rounded-[5px]">
+                        <span class="text-base font-medium">View All</span>
+                        <svg width="21" height="14" viewBox="0 0 21 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.6701 6.19402C17.5805 6.19402 17.4968 6.19402 17.4072 6.19402C11.9868 6.19402 6.56652 6.19402 1.14621 6.19402C1.00278 6.19402 0.859353 6.18894 0.721903 6.21941C0.273696 6.30574 -0.0430371 6.69167 0.00477159 7.07253C0.0585564 7.48894 0.423098 7.78855 0.901186 7.81394C0.996803 7.81902 1.09242 7.81902 1.19401 7.81902C6.5964 7.81902 12.0048 7.81902 17.4072 7.81902C17.4968 7.81902 17.5805 7.81902 17.7299 7.81902C17.6343 7.90535 17.5805 7.95613 17.5207 8.00691C15.9311 9.36277 14.3354 10.7186 12.7458 12.0745C12.3514 12.4096 12.3096 12.8718 12.6442 13.2069C12.9789 13.5471 13.5586 13.5979 13.9709 13.3237C14.0366 13.2831 14.0904 13.2323 14.1502 13.1815C16.3076 11.3483 18.4649 9.51004 20.6163 7.67175C21.1362 7.22996 21.1362 6.78816 20.6163 6.34636C18.447 4.49793 16.2717 2.64949 14.1024 0.795971C13.8155 0.552222 13.4928 0.435425 13.0924 0.531909C12.4351 0.689331 12.1841 1.3698 12.6084 1.81668C12.6621 1.87761 12.7279 1.92839 12.7936 1.98425C14.3713 3.32488 15.943 4.67058 17.5267 6.01121C17.5864 6.06199 17.6641 6.08738 17.7299 6.128C17.706 6.14324 17.688 6.16863 17.6701 6.19402Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="w-full grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5" id="recommended-grid">
+                    <!-- Recommended products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-[#1A1A1A]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0 py-[60px]">
+            <div class="w-full flex xl:flex-row flex-col xl:gap-[128px] gap-10 pb-[30px]">
+                <div class="xl:w-[301px]">
+                    <div class="mb-9">
+                        <a href="index.html">
+                            <img src="assets/img/logo.png" alt="GameShop" class="max-h-[38px]">
+                        </a>
+                    </div>
+                    <p class="text-base text-[#E5E7EB]">
+                        Your ultimate destination for gaming. Find the best deals on game keys, gift cards, and gaming accessories.
+                    </p>
+                </div>
+                <div class="flex-1">
+                    <div class="grid md:grid-cols-3 grid-cols-2 lg:gap-0 gap-10 justify-between">
+                        <div>
+                            <p class="text-lg text-white leading-8 mb-[14px]">Company</p>
+                            <ul>
+                                <li><a href="about.html" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">About Us</a></li>
+                                <li><a href="products.html" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Products</a></li>
+                                <li><a href="contact.html" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Contact us</a></li>
+                                <li><a href="blogs.html" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Blogs</a></li>
+                                <li><a href="faq.html" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">FAQ</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-lg text-white leading-8 mb-[14px]">Categories</p>
+                            <ul id="footer-categories">
+                                <!-- Categories will be loaded here -->
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-lg text-white leading-8 mb-[14px]">Social</p>
+                            <ul>
+                                <li><a href="#" target="_blank" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Facebook</a></li>
+                                <li><a href="#" target="_blank" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Twitter</a></li>
+                                <li><a href="#" target="_blank" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">Instagram</a></li>
+                                <li><a href="#" target="_blank" class="text-base hover:text-primary-blue transition-all duration-300 leading-[34px]">YouTube</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#1A1A1A] w-full sm:h-[50px] h-[70px] flex sm:flex-row flex-col-reverse sm:justify-between justify-center items-center pt-5">
+                <div>
+                    <p class="text-base leading-7 text-white font-semibold">© 2024 GameShop. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-7 items-center">
+                    <a href="privacy-policy.html" class="text-base hover:text-primary-blue text-white transition-all duration-300">Privacy Policy</a>
+                    <span class="text-base">|</span>
+                    <a href="terms-conditions.html" class="text-base hover:text-primary-blue text-white transition-all duration-300">Terms & Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Main JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/data.js"></script>
+</body>
+</html>

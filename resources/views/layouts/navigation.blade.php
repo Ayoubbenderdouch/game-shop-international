@@ -212,46 +212,86 @@
 
 @push('scripts')
 <script>
-// Update cart count on page load
+// Update cart count on page load - FIXED to only run for authenticated users
 document.addEventListener('DOMContentLoaded', function() {
     @auth
-    updateCartCount();
-    updateFavoritesCount();
+    // Only call these functions if user is authenticated
+    if (typeof updateCartCount === 'function') {
+        updateCartCount();
+    }
+    if (typeof updateFavoritesCount === 'function') {
+        updateFavoritesCount();
+    }
+    @else
+    // User not authenticated - ensure cart count is hidden
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.classList.add('hidden');
+    }
     @endauth
 });
 
-// Function to update cart count
+@auth
+// Function to update cart count - only defined for authenticated users
 function updateCartCount() {
     fetch('/api/cart/count', {
         headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-        }
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        },
+        credentials: 'same-origin'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            if (response.status === 401) {
+                // User not authenticated, hide the cart count
+                const cartCountElement = document.getElementById('cart-count');
+                if (cartCountElement) {
+                    cartCountElement.classList.add('hidden');
+                }
+                return null;
+            }
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
-        const cartCountElement = document.getElementById('cart-count');
-        const mobileCartCount = document.querySelector('.cart-count-mobile');
+        if (data) {
+            const cartCountElement = document.getElementById('cart-count');
+            const mobileCartCount = document.querySelector('.cart-count-mobile');
 
-        if (data.count > 0) {
-            cartCountElement.textContent = data.count;
-            cartCountElement.classList.remove('hidden');
-            if (mobileCartCount) {
-                mobileCartCount.textContent = data.count;
-            }
-        } else {
-            cartCountElement.classList.add('hidden');
-            if (mobileCartCount) {
-                mobileCartCount.textContent = '0';
+            if (data.count > 0) {
+                if (cartCountElement) {
+                    cartCountElement.textContent = data.count;
+                    cartCountElement.classList.remove('hidden');
+                }
+                if (mobileCartCount) {
+                    mobileCartCount.textContent = data.count;
+                }
+            } else {
+                if (cartCountElement) {
+                    cartCountElement.classList.add('hidden');
+                }
+                if (mobileCartCount) {
+                    mobileCartCount.textContent = '0';
+                }
             }
         }
     })
-    .catch(error => console.error('Error updating cart count:', error));
+    .catch(error => {
+        console.error('Error updating cart count:', error);
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.classList.add('hidden');
+        }
+    });
 }
 
 function updateFavoritesCount() {
     // This would require a similar API endpoint for favorites count
     // For now, we'll leave it as a placeholder
 }
+@endauth
 </script>
 @endpush
