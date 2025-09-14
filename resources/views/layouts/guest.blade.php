@@ -1,53 +1,99 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'GameShop') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800,900&display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-        <style>
-            /* Custom animations */
-            @keyframes gradient {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#45F882',
+                        'primary-black': '#000000',
+                        'primary-border': '#23262B',
+                        'primary-border-secondary': '#3C3E42'
+                    },
+                    fontFamily: {
+                        'urbanist': ['Urbanist', 'sans-serif']
+                    }
+                }
             }
+        }
+    </script>
 
-            .animate-gradient {
-                background-size: 200% 200%;
-                animation: gradient 15s ease infinite;
-            }
+    <style>
+        body {
+            font-family: "Urbanist", sans-serif;
+        }
 
-            /* Custom scrollbar */
-            ::-webkit-scrollbar {
-                width: 10px;
-                height: 10px;
-            }
+        /* Custom animations */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-            ::-webkit-scrollbar-track {
-                background: rgb(15 23 42);
-            }
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
 
-            ::-webkit-scrollbar-thumb {
-                background: linear-gradient(to bottom, rgb(6 182 212), rgb(147 51 234));
-                border-radius: 5px;
-            }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(to bottom, rgb(8 145 178), rgb(126 34 206));
-            }
-        </style>
-    </head>
-    <body class="font-sans antialiased">
-        {{ $slot }}
-    </body>
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #45F882;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3fda74;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#0b0e13] text-[#e5e7eb] min-h-screen">
+    <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background effects -->
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0b0e13] via-[#0b0e13] to-black opacity-90"></div>
+            <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+
+            <!-- Grid pattern -->
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"%3E%3Cpath d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(69,248,130,0.05)" stroke-width="1"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23grid)"/%3E%3C/svg%3E')]"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="relative z-10 w-full">
+            {{ $slot }}
+        </div>
+    </div>
+</body>
 </html>

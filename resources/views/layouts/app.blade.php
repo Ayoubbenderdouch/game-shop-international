@@ -1,137 +1,245 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        @auth
-        <meta name="user" content="{{ auth()->user()->id }}">
-        @endauth
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+    <meta name="user" content="{{ auth()->user()->id }}">
+    @endauth
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>@yield('title', config('app.name', 'GameShop'))</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
-        <style>
-            /* Gradient animations */
-            @keyframes gradient-shift {
-                0%, 100% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
+    <!-- Bunny Fonts (Privacy-friendly Google Fonts alternative) -->
+    <link href="https://fonts.bunny.net/css?family=urbanist:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i" rel="stylesheet" />
+
+    <!-- Tailwind Config -->
+    <script>
+        // Wait for Tailwind to be available
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-blue': '#45F882',
+                            'primary-black': '#000000',
+                            'primary-border': '#23262B',
+                            'primary-border-secondary': '#3C3E42'
+                        },
+                        fontFamily: {
+                            'urbanist': ['Urbanist', 'sans-serif']
+                        }
+                    }
+                }
             }
+        }
+    </script>
 
-            .bg-gradient-animate {
-                background-size: 200% 200%;
-                animation: gradient-shift 10s ease infinite;
+    <style>
+        body {
+            font-family: "Urbanist", sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #45F882;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3fda74;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #45F882;
+            color: #000;
+            padding: 15px 20px;
+            border-radius: 5px;
+            min-width: 250px;
+            z-index: 99999;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
             }
-
-            /* Glow effects */
-            .glow-cyan {
-                box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+            to {
+                transform: translateX(0);
             }
+        }
 
-            .glow-purple {
-                box-shadow: 0 0 30px rgba(147, 51, 234, 0.3);
-            }
+        /* Product Card Hover */
+        .product-card:hover {
+            border-color: #45F882;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(69, 248, 130, 0.2);
+        }
 
-            /* Improved transitions */
-            * {
-                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            }
-        </style>
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #45F882;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
 
-        @stack('styles')
-    </head>
-    <body class="font-sans antialiased bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen">
-        <!-- Background effects -->
-        <div class="fixed inset-0 pointer-events-none">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(73,186,238,0.08),transparent_50%)]"></div>
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(147,51,234,0.06),transparent_50%)]"></div>
-        </div>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 
-        <div class="relative min-h-screen">
-            @include('layouts.navigation')
+    @stack('styles')
+</head>
+<body class="bg-[#0b0e13] text-[#e5e7eb]">
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
-                            {{ $header }}
-                        </h1>
-                    </div>
-                </header>
-            @endisset
+    @include('layouts.navigation')
 
-            <!-- Page Content -->
-            <main class="relative z-10">
-                @yield('content')
-                {{ $slot ?? '' }}
-            </main>
+    <!-- Page Heading -->
+    @isset($header)
+        <section class="page-title-wrapper bg-cover bg-center py-[60px]" style="background-image: url('/assets/img/page-title-bg.png')">
+            <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+                {{ $header }}
+            </div>
+        </section>
+    @endisset
 
-            <!-- Footer -->
-            <footer class="relative mt-auto py-6 px-4 sm:px-6 lg:px-8 border-t border-slate-800 bg-slate-900/50 backdrop-blur-sm">
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div class="text-sm text-slate-400">
-                            © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. All rights reserved.
+    <!-- Page Content -->
+    <main>
+        @yield('content')
+        {{ $slot ?? '' }}
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-black border-t border-[#23262B] mt-[60px]">
+        <div class="max-w-[1170px] mx-auto px-5 lg:px-0 py-[60px]">
+            <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-8">
+                <!-- Logo & About -->
+                <div>
+                    <a href="{{ route('home') }}" class="inline-block mb-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-primary-blue rounded-lg flex items-center justify-center">
+                                <span class="text-black font-black text-xl">G</span>
+                            </div>
+                            <span class="text-white font-bold text-xl">GameShop</span>
                         </div>
-                        <div class="flex space-x-6">
-                            <a href="#" class="text-slate-400 hover:text-cyan-400 transition-colors">Privacy</a>
-                            <a href="#" class="text-slate-400 hover:text-cyan-400 transition-colors">Terms</a>
-                            <a href="#" class="text-slate-400 hover:text-cyan-400 transition-colors">Support</a>
-                        </div>
+                    </a>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Your ultimate destination for digital game cards, gift cards, and premium gaming subscriptions.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-primary-blue transition-all">Home</a></li>
+                        <li><a href="{{ route('shop') }}" class="text-gray-400 hover:text-primary-blue transition-all">Shop</a></li>
+                        @auth
+                        <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-primary-blue transition-all">Dashboard</a></li>
+                        <li><a href="{{ route('orders.index') }}" class="text-gray-400 hover:text-primary-blue transition-all">My Orders</a></li>
+                        @endauth
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Game Cards</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Gift Cards</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Subscriptions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Top Up</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">
+                            <span>Email: support@gameshop.com</span>
+                        </li>
+                        <li class="text-gray-400">
+                            <span>24/7 Customer Support</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-[#23262B] mt-8 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <p class="text-sm text-gray-400">
+                        © {{ date('Y') }} {{ config('app.name', 'GameShop') }}. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Terms of Service</a>
                     </div>
                 </div>
-            </footer>
+            </div>
         </div>
+    </footer>
 
-        <!-- Toast Notifications Container -->
-        <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
 
-        @stack('scripts')
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-        <script>
-            // Toast notification system
-            window.showToast = function(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
+    @stack('scripts')
 
-                const bgColor = type === 'success' ? 'from-green-500 to-emerald-500' :
-                               type === 'error' ? 'from-red-500 to-pink-500' :
-                               type === 'warning' ? 'from-yellow-500 to-orange-500' :
-                               'from-blue-500 to-cyan-500';
+    <script>
+        // Toast notification system
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
 
-                toast.className = `min-w-[300px] px-6 py-4 bg-gradient-to-r ${bgColor} text-white rounded-xl shadow-2xl transform transition-all duration-300 translate-x-96`;
-                toast.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            ${type === 'success' ? '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>' :
-                              type === 'error' ? '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>' :
-                              '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>'}
-                        </svg>
-                        <span class="font-medium">${message}</span>
-                    </div>
-                `;
+            const bgColor = type === 'success' ? '#45F882' :
+                           type === 'error' ? '#ef4444' :
+                           '#fbbf24';
 
-                container.appendChild(toast);
+            toast.className = 'toast';
+            toast.style.background = bgColor;
+            toast.innerHTML = message;
 
-                // Animate in
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-96');
-                    toast.classList.add('translate-x-0');
-                }, 10);
+            container.appendChild(toast);
 
-                // Auto remove after 5 seconds
-                setTimeout(() => {
-                    toast.classList.add('translate-x-96', 'opacity-0');
-                    setTimeout(() => toast.remove(), 300);
-                }, 5000);
-            };
-        </script>
-    </body>
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Show Laravel session messages as toasts
+        @if(session('success'))
+            showToast("{{ session('success') }}", 'success');
+        @endif
+
+        @if(session('error'))
+            showToast("{{ session('error') }}", 'error');
+        @endif
+    </script>
+</body>
 </html>

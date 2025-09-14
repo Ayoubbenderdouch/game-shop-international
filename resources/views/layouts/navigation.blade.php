@@ -1,155 +1,118 @@
-<nav x-data="{ open: false, userMenuOpen: false }" class="bg-slate-900/80 backdrop-blur-lg border-b border-cyan-500/20 fixed w-full top-0 z-50">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center h-16">
-            <!-- Left Side Navigation -->
-            <div class="flex items-center space-x-8">
-                <!-- Logo -->
-                <a href="{{ route('home') }}" class="flex items-center space-x-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-black text-xl">G</span>
+<header class="bg-black sticky top-0 z-50">
+    <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
+        <div class="h-[80px] flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="{{ route('home') }}">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-primary-blue rounded-lg flex items-center justify-center">
+                            <span class="text-black font-black text-xl">G</span>
+                        </div>
+                        <span class="text-white font-bold text-xl">GameShop</span>
                     </div>
-                    <span class="text-white font-bold text-xl">GameStore</span>
                 </a>
-
-                <!-- Main Navigation -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Home') }}
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('shop')" :active="request()->routeIs('shop')">
-                        {{ __('Shop') }}
-                    </x-nav-link>
-
-                    @auth
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
-                    @if(Auth::user()->isAdmin())
-                    <x-nav-link :href="route('admin.dashboard')"
-                                :active="request()->routeIs('admin.*')"
-                                class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                                       {{ request()->routeIs('admin.*')
-                                          ? 'bg-purple-500/20 text-purple-400 shadow-lg shadow-purple-500/25'
-                                          : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }}">
-                        <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-                        </svg>
-                        {{ __('Admin Panel') }}
-                    </x-nav-link>
-                    @endif
-                    @endauth
-                </div>
             </div>
 
-            <!-- Right Side Navigation -->
-            <div class="flex items-center space-x-4">
+            <!-- Navigation -->
+            <nav class="hidden lg:flex items-center space-x-8">
+                <a href="{{ route('home') }}" class="text-white hover:text-primary-blue transition-all duration-300 {{ request()->routeIs('home') ? 'text-primary-blue' : '' }}">Home</a>
+                <a href="{{ route('shop') }}" class="text-white hover:text-primary-blue transition-all duration-300 {{ request()->routeIs('shop') ? 'text-primary-blue' : '' }}">Shop</a>
+
                 @auth
-                <!-- Favorites -->
-                <a href="{{ route('favorites.index') }}"
-                   class="relative p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                <a href="{{ route('dashboard') }}" class="text-white hover:text-primary-blue transition-all duration-300 {{ request()->routeIs('dashboard') ? 'text-primary-blue' : '' }}">Dashboard</a>
+
+                @if(Auth::user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="text-white hover:text-primary-blue transition-all duration-300 {{ request()->routeIs('admin.*') ? 'text-primary-blue' : '' }}">Admin</a>
+                @endif
+                @endauth
+            </nav>
+
+            <!-- Right Actions -->
+            <div class="flex items-center space-x-6">
+                @auth
+                <!-- Search -->
+                <button class="text-white hover:text-primary-blue transition-all duration-300">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M19 19L14.65 14.65" stroke="currentColor" stroke-width="2"/>
                     </svg>
-                    <span id="favorites-count" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center hidden">
-                        0
-                    </span>
+                </button>
+
+                <!-- Wishlist -->
+                <a href="{{ route('favorites.index') }}" class="relative text-white hover:text-primary-blue transition-all duration-300">
+                    <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 3.70259L11.6851 3.00005C13.816 0.814763 17.2709 0.814761 19.4018 3.00005C21.4755 5.12665 21.5392 8.55385 19.5461 10.76L13.8197 17.0982C12.2984 18.782 9.70154 18.782 8.18026 17.0982L2.45393 10.76C0.460783 8.55388 0.5245 5.12667 2.5982 3.00007C4.72912 0.814774 8.18404 0.814776 10.315 3.00007L11 3.70259Z" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    <span id="favorites-count" class="absolute -top-2 -right-2 bg-primary-blue text-black text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
                 </a>
 
                 <!-- Cart -->
-                <a href="{{ route('cart.index') }}"
-                   class="relative p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                <a href="{{ route('cart.index') }}" class="relative text-white hover:text-primary-blue transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 4H18C20.2091 4 22 5.79086 22 8V13C22 15.2091 20.2091 17 18 17H10C7.79086 17 6 15.2091 6 13V4ZM6 4C6 2.89543 5.10457 2 4 2H2" stroke="currentColor" stroke-width="1.5"/>
                     </svg>
-                    <span id="cart-count" class="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 text-white text-xs font-bold rounded-full flex items-center justify-center hidden">
-                        0
-                    </span>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-primary-blue text-black text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
                 </a>
 
-                <!-- Notifications -->
-                <button class="relative p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
-                    </svg>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                </button>
-
                 <!-- User Dropdown -->
-                <div class="relative" x-data="{ userMenuOpen: false }">
-                    <button @click="userMenuOpen = !userMenuOpen"
-                            class="flex items-center space-x-3 px-3 py-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-all duration-200 border border-slate-700 hover:border-cyan-500/50">
-                        <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-semibold text-sm">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </span>
-                        </div>
-                        <span class="hidden md:block text-slate-300">{{ Auth::user()->name }}</span>
-                        <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="text-white hover:text-primary-blue transition-all duration-300">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
+                            <path d="M10 12C4.477 12 0 16.477 0 22H20C20 16.477 15.523 12 10 12Z" fill="currentColor"/>
                         </svg>
                     </button>
 
                     <!-- Dropdown Menu -->
-                    <div x-show="userMenuOpen"
+                    <div x-show="open"
+                         @click.away="open = false"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 transform scale-95"
                          x-transition:enter-end="opacity-100 transform scale-100"
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 transform scale-100"
                          x-transition:leave-end="opacity-0 transform scale-95"
-                         @click.away="userMenuOpen = false"
-                         class="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 overflow-hidden">
+                         class="absolute right-0 mt-2 w-48 bg-black border border-[#23262B] rounded-lg shadow-xl">
 
-                        <a href="{{ route('profile.edit') }}"
-                           class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                            {{ __('Profile') }}
+                        <div class="p-3 border-b border-[#23262B]">
+                            <p class="text-white font-semibold">{{ Auth::user()->name }}</p>
+                            <p class="text-gray-400 text-sm">{{ Auth::user()->email }}</p>
+                        </div>
+
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-300 hover:bg-[#23262B] hover:text-white transition-colors">
+                            Profile
+                        </a>
+                        <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-gray-300 hover:bg-[#23262B] hover:text-white transition-colors">
+                            My Orders
+                        </a>
+                        <a href="{{ route('favorites.index') }}" class="block px-4 py-2 text-gray-300 hover:bg-[#23262B] hover:text-white transition-colors">
+                            My Favorites
                         </a>
 
-                        <a href="{{ route('orders.index') }}"
-                           class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                            {{ __('My Orders') }}
-                        </a>
-
-                        <a href="{{ route('favorites.index') }}"
-                           class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                            {{ __('My Favorites') }}
-                        </a>
-
-                        <div class="border-t border-slate-700"></div>
+                        <div class="border-t border-[#23262B]"></div>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit"
-                                    class="block w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                                {{ __('Log Out') }}
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-gray-300 hover:bg-[#23262B] hover:text-white transition-colors">
+                                Logout
                             </button>
                         </form>
                     </div>
                 </div>
                 @else
                 <!-- Guest Links -->
-                <div class="flex items-center space-x-3">
-                    <a href="{{ route('login') }}"
-                       class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                        {{ __('Log in') }}
-                    </a>
-                    @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
-                       class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200 hover:scale-105">
-                        {{ __('Get Started') }}
-                    </a>
-                    @endif
-                </div>
+                <a href="{{ route('login') }}" class="text-white hover:text-primary-blue transition-all duration-300">Login</a>
+                <a href="{{ route('register') }}" class="px-4 py-2 bg-primary-blue text-black font-semibold rounded-lg hover:bg-[#3fda74] transition-all duration-300">
+                    Get Started
+                </a>
                 @endauth
 
                 <!-- Mobile Menu Toggle -->
-                <button @click="open = !open"
-                        class="md:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <button class="lg:hidden text-white" id="mobile-menu-toggle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 6H21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 18H21" stroke="currentColor" stroke-width="2"/>
                     </svg>
                 </button>
             </div>
@@ -157,141 +120,76 @@
     </div>
 
     <!-- Mobile Navigation Menu -->
-    <div x-show="open"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform -translate-y-4"
-         x-transition:enter-end="opacity-100 transform translate-y-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 transform translate-y-0"
-         x-transition:leave-end="opacity-0 transform -translate-y-4"
-         class="md:hidden bg-slate-900/95 backdrop-blur-lg border-t border-cyan-500/20">
-
-        <div class="px-4 pt-2 pb-3 space-y-1">
-            <a href="{{ route('home') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('home') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Home') }}
-            </a>
-
-            <a href="{{ route('shop') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('shop') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Shop') }}
-            </a>
+    <div id="mobile-menu" class="lg:hidden hidden bg-black border-t border-[#23262B]">
+        <div class="px-5 py-4 space-y-2">
+            <a href="{{ route('home') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Home</a>
+            <a href="{{ route('shop') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Shop</a>
 
             @auth
-            <a href="{{ route('dashboard') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('dashboard') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Dashboard') }}
-            </a>
-
-            <a href="{{ route('cart.index') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('cart.*') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Cart') }}
-                <span class="inline-block ml-2 px-2 py-1 bg-cyan-500 text-white text-xs rounded-full cart-count-mobile">0</span>
-            </a>
-
-            <a href="{{ route('favorites.index') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('favorites.*') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Favorites') }}
-            </a>
-
-            <a href="{{ route('orders.index') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('orders.*') ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('My Orders') }}
-            </a>
+            <a href="{{ route('dashboard') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Dashboard</a>
+            <a href="{{ route('cart.index') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Cart</a>
+            <a href="{{ route('favorites.index') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Favorites</a>
+            <a href="{{ route('orders.index') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">My Orders</a>
 
             @if(Auth::user()->isAdmin())
-            <a href="{{ route('admin.dashboard') }}"
-               class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('admin.*') ? 'bg-purple-500/20 text-purple-400' : 'text-slate-300 hover:text-white hover:bg-slate-800/50' }} transition-colors">
-                {{ __('Admin Panel') }}
-            </a>
+            <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Admin Panel</a>
             @endif
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="block w-full text-left px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">
+                    Logout
+                </button>
+            </form>
+            @else
+            <a href="{{ route('login') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Login</a>
+            <a href="{{ route('register') }}" class="block px-3 py-2 text-white hover:bg-[#23262B] rounded-lg transition-colors">Register</a>
             @endauth
         </div>
     </div>
-</nav>
+</header>
 
-@push('scripts')
+<!-- Include Alpine.js for dropdown functionality -->
+<script src="//unpkg.com/alpinejs" defer></script>
+
 <script>
-// Update cart count on page load - FIXED to only run for authenticated users
-document.addEventListener('DOMContentLoaded', function() {
-    @auth
-    // Only call these functions if user is authenticated
-    if (typeof updateCartCount === 'function') {
-        updateCartCount();
-    }
-    if (typeof updateFavoritesCount === 'function') {
-        updateFavoritesCount();
-    }
-    @else
-    // User not authenticated - ensure cart count is hidden
-    const cartCountElement = document.getElementById('cart-count');
-    if (cartCountElement) {
-        cartCountElement.classList.add('hidden');
-    }
-    @endauth
+// Mobile menu toggle
+document.getElementById('mobile-menu-toggle')?.addEventListener('click', function() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
 });
 
+// Update cart and favorites count
 @auth
-// Function to update cart count - only defined for authenticated users
-function updateCartCount() {
-    fetch('/api/cart/count', {
-        headers: {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (!response.ok) {
-            if (response.status === 401) {
-                // User not authenticated, hide the cart count
-                const cartCountElement = document.getElementById('cart-count');
-                if (cartCountElement) {
-                    cartCountElement.classList.add('hidden');
-                }
-                return null;
-            }
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data) {
-            const cartCountElement = document.getElementById('cart-count');
-            const mobileCartCount = document.querySelector('.cart-count-mobile');
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartCount();
+    updateFavoritesCount();
+});
 
-            if (data.count > 0) {
-                if (cartCountElement) {
-                    cartCountElement.textContent = data.count;
-                    cartCountElement.classList.remove('hidden');
-                }
-                if (mobileCartCount) {
-                    mobileCartCount.textContent = data.count;
-                }
-            } else {
-                if (cartCountElement) {
-                    cartCountElement.classList.add('hidden');
-                }
-                if (mobileCartCount) {
-                    mobileCartCount.textContent = '0';
-                }
+function updateCartCount() {
+    fetch('/api/cart/count')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount && data.count > 0) {
+                cartCount.textContent = data.count;
+                cartCount.classList.remove('hidden');
             }
-        }
-    })
-    .catch(error => {
-        console.error('Error updating cart count:', error);
-        const cartCountElement = document.getElementById('cart-count');
-        if (cartCountElement) {
-            cartCountElement.classList.add('hidden');
-        }
-    });
+        })
+        .catch(error => console.error('Error fetching cart count:', error));
 }
 
 function updateFavoritesCount() {
-    // This would require a similar API endpoint for favorites count
-    // For now, we'll leave it as a placeholder
+    fetch('/api/favorites/count')
+        .then(response => response.json())
+        .then(data => {
+            const favCount = document.getElementById('favorites-count');
+            if (favCount && data.count > 0) {
+                favCount.textContent = data.count;
+                favCount.classList.remove('hidden');
+            }
+        })
+        .catch(error => console.error('Error fetching favorites count:', error));
 }
 @endauth
 </script>
-@endpush
