@@ -113,6 +113,7 @@ return [
         'total' => 'Total',
         'checkout' => 'Proceed to Checkout',
         'update' => 'Update',
+        'proceed_to_checkout' => 'Proceed to Checkout',
     ],
 
     'checkout' => [

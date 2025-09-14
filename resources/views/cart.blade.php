@@ -125,13 +125,13 @@
                     <!-- Checkout Button -->
                     <a href="{{ route('checkout.index') }}"
                        class="block w-full text-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105">
-                        {{ __('cart.proceed_to_checkout') }}
+                        {{ __('app.cart.proceed_to_checkout') }}
                     </a>
 
                     <!-- Continue Shopping -->
                     <a href="{{ route('shop') }}"
                        class="block w-full text-center px-6 py-3 mt-4 bg-slate-700 text-white font-medium rounded-xl hover:bg-slate-600 transition-colors">
-                        {{ __('cart.continue_shopping') }}
+                        {{ __('app.cart.continue_shopping') }}
                     </a>
 
                     <!-- Security Badge -->
@@ -140,7 +140,7 @@
                             <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
-                            <span>{{ __('cart.secure_checkout') }}</span>
+                            <span>{{ __('app.cart.secure_checkout') }}</span>
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 <p class="text-slate-400 mb-8">{{ __('cart.empty_cart_message') }}</p>
                 <a href="{{ route('shop') }}"
                    class="inline-block px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105">
-                    {{ __('cart.start_shopping') }}
+                    {{ __('app.cart.start_shopping') }}
                 </a>
             </div>
         </div>
