@@ -15,8 +15,12 @@
         <h3 class="text-white text-2xl font-bold mb-1">${{ number_format($todayRevenue ?? 0, 2) }}</h3>
         <p class="text-white/80 text-sm">Revenue</p>
         <div class="mt-3 flex items-center text-white/60 text-xs">
-            <i class="fas fa-arrow-up text-green-400 mr-1"></i>
-            <span>{{ $revenueGrowth ?? '12.5' }}% from yesterday</span>
+            @if(($revenueGrowth ?? 0) >= 0)
+                <i class="fas fa-arrow-up text-green-400 mr-1"></i>
+            @else
+                <i class="fas fa-arrow-down text-red-400 mr-1"></i>
+            @endif
+            <span>{{ abs($revenueGrowth ?? 0) }}% from yesterday</span>
         </div>
     </div>
 
@@ -30,8 +34,12 @@
         <h3 class="text-white text-2xl font-bold mb-1">{{ $todayOrders ?? 0 }}</h3>
         <p class="text-white/80 text-sm">Orders</p>
         <div class="mt-3 flex items-center text-white/60 text-xs">
-            <i class="fas fa-arrow-up text-green-400 mr-1"></i>
-            <span>{{ $ordersGrowth ?? '8.2' }}% from yesterday</span>
+            @if(($ordersGrowth ?? 0) >= 0)
+                <i class="fas fa-arrow-up text-green-400 mr-1"></i>
+            @else
+                <i class="fas fa-arrow-down text-red-400 mr-1"></i>
+            @endif
+            <span>{{ abs($ordersGrowth ?? 0) }}% from yesterday</span>
         </div>
     </div>
 
@@ -71,94 +79,26 @@
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-white">Revenue Overview</h2>
             <select id="revenue-period" class="bg-dark-bg border border-dark-border rounded-lg px-3 py-1 text-sm text-gray-400">
-                <option value="7">Last 7 Days</option>
-                <option value="30" selected>Last 30 Days</option>
-                <option value="90">Last 90 Days</option>
+                <option value="7" {{ ($period ?? 30) == 7 ? 'selected' : '' }}>Last 7 Days</option>
+                <option value="30" {{ ($period ?? 30) == 30 ? 'selected' : '' }}>Last 30 Days</option>
+                <option value="90" {{ ($period ?? 30) == 90 ? 'selected' : '' }}>Last 90 Days</option>
             </select>
         </div>
-        <canvas id="revenueChart" height="100"></canvas>
+        <div style="position: relative; height: 300px;">
+            <canvas id="revenueChart"></canvas>
+        </div>
     </div>
 
     <div class="bg-dark-card rounded-xl p-6 border border-dark-border">
         <h2 class="text-xl font-bold text-white mb-6">Top Categories</h2>
-        <canvas id="categoriesChart"></canvas>
+        <div style="position: relative; height: 200px;">
+            <canvas id="categoriesChart"></canvas>
+        </div>
         <div class="mt-4 space-y-2">
             @foreach($topCategories ?? [] as $category)
             <div class="flex items-center justify-between">
                 <span class="text-gray-400 text-sm">{{ $category->name }}</span>
-                <span class="text-white font-semibold">${{ number_format($category->revenue ?? 0, 2) }}</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-dark-card rounded-xl p-6 border border-dark-border">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white">Recent Orders</h2>
-            <a href="{{ route('admin.orders.index') }}" class="text-primary-blue hover:text-green-400 transition-all text-sm">View All</a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="text-left text-gray-400 text-sm border-b border-dark-border">
-                        <th class="pb-3">Order ID</th>
-                        <th class="pb-3">Customer</th>
-                        <th class="pb-3">Amount</th>
-                        <th class="pb-3">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-300">
-                    @foreach($recentOrders ?? [] as $order)
-                    <tr class="border-b border-dark-border/50">
-                        <td class="py-3">
-                            <a href="{{ route('admin.orders.show', $order) }}" class="text-primary-blue hover:text-green-400">
-                                #{{ $order->order_number }}
-                            </a>
-                        </td>
-                        <td class="py-3">{{ $order->user->name }}</td>
-                        <td class="py-3">${{ number_format($order->total_amount, 2) }}</td>
-                        <td class="py-3">
-                            <span class="px-2 py-1 text-xs rounded-full
-                                @if($order->status === 'completed') bg-green-900/50 text-green-400
-                                @elseif($order->status === 'pending') bg-yellow-900/50 text-yellow-400
-                                @elseif($order->status === 'processing') bg-blue-900/50 text-blue-400
-                                @else bg-red-900/50 text-red-400
-                                @endif">
-                                {{ ucfirst($order->status) }}
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="bg-dark-card rounded-xl p-6 border border-dark-border">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white">Best Selling Products</h2>
-            <a href="{{ route('admin.products.index') }}" class="text-primary-blue hover:text-green-400 transition-all text-sm">View All</a>
-        </div>
-        <div class="space-y-4">
-            @foreach($bestSellingProducts ?? [] as $product)
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-dark-bg rounded-lg overflow-hidden flex-shrink-0">
-                    @if($product->image)
-                    <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                    @else
-                    <div class="w-full h-full flex items-center justify-center text-xl">🎮</div>
-                    @endif
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-white font-medium">{{ Str::limit($product->name, 30) }}</h3>
-                    <p class="text-gray-400 text-sm">{{ $product->sales_count }} sales</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-white font-semibold">${{ number_format($product->selling_price, 2) }}</p>
-                    <p class="text-gray-400 text-xs">{{ number_format($product->margin_percentage, 1) }}% margin</p>
-                </div>
+                <span class="text-white font-semibold">${{ number_format($category->revenue, 2) }}</span>
             </div>
             @endforeach
         </div>
@@ -193,11 +133,29 @@
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <span class="text-gray-400">API Connection</span>
-                <span class="px-2 py-1 text-xs rounded-full bg-green-900/50 text-green-400">Connected</span>
+                @if($apiBalance !== null)
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-900/50 text-green-400">Connected</span>
+                @else
+                    <span class="px-2 py-1 text-xs rounded-full bg-red-900/50 text-red-400">Error</span>
+                @endif
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">API Balance</span>
+                <span class="text-gray-300 text-sm">
+                    @if($apiBalance !== null && is_numeric($apiBalance))
+                        @if($apiCurrency === 'USD')
+                            ${{ number_format($apiBalance, 2) }}
+                        @else
+                            {{ $apiCurrency }} {{ number_format($apiBalance, 2) }}
+                        @endif
+                    @else
+                        N/A
+                    @endif
+                </span>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-gray-400">Last Sync</span>
-                <span class="text-gray-300 text-sm">{{ $lastSync ?? '2 hours ago' }}</span>
+                <span class="text-gray-300 text-sm">{{ $lastSync ?? 'Never' }}</span>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-gray-400">Pending Orders</span>
@@ -213,7 +171,7 @@
     <div class="bg-dark-card rounded-xl p-6 border border-dark-border">
         <h2 class="text-xl font-bold text-white mb-4">Recent Activities</h2>
         <div class="space-y-3">
-            @foreach($recentActivities ?? [] as $activity)
+            @forelse($recentActivities ?? [] as $activity)
             <div class="flex items-start space-x-3">
                 <div class="w-2 h-2 bg-primary-blue rounded-full mt-1.5"></div>
                 <div class="flex-1">
@@ -221,90 +179,219 @@
                     <p class="text-gray-500 text-xs">{{ $activity->created_at->diffForHumans() }}</p>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <p class="text-gray-500 text-sm">No recent activities</p>
+            @endforelse
         </div>
     </div>
 </div>
+
+@if($topProducts && count($topProducts) > 0)
+<div class="mt-6 bg-dark-card rounded-xl p-6 border border-dark-border">
+    <h2 class="text-xl font-bold text-white mb-4">Top Selling Products</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-left text-gray-400 text-sm border-b border-dark-border">
+                    <th class="pb-3">Product</th>
+                    <th class="pb-3">Sales</th>
+                    <th class="pb-3">Quantity</th>
+                    <th class="pb-3">Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($topProducts as $product)
+                <tr class="border-b border-dark-border">
+                    <td class="py-3 text-white">{{ Str::limit($product->name, 40) }}</td>
+                    <td class="py-3 text-gray-300">{{ $product->sales_count }}</td>
+                    <td class="py-3 text-gray-300">{{ $product->total_quantity }}</td>
+                    <td class="py-3 text-primary-blue font-semibold">${{ number_format($product->revenue, 2) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
 @endsection
 
 @push('scripts')
-{{-- Chart.js initialization - Using Blade unescaped output for JSON data --}}
 <script>
-const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-const revenueChart = new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode($revenueLabels ?? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']) !!},
-        datasets: [{
-            label: 'Revenue',
-            data: {!! json_encode($revenueData ?? [1200, 1900, 3000, 5000, 2000, 3000, 4500]) !!},
-            borderColor: '#45F882',
-            backgroundColor: 'rgba(69, 248, 130, 0.1)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(255, 255, 255, 0.1)'
+// Store chart instances globally to prevent memory leaks
+let revenueChart = null;
+let categoriesChart = null;
+
+// Function to destroy existing charts
+function destroyCharts() {
+    if (revenueChart) {
+        revenueChart.destroy();
+        revenueChart = null;
+    }
+    if (categoriesChart) {
+        categoriesChart.destroy();
+        categoriesChart = null;
+    }
+}
+
+// Initialize charts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Destroy existing charts first
+    destroyCharts();
+
+    // Revenue Chart Configuration
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        revenueChart = new Chart(revenueCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($revenueLabels ?? []) !!},
+                datasets: [{
+                    label: 'Revenue',
+                    data: {!! json_encode($revenueData ?? []) !!},
+                    borderColor: '#45F882',
+                    backgroundColor: 'rgba(69, 248, 130, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#45F882',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
                 },
-                ticks: {
-                    color: '#9CA3AF',
-                    callback: function(value) {
-                        return '$' + value;
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Revenue: $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#9CA3AF',
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#9CA3AF',
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
                     }
                 }
+            }
+        });
+    }
+
+    // Categories Chart Configuration
+    const categoriesCtx = document.getElementById('categoriesChart');
+    if (categoriesCtx) {
+        categoriesChart = new Chart(categoriesCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {!! json_encode($categoryLabels ?? []) !!},
+                datasets: [{
+                    data: {!! json_encode($categoryData ?? []) !!},
+                    backgroundColor: [
+                        '#3B82F6',
+                        '#8B5CF6',
+                        '#10B981',
+                        '#F59E0B'
+                    ],
+                    borderWidth: 0
+                }]
             },
-            x: {
-                grid: {
-                    display: false
-                },
-                ticks: {
-                    color: '#9CA3AF'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': $' + context.parsed.toLocaleString();
+                            }
+                        }
+                    }
                 }
             }
-        }
+        });
     }
-});
+}
 
-const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
-const categoriesChart = new Chart(categoriesCtx, {
-    type: 'doughnut',
-    data: {
-        labels: {!! json_encode($categoryLabels ?? ['Game Cards', 'Gift Cards', 'Subscriptions', 'Top Up']) !!},
-        datasets: [{
-            data: {!! json_encode($categoryData ?? [35, 25, 25, 15]) !!},
-            backgroundColor: [
-                '#3B82F6',
-                '#8B5CF6',
-                '#10B981',
-                '#F59E0B'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false
-            }
-        }
-    }
-});
-
+// Handle period change
 document.getElementById('revenue-period').addEventListener('change', function() {
+    // Show loading state
+    const button = this;
+    button.disabled = true;
+
+    // Redirect with new period parameter
     window.location.href = '{{ route("admin.dashboard") }}?period=' + this.value;
 });
+
+// Cleanup charts before page unload
+window.addEventListener('beforeunload', function() {
+    destroyCharts();
+});
+
+// Auto-refresh dashboard data every 5 minutes (optional)
+let refreshInterval = null;
+
+function startAutoRefresh() {
+    refreshInterval = setInterval(function() {
+        // Only refresh if page is visible
+        if (!document.hidden) {
+            location.reload();
+        }
+    }, 300000); // 5 minutes
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
+
+// Handle visibility change
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        stopAutoRefresh();
+    } else {
+        startAutoRefresh();
+    }
+});
+
+// Start auto-refresh when page loads
+startAutoRefresh();
 </script>
 @endpush
-{{-- File ends here - no extra @endsection needed --}}

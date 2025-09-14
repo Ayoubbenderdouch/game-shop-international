@@ -85,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Admin Routes - Require Admin Role
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Admin Dashboard
+    // Admin Dashboard - Optimized route
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
     // Categories Management
@@ -115,18 +115,22 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/sales', [App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('sales');
         Route::get('/products', [App\Http\Controllers\Admin\ReportController::class, 'products'])->name('products');
         Route::get('/customers', [App\Http\Controllers\Admin\ReportController::class, 'customers'])->name('customers');
+        Route::get('/export', [App\Http\Controllers\Admin\ReportController::class, 'export'])->name('export');
     });
 
-    // API Sync
+    // API Sync Routes
     Route::prefix('api-sync')->name('api-sync.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\ApiSyncController::class, 'index'])->name('index');
+        Route::post('/test-connection', [App\Http\Controllers\Admin\ApiSyncController::class, 'testConnection'])->name('test-connection');
+        Route::post('/balance', [App\Http\Controllers\Admin\ApiSyncController::class, 'balance'])->name('balance');
         Route::post('/categories', [App\Http\Controllers\Admin\ApiSyncController::class, 'syncCategories'])->name('categories');
         Route::post('/products', [App\Http\Controllers\Admin\ApiSyncController::class, 'syncProducts'])->name('products');
-        Route::post('/check-balance', [App\Http\Controllers\Admin\ApiSyncController::class, 'checkBalance'])->name('balance');
+        Route::post('/full-sync', [App\Http\Controllers\Admin\ApiSyncController::class, 'fullSync'])->name('full-sync');
+        Route::post('/settings', [App\Http\Controllers\Admin\ApiSyncController::class, 'saveSettings'])->name('settings');
     });
 });
 
-// Fallback Route
+// Fallback route - must be last
 Route::fallback(function () {
     return view('errors.404');
 });
