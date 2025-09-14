@@ -305,4 +305,3 @@ function debounce(func, wait) {
 }
 </script>
 @endpush
-@endsection

@@ -378,4 +378,4 @@ function filterRules() {
 }
 </script>
 @endpush
-@endsection
+

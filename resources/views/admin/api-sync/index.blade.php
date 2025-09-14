@@ -448,4 +448,3 @@ function saveSettings() {
 }
 </script>
 @endpush
-@endsection

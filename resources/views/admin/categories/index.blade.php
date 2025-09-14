@@ -289,4 +289,4 @@ function syncCategories() {
 }
 </script>
 @endpush
-@endsection
+

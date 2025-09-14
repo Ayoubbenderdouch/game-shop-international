@@ -228,6 +228,7 @@
 @endsection
 
 @push('scripts')
+{{-- Chart.js initialization - Using Blade unescaped output for JSON data --}}
 <script>
 const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 const revenueChart = new Chart(revenueCtx, {
@@ -306,4 +307,4 @@ document.getElementById('revenue-period').addEventListener('change', function() 
 });
 </script>
 @endpush
-@endsection
+{{-- File ends here - no extra @endsection needed --}}
