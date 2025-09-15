@@ -105,9 +105,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Pricing Rules
     Route::resource('pricing-rules', App\Http\Controllers\Admin\PricingRuleController::class);
 
-    // Settings
+    // Settings - UPDATED WITH MISSING ROUTES
     Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/test-email', [App\Http\Controllers\Admin\SettingController::class, 'testEmail'])->name('settings.test-email');
+    Route::get('/settings/clear-cache', [App\Http\Controllers\Admin\SettingController::class, 'clearCache'])->name('settings.clear-cache');
 
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {

@@ -150,7 +150,7 @@
 </header>
 
 <!-- Include Alpine.js for dropdown functionality -->
-<script src="//unpkg.com/alpinejs" defer></script>
+<script src="https://unpkg.com/alpinejs@2.8.2" defer></script>
 
 <script>
 // Mobile menu toggle

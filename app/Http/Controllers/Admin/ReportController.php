@@ -54,30 +54,41 @@ class ReportController extends Controller
             ->distinct('user_id')
             ->count();
 
-        // Product statistics
-        $topProducts = Product::select('products.*')
-            ->selectRaw('SUM(order_items.quantity) as total_sold')
-            ->selectRaw('SUM(order_items.total_price) as total_revenue')
-            ->join('order_items', 'products.id', '=', 'order_items.product_id')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.payment_status', 'paid')
-            ->groupBy('products.id')
-            ->orderBy('total_revenue', 'desc')
+        // Product statistics - ALTERNATIVE SOLUTION using subquery
+        $topProducts = Product::withCount(['orderItems as total_sold' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('SUM(quantity)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->withCount(['orderItems as total_revenue' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('SUM(total_price)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->orderByDesc('total_revenue')
             ->limit(10)
             ->get();
 
-        // Category performance
-        $categoryPerformance = Category::select('categories.*')
-            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
-            ->selectRaw('SUM(order_items.total_price) as revenue')
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->join('order_items', 'products.id', '=', 'order_items.product_id')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.payment_status', 'paid')
-            ->groupBy('categories.id')
-            ->orderBy('revenue', 'desc')
+        // Category performance - ALTERNATIVE SOLUTION using subquery
+        $categoryPerformance = Category::withCount(['products as order_count' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COUNT(DISTINCT orders.id)'))
+                    ->join('order_items', 'products.id', '=', 'order_items.product_id')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->whereBetween('orders.created_at', [$startDate, $endDate])
+                    ->where('orders.payment_status', 'paid');
+            }])
+            ->withCount(['products as revenue' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('SUM(order_items.total_price)'))
+                    ->join('order_items', 'products.id', '=', 'order_items.product_id')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->whereBetween('orders.created_at', [$startDate, $endDate])
+                    ->where('orders.payment_status', 'paid');
+            }])
+            ->orderByDesc('revenue')
             ->get();
 
         // Daily revenue chart data
@@ -152,19 +163,36 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', now()->format('Y-m-d'));
 
-        $productPerformance = Product::select('products.*')
-            ->selectRaw('COUNT(DISTINCT order_items.order_id) as order_count')
-            ->selectRaw('SUM(order_items.quantity) as total_sold')
-            ->selectRaw('SUM(order_items.total_price) as total_revenue')
-            ->selectRaw('AVG(order_items.price) as avg_selling_price')
-            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-            ->leftJoin('orders', function ($join) use ($startDate, $endDate) {
-                $join->on('order_items.order_id', '=', 'orders.id')
-                     ->whereBetween('orders.created_at', [$startDate, $endDate])
-                     ->where('orders.payment_status', 'paid');
-            })
-            ->groupBy('products.id')
-            ->orderBy('total_revenue', 'desc')
+        // Product performance using subqueries
+        $productPerformance = Product::withCount(['orderItems as order_count' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COUNT(DISTINCT order_id)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->withCount(['orderItems as total_sold' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(SUM(quantity), 0)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->withCount(['orderItems as total_revenue' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(SUM(total_price), 0)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->withCount(['orderItems as avg_selling_price' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(AVG(price), 0)'))
+                    ->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                          ->where('payment_status', 'paid');
+                    });
+            }])
+            ->orderByDesc('total_revenue')
             ->paginate(30);
 
         // Low stock products
@@ -174,20 +202,23 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-        // Best performing categories
-        $categoryPerformance = Category::select('categories.*')
-            ->selectRaw('COUNT(DISTINCT products.id) as product_count')
-            ->selectRaw('SUM(order_items.quantity) as total_sold')
-            ->selectRaw('SUM(order_items.total_price) as revenue')
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
-            ->leftJoin('orders', function ($join) use ($startDate, $endDate) {
-                $join->on('order_items.order_id', '=', 'orders.id')
-                     ->whereBetween('orders.created_at', [$startDate, $endDate])
-                     ->where('orders.payment_status', 'paid');
-            })
-            ->groupBy('categories.id')
-            ->orderBy('revenue', 'desc')
+        // Best performing categories using subqueries
+        $categoryPerformance = Category::withCount(['products as product_count'])
+            ->withCount(['products as total_sold' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(SUM(order_items.quantity), 0)'))
+                    ->join('order_items', 'products.id', '=', 'order_items.product_id')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->whereBetween('orders.created_at', [$startDate, $endDate])
+                    ->where('orders.payment_status', 'paid');
+            }])
+            ->withCount(['products as revenue' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(SUM(order_items.total_price), 0)'))
+                    ->join('order_items', 'products.id', '=', 'order_items.product_id')
+                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                    ->whereBetween('orders.created_at', [$startDate, $endDate])
+                    ->where('orders.payment_status', 'paid');
+            }])
+            ->orderByDesc('revenue')
             ->get();
 
         return view('admin.reports.products', compact(
@@ -207,17 +238,28 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', now()->format('Y-m-d'));
 
-        // Top customers
-        $topCustomers = User::select('users.*')
-            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
-            ->selectRaw('SUM(orders.total_amount) as total_spent')
-            ->selectRaw('AVG(orders.total_amount) as avg_order_value')
-            ->selectRaw('MAX(orders.created_at) as last_order_date')
-            ->join('orders', 'users.id', '=', 'orders.user_id')
-            ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->where('orders.payment_status', 'paid')
-            ->groupBy('users.id')
-            ->orderBy('total_spent', 'desc')
+        // Top customers using subqueries
+        $topCustomers = User::withCount(['orders as order_count' => function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('created_at', [$startDate, $endDate])
+                      ->where('payment_status', 'paid');
+            }])
+            ->withCount(['orders as total_spent' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(SUM(total_amount), 0)'))
+                      ->whereBetween('created_at', [$startDate, $endDate])
+                      ->where('payment_status', 'paid');
+            }])
+            ->withCount(['orders as avg_order_value' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('COALESCE(AVG(total_amount), 0)'))
+                      ->whereBetween('created_at', [$startDate, $endDate])
+                      ->where('payment_status', 'paid');
+            }])
+            ->withCount(['orders as last_order_date' => function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw('MAX(created_at)'))
+                      ->whereBetween('created_at', [$startDate, $endDate])
+                      ->where('payment_status', 'paid');
+            }])
+            ->having('order_count', '>', 0)
+            ->orderByDesc('total_spent')
             ->paginate(30);
 
         // Customer acquisition
@@ -233,14 +275,28 @@ class ReportController extends Controller
         $activeCustomers = User::whereHas('orders', function ($q) use ($startDate, $endDate) {
             $q->whereBetween('created_at', [$startDate, $endDate]);
         })->count();
-        $retentionRate = $totalCustomers > 0 ? ($activeCustomers / $totalCustomers) * 100 : 0;
+        $retentionRate = $totalCustomers > 0 ?
+            ($activeCustomers / $totalCustomers) * 100 : 0;
+
+        // Customer segments
+        $customerSegments = [
+            'new' => User::whereBetween('created_at', [$startDate, $endDate])->count(),
+            'returning' => User::has('orders', '>=', 2)->count(),
+            'vip' => User::whereHas('orders', function ($q) {
+                $q->havingRaw('SUM(total_amount) > ?', [1000]);
+            })->count(),
+            'inactive' => User::whereDoesntHave('orders', function ($q) {
+                $q->where('created_at', '>=', now()->subDays(90));
+            })->count()
+        ];
 
         return view('admin.reports.customers', compact(
             'topCustomers',
             'customerAcquisition',
+            'retentionRate',
+            'customerSegments',
             'totalCustomers',
             'activeCustomers',
-            'retentionRate',
             'startDate',
             'endDate'
         ));
@@ -256,9 +312,8 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', now()->format('Y-m-d'));
 
-        // Implementation for export functionality would go here
-        // This could generate CSV, Excel, or PDF reports
-
-        return back()->with('info', 'Export functionality will be implemented soon');
+        // Generate export based on type
+        // This is a placeholder for export functionality
+        return back()->with('info', 'Export functionality coming soon');
     }
 }
