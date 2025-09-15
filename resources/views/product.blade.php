@@ -205,10 +205,14 @@
                             </div>
                         </form>
 
+                        @php
+                            $isFavorited = auth()->user()->favorites()->where('product_id', $product->id)->exists();
+                        @endphp
+
                         <button onclick="toggleFavorite({{ $product->id }})"
                                 id="favorite-btn-{{ $product->id }}"
-                                class="px-6 py-3 border border-slate-700 text-white rounded-lg hover:border-primary-blue transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="px-6 py-3 border border-slate-700 rounded-lg hover:border-primary-blue transition-all {{ $isFavorited ? 'text-red-500 border-red-500' : 'text-white' }}">
+                            <svg class="w-5 h-5" fill="{{ $isFavorited ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                             </svg>
                         </button>
@@ -462,16 +466,21 @@ function toggleFavorite(productId) {
             if (btn) {
                 const svg = btn.querySelector('svg');
                 if (data.is_favorited) {
+                    // Fill the heart and add red color
                     svg.setAttribute('fill', 'currentColor');
-                    btn.classList.add('text-red-500');
+                    btn.classList.add('text-red-500', 'border-red-500');
+                    btn.classList.remove('text-white');
                 } else {
+                    // Empty the heart and remove red color
                     svg.setAttribute('fill', 'none');
-                    btn.classList.remove('text-red-500');
+                    btn.classList.remove('text-red-500', 'border-red-500');
+                    btn.classList.add('text-white');
                 }
             }
         }
     })
     .catch(error => console.error('Error:', error));
+    window.location.reload();
 }
 
 function addToCart(productId) {
@@ -507,6 +516,18 @@ function openReviewModal() {
     // For now, just show an alert
     alert('Review modal would open here. This feature needs to be implemented with a proper modal component.');
 }
+
+// Initialize favorite button state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if button has the red color class to ensure proper initial state
+    const favoriteBtn = document.querySelector('[id^="favorite-btn-"]');
+    if (favoriteBtn && favoriteBtn.classList.contains('text-red-500')) {
+        const svg = favoriteBtn.querySelector('svg');
+        if (svg) {
+            svg.setAttribute('fill', 'currentColor');
+        }
+    }
+});
 @else
 function addToCart(productId) {
     window.location.href = "{{ route('login') }}";

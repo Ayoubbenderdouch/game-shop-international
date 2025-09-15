@@ -44,10 +44,10 @@ class CartController extends Controller implements HasMiddleware
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('cart.product_not_available', 'Product is not available')
+                    'message' => __('app.cart.product_not_available', 'Product is not available')
                 ], 400);
             }
-            return back()->with('error', __('cart.product_not_available'));
+            return back()->with('error', __('app.cart.product_not_available'));
         }
 
         // Check stock if applicable
@@ -55,10 +55,10 @@ class CartController extends Controller implements HasMiddleware
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('cart.insufficient_stock', 'Insufficient stock')
+                    'message' => __('app.cart.insufficient_stock', 'Insufficient stock')
                 ], 400);
             }
-            return back()->with('error', __('cart.insufficient_stock'));
+            return back()->with('error', __('app.cart.insufficient_stock'));
         }
 
         // Check if product is forbidden in user's country
@@ -66,10 +66,10 @@ class CartController extends Controller implements HasMiddleware
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('cart.product_not_available_in_country', 'Product not available in your country')
+                    'message' => __('app.cart.product_not_available_in_country', 'Product not available in your country')
                 ], 400);
             }
-            return back()->with('error', __('cart.product_not_available_in_country'));
+            return back()->with('error', __('app.cart.product_not_available_in_country'));
         }
 
         // Get optional fields data if provided
@@ -80,7 +80,7 @@ class CartController extends Controller implements HasMiddleware
             // Validate required optional fields
             foreach ($product->getRequiredOptionalFields() as $field) {
                 if (!isset($optionalFieldsData[$field['fieldCode']]) || empty($optionalFieldsData[$field['fieldCode']])) {
-                    $errorMessage = __('cart.required_field_missing', ['field' => $field['label']], 'Required field missing: ' . $field['label']);
+                    $errorMessage = __('app.cart.required_field_missing', ['field' => $field['label']], 'Required field missing: ' . $field['label']);
                     if ($request->ajax()) {
                         return response()->json([
                             'success' => false,
@@ -117,7 +117,7 @@ class CartController extends Controller implements HasMiddleware
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => __('cart.product_added', 'Product added to cart'),
+                'message' => __('app.cart.product_added', 'Product added to cart'),
                 'cartCount' => $cartCount,
                 'cartItem' => [
                     'id' => $cartItem->id,
@@ -128,7 +128,7 @@ class CartController extends Controller implements HasMiddleware
             ]);
         }
 
-        return back()->with('success', __('cart.product_added'));
+        return back()->with('success', __('app.cart.product_added'));
     }
 
     public function update(Request $request, CartItem $cartItem)
@@ -148,10 +148,10 @@ class CartController extends Controller implements HasMiddleware
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('cart.insufficient_stock', 'Insufficient stock')
+                    'message' => __('app.cart.insufficient_stock', 'Insufficient stock')
                 ], 400);
             }
-            return back()->with('error', __('cart.insufficient_stock'));
+            return back()->with('error', __('app.cart.insufficient_stock'));
         }
 
         $cartItem->update(['quantity' => $request->quantity]);
@@ -164,14 +164,14 @@ class CartController extends Controller implements HasMiddleware
 
             return response()->json([
                 'success' => true,
-                'message' => __('cart.cart_updated', 'Cart updated'),
+                'message' => __('app.cart.cart_updated', 'Cart updated'),
                 'cartCount' => $cartCount,
                 'total' => $total,
                 'itemTotal' => $cartItem->product->selling_price * $cartItem->quantity
             ]);
         }
 
-        return back()->with('success', __('cart.cart_updated'));
+        return back()->with('success', __('app.cart.cart_updated'));
     }
 
     public function remove(CartItem $cartItem)
@@ -191,13 +191,13 @@ class CartController extends Controller implements HasMiddleware
 
             return response()->json([
                 'success' => true,
-                'message' => __('cart.product_removed', 'Product removed from cart'),
+                'message' => __('app.cart.product_removed', 'Product removed from cart'),
                 'cartCount' => $cartCount,
                 'total' => $total
             ]);
         }
 
-        return back()->with('success', __('cart.product_removed'));
+        return back()->with('success', __('app.cart.product_removed'));
     }
 
     public function clear()
@@ -207,12 +207,12 @@ class CartController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => __('cart.cart_cleared', 'Cart cleared'),
+                'message' => __('app.cart.cart_cleared', 'Cart cleared'),
                 'cartCount' => 0
             ]);
         }
 
-        return back()->with('success', __('cart.cart_cleared'));
+        return back()->with('success', __('app.cart.cart_cleared'));
     }
 
     /**

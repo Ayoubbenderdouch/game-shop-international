@@ -144,7 +144,8 @@ class OrderController extends Controller implements HasMiddleware
             abort(403);
         }
 
-        $order->load(['orderItems.product', 'transaction']);
+        // FIXED: Removed 'transaction' relationship that doesn't exist
+        $order->load(['orderItems.product']);
 
         return view('orders.show', compact('order'));
     }

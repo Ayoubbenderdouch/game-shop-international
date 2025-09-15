@@ -286,6 +286,7 @@ function addToCart(productId) {
         console.error('Error:', error);
         showNotification('An error occurred', 'error');
     });
+    window.location.reload();
 }
 
 function toggleFavorite(productId) {

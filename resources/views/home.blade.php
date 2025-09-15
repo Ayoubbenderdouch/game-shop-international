@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Home - GameShop')
+@section('title', 'Home - Gaming Store')
 
 @section('content')
 <!-- Hero Section -->
@@ -10,8 +10,9 @@
         <div class="swiper-wrapper">
             <!-- Slide 1 -->
             <div class="swiper-slide">
-                <div class="relative min-h-[600px] bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center">
-                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full">
+                <div class="relative min-h-[600px] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2065'); background-size: cover; background-position: center;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full relative z-10">
                         <div class="max-w-xl">
                             <h1 class="text-5xl lg:text-6xl font-black text-white mb-6">
                                 Level Up Your Gaming Experience
@@ -19,7 +20,7 @@
                             <p class="text-xl text-gray-300 mb-8">
                                 Get instant access to game cards, gift cards, and premium subscriptions
                             </p>
-                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#49b8ef] to-[#3da2d4] text-black font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                                 Explore Collection
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -32,8 +33,9 @@
 
             <!-- Slide 2 -->
             <div class="swiper-slide">
-                <div class="relative min-h-[600px] bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900 flex items-center">
-                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full">
+                <div class="relative min-h-[600px] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070'); background-size: cover; background-position: center;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full relative z-10">
                         <div class="max-w-xl">
                             <h1 class="text-5xl lg:text-6xl font-black text-white mb-6">
                                 Exclusive Gaming Deals
@@ -41,7 +43,7 @@
                             <p class="text-xl text-gray-300 mb-8">
                                 Save big on your favorite games and digital content
                             </p>
-                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#49b8ef] to-[#3da2d4] text-black font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                                 View Deals
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -54,8 +56,9 @@
 
             <!-- Slide 3 -->
             <div class="swiper-slide">
-                <div class="relative min-h-[600px] bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900 flex items-center">
-                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full">
+                <div class="relative min-h-[600px] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071'); background-size: cover; background-position: center;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+                    <div class="max-w-[1170px] mx-auto px-5 lg:px-0 w-full relative z-10">
                         <div class="max-w-xl">
                             <h1 class="text-5xl lg:text-6xl font-black text-white mb-6">
                                 Lightning Fast Delivery
@@ -63,7 +66,7 @@
                             <p class="text-xl text-gray-300 mb-8">
                                 Receive your codes instantly after purchase, 24/7 automated delivery
                             </p>
-                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <a href="{{ route('shop') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#49b8ef] to-[#3da2d4] text-black font-bold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                                 Get Started
                                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -83,7 +86,7 @@
 <section class="w-full py-[60px]">
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
         <div class="text-center mb-12">
-            <p class="text-primary-blue text-lg font-medium mb-2">Shop by Category</p>
+            <p class="text-[#49b8ef] text-lg font-medium mb-2">Shop by Category</p>
             <h2 class="text-3xl md:text-4xl font-black text-white">Browse Our Collection</h2>
         </div>
 
@@ -91,7 +94,7 @@
             @foreach($categories as $category)
             <a href="{{ route('category.show', $category->slug) }}"
                class="group text-center">
-                <div class="w-full aspect-square bg-black border border-[#23262B] rounded-lg flex flex-col items-center justify-center hover:border-primary-blue transition-all duration-300 group-hover:scale-105">
+                <div class="w-full aspect-square bg-black border border-[#23262B] rounded-lg flex flex-col items-center justify-center hover:border-[#49b8ef] transition-all duration-300 group-hover:scale-105">
                     @if($category->icon)
                     <div class="text-3xl mb-2">{!! $category->icon !!}</div>
                     @else
@@ -99,7 +102,7 @@
                     @endif
                     <p class="text-xs text-gray-400 group-hover:text-white transition-colors">{{ $category->name }}</p>
                     @if($category->products_count > 0)
-                    <span class="text-xs text-primary-blue mt-1">{{ $category->products_count }} items</span>
+                    <span class="text-xs text-[#49b8ef] mt-1">{{ $category->products_count }} items</span>
                     @endif
                 </div>
             </a>
@@ -115,10 +118,10 @@
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
         <div class="flex justify-between items-center mb-8">
             <div>
-                <p class="text-primary-blue text-lg font-medium">Top Picks</p>
+                <p class="text-[#49b8ef] text-lg font-medium">Top Picks</p>
                 <h2 class="text-3xl md:text-4xl font-black text-white">Best Selling Products</h2>
             </div>
-            <a href="{{ route('shop') }}" class="text-gray-400 hover:text-primary-blue transition-all">
+            <a href="{{ route('shop') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">
                 View All →
             </a>
         </div>
@@ -126,7 +129,7 @@
         <!-- Products Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach($featuredProducts as $product)
-            <div class="product-card border border-[#3C3E42] rounded-lg overflow-hidden bg-black hover:border-primary-blue transition-all duration-300">
+            <div class="product-card border border-[#3C3E42] rounded-lg overflow-hidden bg-black hover:border-[#49b8ef] transition-all duration-300">
                 <a href="{{ route('product.show', $product->slug) }}" class="block">
                     <div class="relative h-48 bg-gradient-to-br from-[#23262B] to-black flex items-center justify-center group overflow-hidden">
                         @if($product->discount_percentage > 0)
@@ -169,15 +172,15 @@
                         <div>
                             @if($product->original_price && $product->original_price > $product->selling_price)
                             <span class="text-gray-500 line-through text-sm">${{ number_format($product->original_price, 2) }}</span>
-                            <span class="text-primary-blue font-bold text-lg ml-1">${{ number_format($product->selling_price, 2) }}</span>
+                            <span class="text-[#49b8ef] font-bold text-lg ml-1">${{ number_format($product->selling_price, 2) }}</span>
                             @else
-                            <span class="text-primary-blue font-bold text-lg">${{ number_format($product->selling_price, 2) }}</span>
+                            <span class="text-[#49b8ef] font-bold text-lg">${{ number_format($product->selling_price, 2) }}</span>
                             @endif
                         </div>
 
                         @if($product->is_available)
                         <button onclick="addToCart({{ $product->id }})"
-                                class="px-3 py-1 bg-primary-blue text-black text-sm font-semibold rounded hover:bg-[#3fda74] transition-all">
+                                class="px-3 py-1 bg-[#49b8ef] text-black text-sm font-semibold rounded hover:bg-[#3da2d4] transition-all">
                             Add
                         </button>
                         @else
@@ -198,19 +201,19 @@
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
         <div class="grid md:grid-cols-4 gap-6">
             <div class="text-center">
-                <div class="text-4xl font-black text-primary-blue mb-2">{{ number_format($stats['total_customers']) }}+</div>
+                <div class="text-4xl font-black text-[#49b8ef] mb-2">{{ number_format($stats['total_customers'] ?? 1000) }}+</div>
                 <p class="text-gray-400">Happy Customers</p>
             </div>
             <div class="text-center">
-                <div class="text-4xl font-black text-primary-blue mb-2">{{ number_format($stats['total_products']) }}+</div>
+                <div class="text-4xl font-black text-[#49b8ef] mb-2">{{ number_format($stats['total_products'] ?? 500) }}+</div>
                 <p class="text-gray-400">Digital Products</p>
             </div>
             <div class="text-center">
-                <div class="text-4xl font-black text-primary-blue mb-2">24/7</div>
+                <div class="text-4xl font-black text-[#49b8ef] mb-2">24/7</div>
                 <p class="text-gray-400">Instant Delivery</p>
             </div>
             <div class="text-center">
-                <div class="text-4xl font-black text-primary-blue mb-2">{{ $stats['countries_served'] }}+</div>
+                <div class="text-4xl font-black text-[#49b8ef] mb-2">{{ $stats['countries_served'] ?? 50 }}+</div>
                 <p class="text-gray-400">Countries Served</p>
             </div>
         </div>
@@ -221,12 +224,12 @@
 <!-- CTA Section -->
 <section class="w-full py-[60px]">
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
-        <div class="bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl p-12 text-center">
-            <h2 class="text-4xl font-black text-white mb-4">Ready to Level Up?</h2>
-            <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+        <div class="bg-gradient-to-r from-[#49b8ef] to-[#3da2d4] rounded-2xl p-12 text-center">
+            <h2 class="text-4xl font-black text-black mb-4">Ready to Level Up?</h2>
+            <p class="text-xl text-black/80 mb-8 max-w-2xl mx-auto">
                 Join thousands of gamers who trust us for their digital gaming needs. Start shopping now and get instant delivery!
             </p>
-            <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+            <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-black text-white font-bold rounded-lg hover:bg-gray-900 transition-all duration-300 transform hover:scale-105">
                 Create Account
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>

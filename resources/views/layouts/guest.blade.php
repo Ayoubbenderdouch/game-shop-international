@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'GameShop') }}</title>
+    <title>{{ config('app.name', 'Gaming Store') }}</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,7 +19,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-blue': '#45F882',
+                        'primary-blue': '#49b8ef',
                         'primary-black': '#000000',
                         'primary-border': '#23262B',
                         'primary-border-secondary': '#3C3E42'
@@ -59,12 +59,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #45F882;
+            background: #49b8ef;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #3fda74;
+            background: #3da2d4;
         }
 
         /* Floating animation */
@@ -83,11 +83,11 @@
         <!-- Background effects -->
         <div class="absolute inset-0">
             <div class="absolute inset-0 bg-gradient-to-br from-[#0b0e13] via-[#0b0e13] to-black opacity-90"></div>
-            <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-[#49b8ef]/10 rounded-full blur-3xl"></div>
             <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
 
             <!-- Grid pattern -->
-            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"%3E%3Cpath d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(69,248,130,0.05)" stroke-width="1"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23grid)"/%3E%3C/svg%3E')]"></div>
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"%3E%3Cpath d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(73,184,239,0.05)" stroke-width="1"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%25" height="100%25" fill="url(%23grid)"/%3E%3C/svg%3E')]"></div>
         </div>
 
         <!-- Main Content -->

@@ -241,7 +241,6 @@ function removeFromCart(itemId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Remove item from DOM
             const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
             if (itemElement) {
                 itemElement.remove();
@@ -260,12 +259,16 @@ function removeFromCart(itemId) {
 
             updateCartCount();
             showNotification('Item removed from cart', 'success');
+
         }
     })
     .catch(error => {
         console.error('Error:', error);
         showNotification('An error occurred', 'error');
     });
+    window.setInterval(function() {
+        window.location.reload();
+    }, 1000);
 }
 </script>
 @endpush

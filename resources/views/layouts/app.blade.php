@@ -8,7 +8,7 @@
     <meta name="user" content="{{ auth()->user()->id }}">
     @endauth
 
-    <title>@yield('title', config('app.name', 'GameShop'))</title>
+    <title>@yield('title', config('app.name', 'Gaming Store'))</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,7 +27,7 @@
                 theme: {
                     extend: {
                         colors: {
-                            'primary-blue': '#45F882',
+                            'primary-blue': '#49b8ef',
                             'primary-black': '#000000',
                             'primary-border': '#23262B',
                             'primary-border-secondary': '#3C3E42'
@@ -56,12 +56,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #45F882;
+            background: #49b8ef;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #3fda74;
+            background: #3da2d4;
         }
 
         /* Toast Notifications */
@@ -69,7 +69,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #45F882;
+            background: #49b8ef;
             color: #000;
             padding: 15px 20px;
             border-radius: 5px;
@@ -89,15 +89,15 @@
 
         /* Product Card Hover */
         .product-card:hover {
-            border-color: #45F882;
+            border-color: #49b8ef;
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(69, 248, 130, 0.2);
+            box-shadow: 0 10px 30px rgba(73, 184, 239, 0.2);
         }
 
         /* Loading Spinner */
         .loader {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #45F882;
+            border-top: 3px solid #49b8ef;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -138,12 +138,8 @@
                 <!-- Logo & About -->
                 <div>
                     <a href="{{ route('home') }}" class="inline-block mb-4">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-10 h-10 bg-primary-blue rounded-lg flex items-center justify-center">
-                                <span class="text-black font-black text-xl">G</span>
-                            </div>
-                            <span class="text-white font-bold text-xl">GameShop</span>
-                        </div>
+                        <!-- Gaming Controller Logo SVG -->
+                        <img src="{{ asset('storage/images/logo.png') }}" alt="Logo" style="height: 70px; width: 100px;">
                     </a>
                     <p class="text-sm text-gray-400 leading-relaxed">
                         Your ultimate destination for digital game cards, gift cards, and premium gaming subscriptions.
@@ -154,11 +150,11 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Quick Links</h4>
                     <ul class="space-y-2">
-                        <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-primary-blue transition-all">Home</a></li>
-                        <li><a href="{{ route('shop') }}" class="text-gray-400 hover:text-primary-blue transition-all">Shop</a></li>
+                        <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Home</a></li>
+                        <li><a href="{{ route('shop') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Shop</a></li>
                         @auth
-                        <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-primary-blue transition-all">Dashboard</a></li>
-                        <li><a href="{{ route('orders.index') }}" class="text-gray-400 hover:text-primary-blue transition-all">My Orders</a></li>
+                        <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Dashboard</a></li>
+                        <li><a href="{{ route('orders.index') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">My Orders</a></li>
                         @endauth
                     </ul>
                 </div>
@@ -167,10 +163,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Categories</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Game Cards</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Gift Cards</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Subscriptions</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Top Up</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Game Cards</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Gift Cards</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Subscriptions</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Top Up</a></li>
                     </ul>
                 </div>
 
@@ -179,7 +175,7 @@
                     <h4 class="text-white font-semibold mb-4">Support</h4>
                     <ul class="space-y-2">
                         <li class="text-gray-400">
-                            <span>Email: support@gameshop.com</span>
+                            <span>Email: support@gamingstore.com</span>
                         </li>
                         <li class="text-gray-400">
                             <span>24/7 Customer Support</span>
@@ -192,11 +188,11 @@
             <div class="border-t border-[#23262B] mt-8 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     <p class="text-sm text-gray-400">
-                        © {{ date('Y') }} {{ config('app.name', 'GameShop') }}. All rights reserved.
+                        © {{ date('Y') }} Gaming Store. All rights reserved.
                     </p>
                     <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Privacy Policy</a>
-                        <a href="#" class="text-gray-400 hover:text-primary-blue transition-all">Terms of Service</a>
+                        <a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Terms of Service</a>
                     </div>
                 </div>
             </div>
@@ -217,7 +213,7 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
 
-            const bgColor = type === 'success' ? '#45F882' :
+            const bgColor = type === 'success' ? '#49b8ef' :
                            type === 'error' ? '#ef4444' :
                            '#fbbf24';
 
@@ -232,7 +228,6 @@
             }, 3000);
         }
 
-        // Show Laravel session messages as toasts
         @if(session('success'))
             showToast("{{ session('success') }}", 'success');
         @endif

@@ -54,14 +54,14 @@ class FavoriteController extends Controller implements HasMiddleware
         if ($favorite) {
             $favorite->delete();
             $isFavorited = false;
-            $message = __('favorites.removed');
+            $message = __('app.favorites.removed');
         } else {
             Favorite::create([
                 'user_id' => $userId,
                 'product_id' => $productId
             ]);
             $isFavorited = true;
-            $message = __('favorites.added');
+            $message = __('app.favorites.added');
         }
 
         if ($request->ajax()) {
@@ -87,7 +87,7 @@ class FavoriteController extends Controller implements HasMiddleware
 
         $favorite->delete();
 
-        return back()->with('success', __('favorites.removed'));
+        return back()->with('success', __('app.favorites.removed'));
     }
 
     /**

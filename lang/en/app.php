@@ -114,6 +114,15 @@ return [
         'checkout' => 'Proceed to Checkout',
         'update' => 'Update',
         'proceed_to_checkout' => 'Proceed to Checkout',
+        'product_not_available' => 'Product is not available.',
+        'insufficient_stock' => 'Insufficient stock.',
+        'product_not_available_in_country' => 'This product is not available in your country.',
+        'required_field_missing' => 'Required field missing: :field',
+        'product_added' => 'Product added to cart.',
+        'cart_updated' => 'Cart updated successfully.',
+        'product_removed' => 'Product removed from cart.',
+        'cart_cleared' => 'Cart cleared successfully.',
+
     ],
 
     'checkout' => [
@@ -180,4 +189,10 @@ return [
         'password_changed' => 'Password changed successfully',
         'login_required' => 'Please login to continue',
     ],
+    'favorites' => [
+        'title' => 'My Favorites',
+        'no_favorites' => 'You have no favorite products yet.',
+        'added' => 'Product added to favorites.',
+        'removed' => 'Product removed from favorites.',
+    ]
 ];
