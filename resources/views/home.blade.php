@@ -3,6 +3,7 @@
 @section('title', 'Home - Gaming Store')
 
 @section('content')
+
 <!-- Hero Section -->
 <section class="w-full relative">
     <!-- Swiper Hero Slider -->
@@ -81,36 +82,18 @@
     </div>
 </section>
 
-<!-- Categories Section -->
-@if(isset($categories) && $categories->count() > 0)
+<!-- Shop by Category Section with Navigation Component -->
 <section class="w-full py-[60px]">
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
         <div class="text-center mb-12">
-            <p class="text-[#49b8ef] text-lg font-medium mb-2">Shop by Category</p>
-            <h2 class="text-3xl md:text-4xl font-black text-white">Browse Our Collection</h2>
-        </div>
-
-        <div class="grid xl:grid-cols-8 lg:grid-cols-6 sm:grid-cols-5 grid-cols-4 sm:gap-5 gap-3">
-            @foreach($categories as $category)
-            <a href="{{ route('category.show', $category->slug) }}"
-               class="group text-center">
-                <div class="w-full aspect-square bg-black border border-[#23262B] rounded-lg flex flex-col items-center justify-center hover:border-[#49b8ef] transition-all duration-300 group-hover:scale-105">
-                    @if($category->icon)
-                    <div class="text-3xl mb-2">{!! $category->icon !!}</div>
-                    @else
-                    <div class="text-3xl mb-2">🎮</div>
-                    @endif
-                    <p class="text-xs text-gray-400 group-hover:text-white transition-colors">{{ $category->name }}</p>
-                    @if($category->products_count > 0)
-                    <span class="text-xs text-[#49b8ef] mt-1">{{ $category->products_count }} items</span>
-                    @endif
-                </div>
-            </a>
-            @endforeach
+            <p class="text-[#49b8ef] text-lg font-medium mb-2">Explore Categories</p>
+            <h2 class="text-3xl md:text-4xl font-black text-white">Shop by Category</h2>
         </div>
     </div>
+
+    <!-- Category Navigation Component -->
+    @include('components.category-navigation')
 </section>
-@endif
 
 <!-- Best Selling Products -->
 @if(isset($featuredProducts) && $featuredProducts->count() > 0)

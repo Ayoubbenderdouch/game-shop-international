@@ -25,6 +25,9 @@ class HomeController extends Controller
                 ->get();
         });
 
+        // Get categorized navigation
+        $categorizedNav = CategoryNavigationController::getCategorizedNavigation();
+
         // Fetch featured products (best sellers)
         $featuredProducts = Cache::remember('featured_products', 1800, function () {
             return Product::where('is_active', true)
@@ -63,7 +66,7 @@ class HomeController extends Controller
             ];
         });
 
-        return view('home', compact('categories', 'featuredProducts', 'stats'));
+        return view('home', compact('categories', 'featuredProducts', 'stats', 'categorizedNav'));
     }
 
     public function setLocale(Request $request)

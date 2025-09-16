@@ -3,6 +3,7 @@
 @section('title', 'Shop - GameShop')
 
 @section('content')
+
 <!-- Shop Section -->
 <section class="w-full py-[60px] min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
     <div class="max-w-[1170px] mx-auto px-5 lg:px-0">

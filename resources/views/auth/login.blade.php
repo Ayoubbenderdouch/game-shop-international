@@ -106,17 +106,17 @@
                     </button>
 
                     <!-- Divider -->
-                    <div class="relative">
+                    <!-- <div class="relative">
                         <div class="absolute inset-0 flex items-center">
                             <div class="w-full border-t border-slate-700"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
                             <span class="px-4 bg-slate-900/50 text-slate-400">Or continue with</span>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Social Login Options -->
-                    <div class="grid grid-cols-2 gap-3">
+                    <!-- <div class="grid grid-cols-2 gap-3">
                         <button type="button"
                                 class="flex items-center justify-center px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl hover:bg-slate-700/50 transition-colors">
                             <svg class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
@@ -132,7 +132,7 @@
                             </svg>
                             <span class="ml-2 text-sm font-medium text-slate-300">GitHub</span>
                         </button>
-                    </div>
+                    </div> -->
                 </form>
             </div>
 
