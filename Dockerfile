@@ -1,7 +1,7 @@
 # Dockerfile for Laravel on Railway
 FROM php:8.3-fpm
 
-# Install system dependencies
+# Install system dependencies INCLUDING ICU for intl extension
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,13 +9,14 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libicu-dev \
     zip \
     unzip \
     nodejs \
     npm \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
+# Install PHP extensions (intl now has required dependencies)
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # Install Redis extension
