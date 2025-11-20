@@ -1,331 +1,239 @@
 @extends('layouts.app')
 
-@section('title', 'Shop - GameShop')
+@section('title', __('shop.title'))
 
 @section('content')
 
-<!-- Shop Section -->
-<section class="w-full py-[60px] min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-    <div class="max-w-[1170px] mx-auto px-5 lg:px-0">
-        <div class="lg:flex lg:space-x-[30px]">
-            <!-- Sidebar -->
-            <div class="lg:w-[270px] mb-8 lg:mb-0">
-                <div class="w-full px-5 py-4 rounded-lg border border-slate-700 bg-slate-800/50 backdrop-blur-sm">
-                    <!-- Categories -->
-                    <div class="mb-8">
-                        <p class="text-xl leading-8 font-semibold text-white pb-[6px] border-b border-slate-700 mb-4">
-                            Categories
-                        </p>
-                        <ul class="space-y-2">
-                            <li>
-                                <a href="{{ route('shop') }}"
-                                   class="flex items-center justify-between text-gray-400 hover:text-primary-blue transition-all {{ !request()->has('category') ? 'text-primary-blue font-semibold' : '' }}">
-                                    <span>All Products</span>
-                                    @if(isset($products))
-                                    <span class="text-xs">({{ \App\Models\Product::active()->available()->count() }})</span>
-                                    @endif
-                                </a>
-                            </li>
-                            @if(isset($categories))
-                                @foreach($categories as $category)
-                                <li>
-                                    <a href="{{ route('shop', ['category' => $category->slug]) }}"
-                                       class="flex items-center justify-between text-gray-400 hover:text-primary-blue transition-all {{ request('category') == $category->slug ? 'text-primary-blue font-semibold' : '' }}">
-                                        <span>{{ $category->name }}</span>
-                                        <span class="text-xs">({{ $category->products_count ?? 0 }})</span>
-                                    </a>
-                                </li>
-                                @endforeach
-                            @endif
-                        </ul>
-                    </div>
+<!-- Page Header -->
+<section class="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-12">
+    <div class="max-w-[1200px] mx-auto px-5 lg:px-8">
+        <h1 class="text-4xl lg:text-5xl font-black text-white mb-4">
+            {{ __('shop.header.title') }}
+        </h1>
+        <p class="text-blue-100 text-lg">
+            {{ __('shop.header.subtitle') }}
+        </p>
+    </div>
+</section>
 
-                    <!-- Price Filter -->
-                    <div class="mb-8">
-                        <p class="text-xl leading-8 font-semibold text-white pb-[6px] border-b border-slate-700 mb-4">
-                            Price Range
-                        </p>
-                        <form method="GET" action="{{ route('shop') }}">
-                            @if(request('category'))
-                            <input type="hidden" name="category" value="{{ request('category') }}">
-                            @endif
-                            @if(request('search'))
-                            <input type="hidden" name="search" value="{{ request('search') }}">
-                            @endif
-                            <div class="space-y-3">
-                                <input type="number" name="min_price" placeholder="Min price"
-                                       value="{{ request('min_price') }}"
-                                       class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-primary-blue focus:outline-none">
-                                <input type="number" name="max_price" placeholder="Max price"
-                                       value="{{ request('max_price') }}"
-                                       class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-primary-blue focus:outline-none">
-                                <button type="submit" class="w-full bg-primary-blue text-black font-semibold py-2 rounded-lg hover:bg-[#3fda74] transition-all">
-                                    Apply Filter
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+<!-- Shop Content -->
+<section class="w-full py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-[1200px] mx-auto px-5 lg:px-8">
 
-                    <!-- Sort By -->
-                    <div>
-                        <p class="text-xl leading-8 font-semibold text-white pb-[6px] border-b border-slate-700 mb-4">
-                            Sort By
-                        </p>
-                        <form method="GET" action="{{ route('shop') }}" id="sortForm">
-                            @foreach(request()->except('sort') as $key => $value)
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                            @endforeach
-                            <select name="sort" onchange="document.getElementById('sortForm').submit()"
-                                    class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white focus:border-primary-blue focus:outline-none">
-                                <option value="newest" {{ request('sort') == 'newest' || !request('sort') ? 'selected' : '' }}>Latest</option>
-                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                                <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular</option>
-                                <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Best Rated</option>
-                            </select>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        @if(request()->has('category'))
+            <!-- Category Products View -->
+            @php
+                $category = \App\Models\Category::where('id', request('category'))
+                    ->orWhere('slug', request('category'))
+                    ->first();
 
-            <!-- Products Grid -->
-            <div class="flex-1">
-                <!-- Search Bar -->
-                <div class="mb-6">
-                    <form method="GET" action="{{ route('shop') }}" class="relative">
-                        @foreach(request()->except(['search', 'page']) as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                        @endforeach
-                        <input type="text" name="search" placeholder="Search products..."
-                               value="{{ request('search') }}"
-                               class="search-bar-enhanced w-full px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none">
-                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-blue transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </button>
-                    </form>
+                $products = $category ?
+                    \App\Models\Product::where('category_id', $category->id)
+                        ->where('is_active', true)
+                        ->where('available', true)
+                        ->paginate(24)
+                    : collect();
+            @endphp
+
+            @if($category)
+                <!-- Breadcrumb -->
+                <div class="mb-8">
+                    <nav class="flex items-center gap-2 text-sm text-gray-600">
+                        <a href="{{ route('shop') }}" class="hover:text-blue-600">{{ __('shop.all_categories') }}</a>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                        <span class="text-gray-900 font-semibold">{{ $category->name }}</span>
+                    </nav>
                 </div>
 
-                <!-- Results Info -->
-                @if(isset($products))
-                <div class="flex justify-between items-center mb-6">
-                    <p class="text-gray-400">
-                        @if($products->total() > 0)
-                            Showing <span class="text-white">{{ $products->firstItem() }}-{{ $products->lastItem() }}</span>
-                            of <span class="text-white">{{ $products->total() }}</span> results
-                            @if(request('search'))
-                                for "<span class="text-white">{{ request('search') }}</span>"
-                            @endif
+                <!-- Category Header -->
+                <div class="bg-white rounded-2xl p-8 mb-8 shadow-sm">
+                    <div class="flex items-center gap-6">
+                        @if($category->image)
+                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-20 h-20 object-contain">
                         @else
-                            No products found
+                            <div class="w-20 h-20 bg-blue-100 rounded-xl flex items-center justify-center">
+                                <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                </svg>
+                            </div>
                         @endif
-                    </p>
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-900 mb-2">{{ $category->name }}</h2>
+                            <p class="text-gray-600">{{ $products->total() }} {{ __('shop.products_available') }}</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Products Grid -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @forelse($products as $product)
-                    <div class="product-card-enhanced">
-                        <a href="{{ route('product.show', $product->slug) }}" class="block">
-                            <div class="relative h-48 bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center group overflow-hidden">
-                                @if($product->discount_percentage > 0 || ($product->original_price && $product->original_price > $product->selling_price))
-                                <span class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded z-10">
-                                    -{{ $product->discount_percentage ?? round((($product->original_price - $product->selling_price) / $product->original_price) * 100) }}%
-                                </span>
-                                @endif
-
+                        <a href="{{ route('product.show', $product->id) }}" class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                            <div class="aspect-square bg-gradient-to-br from-blue-100 to-blue-200 relative overflow-hidden">
                                 @if($product->image)
-                                <img src="{{ $product->image }}" alt="{{ $product->name }}"
-                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                 @else
-                                <div class="text-6xl">🎮</div>
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-20 h-20 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                        </svg>
+                                    </div>
                                 @endif
-
-                                <!-- Quick Actions Overlay -->
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                                    @if($product->is_available && ($product->stock_quantity === null || $product->stock_quantity > 0))
-                                    <button onclick="event.preventDefault(); addToCart({{ $product->id }})"
-                                            class="p-3 bg-primary-blue text-black rounded-lg hover:bg-[#3fda74] transition-all transform scale-0 group-hover:scale-100">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                        </svg>
-                                    </button>
-                                    @endif
-
-                                    @auth
-                                    <button onclick="event.preventDefault(); toggleFavorite({{ $product->id }})"
-                                            class="p-3 bg-white text-black rounded-lg hover:bg-gray-200 transition-all transform scale-0 group-hover:scale-100">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                        </svg>
-                                    </button>
-                                    @endauth
-                                </div>
+                                @if($product->discount > 0)
+                                    <div class="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                        -{{ $product->discount }}%
+                                    </div>
+                                @endif
                             </div>
-                        </a>
-
-                        <div class="p-4">
-                            <a href="{{ route('product.show', $product->slug) }}" class="block">
-                                <h3 class="text-white font-semibold mb-2 hover:text-primary-blue transition-colors line-clamp-2">
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                                     {{ $product->name }}
                                 </h3>
-                            </a>
-
-                            @if($product->category)
-                            <p class="text-xs text-gray-400 mb-2">{{ $product->category->name }}</p>
-                            @endif
-
-                            <!-- Rating -->
-                            @if($product->reviews_count > 0)
-                            <div class="flex items-center gap-1 mb-3">
-                                @php
-                                    $rating = round($product->reviews_avg_rating ?? 0);
-                                @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= $rating)
-                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                    </svg>
-                                    @else
-                                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                    </svg>
-                                    @endif
-                                @endfor
-                                <span class="text-gray-400 text-xs ml-1">({{ $product->reviews_count }})</span>
-                            </div>
-                            @endif
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    @if($product->original_price && $product->original_price > $product->selling_price)
-                                    <span class="text-gray-500 line-through text-sm">
-                                        <x-price :price="$product->original_price" />
-                                    </span>
-                                    <span class="text-primary-blue font-bold text-lg ml-2">
-                                        <x-price :price="$product->selling_price" />
-                                    </span>
-                                    @else
-                                    <span class="text-primary-blue font-bold text-lg">
-                                        <x-price :price="$product->selling_price" />
-                                    </span>
-                                    @endif
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-2xl font-black text-blue-600">
+                                            {{ number_format($product->sell_price, 2) }} {{ $product->currency }}
+                                        </div>
+                                        @if($product->original_price && $product->original_price > $product->sell_price)
+                                            <div class="text-sm text-gray-400 line-through">
+                                                {{ number_format($product->original_price, 2) }} {{ $product->currency }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-
-                                @if($product->is_available)
-                                    @if($product->stock_quantity !== null && $product->stock_quantity <= 5 && $product->stock_quantity > 0)
-                                    <span class="text-xs text-orange-400">Only {{ $product->stock_quantity }} left</span>
-                                    @elseif($product->stock_quantity === 0)
-                                    <span class="text-xs text-red-400">Out of Stock</span>
-                                    @else
-                                    <span class="text-xs text-green-400">In Stock</span>
-                                    @endif
-                                @else
-                                <span class="text-xs text-red-400">Unavailable</span>
-                                @endif
                             </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-span-full text-center py-12">
-                        <div class="text-6xl mb-4">😕</div>
-                        <h3 class="text-2xl font-bold text-white mb-2">No products found</h3>
-                        <p class="text-gray-400 mb-6">
-                            @if(request('search'))
-                                No results for "{{ request('search') }}". Try different keywords.
-                            @else
-                                Try adjusting your filters or browse all products.
-                            @endif
-                        </p>
-                        <a href="{{ route('shop') }}" class="inline-block px-6 py-3 bg-primary-blue text-black font-bold rounded-lg hover:bg-[#3fda74] transition-all">
-                            Clear Filters
                         </a>
-                    </div>
+                    @empty
+                        <div class="col-span-full text-center py-16">
+                            <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <p class="text-gray-500 text-lg">{{ __('shop.no_products_in_category') }}</p>
+                        </div>
                     @endforelse
                 </div>
 
                 <!-- Pagination -->
                 @if($products->hasPages())
-                <div class="mt-8">
-                    {{ $products->withQueryString()->links() }}
-                </div>
+                    <div class="mt-12">
+                        {{ $products->links() }}
+                    </div>
                 @endif
-                @else
-                <div class="text-center py-12">
-                    <p class="text-gray-400">Loading products...</p>
+            @endif
+
+        @else
+            <!-- All Categories View -->
+            @php
+                $allCategories = \App\Models\Category::whereNull('parent_id')
+                    ->withCount('products')
+                    ->orderBy('name')
+                    ->get();
+            @endphp
+
+            <!-- Search & Filter Bar -->
+            <div class="bg-white rounded-2xl p-6 mb-8 shadow-sm">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="flex-1 w-full md:w-auto">
+                        <div class="relative">
+                            <input type="text" id="categorySearch" placeholder="{{ __('shop.search_categories') }}"
+                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-gray-600">
+                        <span class="font-bold text-gray-900">{{ $allCategories->count() }}</span> {{ __('shop.categories_total') }}
+                    </div>
                 </div>
-                @endif
             </div>
-        </div>
+
+            <!-- Categories Grid -->
+            <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @forelse($allCategories as $category)
+                    <a href="{{ route('shop', ['category' => $category->id]) }}" class="category-card group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2" data-name="{{ strtolower($category->name) }}">
+                        <div class="aspect-square bg-gradient-to-br from-blue-100 to-blue-200 relative overflow-hidden p-8 flex items-center justify-center">
+                            @if($category->image)
+                                <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                            @else
+                                <div class="w-24 h-24 bg-blue-300 rounded-full flex items-center justify-center">
+                                    <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                </div>
+                            @endif
+                            @if($category->products_count > 0)
+                                <div class="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                    {{ $category->products_count }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-6 bg-white">
+                            <h3 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                                {{ $category->name }}
+                            </h3>
+                            <p class="text-sm text-gray-600">
+                                {{ $category->products_count }} {{ __('shop.products') }}
+                            </p>
+                        </div>
+                    </a>
+                @empty
+                    <div class="col-span-full text-center py-16">
+                        <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p class="text-gray-500 text-lg mb-4">{{ __('shop.no_categories') }}</p>
+                        <p class="text-gray-400">{{ __('shop.sync_hint') }}</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Empty State for Search -->
+            <div id="noResults" class="hidden text-center py-16">
+                <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <p class="text-gray-500 text-lg">{{ __('shop.no_results') }}</p>
+            </div>
+
+        @endif
     </div>
 </section>
-@endsection
 
-@push('scripts')
+<!-- Category Search Script -->
+@if(!request()->has('category'))
 <script>
-@auth
-function addToCart(productId) {
-    fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            product_id: productId,
-            quantity: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            showNotification('Product added to cart!', 'success');
-            updateCartCount();
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('categorySearch');
+    const categoryCards = document.querySelectorAll('.category-card');
+    const noResults = document.getElementById('noResults');
+    const categoriesGrid = document.getElementById('categoriesGrid');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+
+        categoryCards.forEach(card => {
+            const categoryName = card.getAttribute('data-name');
+            if (categoryName.includes(searchTerm)) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0) {
+            categoriesGrid.classList.add('hidden');
+            noResults.classList.remove('hidden');
         } else {
-            showNotification(data.message || 'Failed to add product', 'error');
+            categoriesGrid.classList.remove('hidden');
+            noResults.classList.add('hidden');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('An error occurred', 'error');
     });
-    window.location.reload();
-}
-
-function toggleFavorite(productId) {
-    fetch('/favorites/toggle', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            product_id: productId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            showNotification(data.is_favorited ? 'Added to favorites!' : 'Removed from favorites!', 'success');
-            updateFavoritesCount();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('An error occurred', 'error');
-    });
-}
-@else
-function addToCart(productId) {
-    window.location.href = "{{ route('login') }}";
-}
-
-function toggleFavorite(productId) {
-    window.location.href = "{{ route('login') }}";
-}
-@endauth
+});
 </script>
-@endpush
+@endif
+
+@endsection

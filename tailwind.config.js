@@ -24,6 +24,18 @@ export default {
                     850: '#0f1623',
                     950: '#020617',
                 },
+                primary: {
+                    50: '#eff6ff',
+                    100: '#dbeafe',
+                    200: '#bfdbfe',
+                    300: '#93c5fd',
+                    400: '#60a5fa',
+                    500: '#3b82f6',
+                    600: '#2563eb',
+                    700: '#1d4ed8',
+                    800: '#1e40af',
+                    900: '#1e3a8a',
+                },
             },
             animation: {
                 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -47,10 +59,10 @@ export default {
                 },
                 glow: {
                     '0%, 100%': {
-                        'box-shadow': '0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(6, 182, 212, 0.3)',
+                        'box-shadow': '0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3)',
                     },
                     '50%': {
-                        'box-shadow': '0 0 30px rgba(147, 51, 234, 0.5), 0 0 60px rgba(147, 51, 234, 0.3)',
+                        'box-shadow': '0 0 30px rgba(96, 165, 250, 0.5), 0 0 60px rgba(96, 165, 250, 0.3)',
                     },
                 },
                 float: {
@@ -130,13 +142,13 @@ export default {
                     'border': '1px solid rgba(255, 255, 255, 0.1)',
                 },
                 '.text-gradient': {
-                    'background': 'linear-gradient(to right, #06b6d4, #9333ea)',
+                    'background': 'linear-gradient(to right, #3b82f6, #60a5fa)',
                     '-webkit-background-clip': 'text',
                     '-webkit-text-fill-color': 'transparent',
                     'background-clip': 'text',
                 },
                 '.border-gradient': {
-                    'border-image': 'linear-gradient(to right, #06b6d4, #9333ea) 1',
+                    'border-image': 'linear-gradient(to right, #3b82f6, #60a5fa) 1',
                 },
             }
             addUtilities(newUtilities)
