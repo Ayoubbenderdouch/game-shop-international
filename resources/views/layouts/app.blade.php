@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,23 @@
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+    <!-- Custom Gaming Style CSS -->
+    <link rel="stylesheet" href="{{ asset('css/gaming-style.css') }}">
+
+    <!-- Abady Store Theme CSS -->
+    <link rel="stylesheet" href="{{ asset('css/abady-style.css') }}">
+
+    <!-- Luxury Navigation CSS -->
+    <link rel="stylesheet" href="{{ asset('css/navigation-luxury.css') }}">
+
+    <!-- RTL Support CSS -->
+    <link rel="stylesheet" href="{{ asset('css/rtl-support.css') }}">
+
+    <!-- Cairo Font (for Arabic support) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Bunny Fonts (Privacy-friendly Google Fonts alternative) -->
     <link href="https://fonts.bunny.net/css?family=urbanist:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i" rel="stylesheet" />
@@ -42,8 +59,19 @@
     </script>
 
     <style>
-        body {
+        html, body {
             font-family: "Urbanist", sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        main {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         /* Custom Scrollbar */
@@ -112,7 +140,7 @@
 
     @stack('styles')
 </head>
-<body class="bg-[#0b0e13] text-[#e5e7eb]">
+<body class="bg-white text-gray-900">
 
     @include('layouts.navigation')
 
@@ -132,70 +160,18 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full bg-black border-t border-[#23262B] mt-[60px]">
-        <div class="max-w-[1170px] mx-auto px-5 lg:px-0 py-[60px]">
-            <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-8">
-                <!-- Logo & About -->
-                <div>
-                    <a href="{{ route('home') }}" class="inline-block mb-4">
-                        <!-- Gaming Controller Logo SVG -->
-                        <img src="{{ asset('storage/images/logo.png') }}" alt="Logo" style="height: 70px; width: 100px;">
-                    </a>
-                    <p class="text-sm text-gray-400 leading-relaxed">
-                        Your ultimate destination for digital game cards, gift cards, and premium gaming subscriptions.
-                    </p>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('home') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Home</a></li>
-                        <li><a href="{{ route('shop') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Shop</a></li>
-                        @auth
-                        <li><a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">Dashboard</a></li>
-                        <li><a href="{{ route('orders.index') }}" class="text-gray-400 hover:text-[#49b8ef] transition-all">My Orders</a></li>
-                        @endauth
-                    </ul>
-                </div>
-
-                <!-- Categories -->
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Categories</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Game Cards</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Gift Cards</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Subscriptions</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Top Up</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact Info -->
-                <div>
-                    <h4 class="text-white font-semibold mb-4">Support</h4>
-                    <ul class="space-y-2">
-                        <li class="text-gray-400">
-                            <span>Email: support@gamingstore.com</span>
-                        </li>
-                        <li class="text-gray-400">
-                            <span>24/7 Customer Support</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Bottom Bar -->
-            <div class="border-t border-[#23262B] mt-8 pt-8">
-                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                    <p class="text-sm text-gray-400">
-                        © {{ date('Y') }} Gaming Store. All rights reserved.
-                    </p>
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Privacy Policy</a>
-                        <a href="#" class="text-gray-400 hover:text-[#49b8ef] transition-all">Terms of Service</a>
-                    </div>
-                </div>
-            </div>
+    <footer class="w-full bg-[#2E2370] border-t border-[#F4C430] mt-[60px]" style="min-height: 100px;">
+        <div class="max-w-[1170px] mx-auto px-5 py-8 text-[#F6F7FB] text-sm flex flex-col md:flex-row gap-4 md:gap-8">
+            <div class="flex-1">© {{ date('Y') }} {{ config('company.name') }}</div>
+            <nav class="flex flex-wrap gap-x-6 gap-y-2">
+                <a href="{{ route('legal.privacy') }}" class="hover:underline">{{ __('Privacy Policy') }}</a>
+                <a href="{{ route('legal.terms') }}" class="hover:underline">{{ __('Terms & Conditions') }}</a>
+                <a href="{{ route('legal.refund') }}" class="hover:underline">{{ __('Refund Policy') }}</a>
+                <a href="{{ route('legal.contact') }}" class="hover:underline">{{ __('Contact & Support') }}</a>
+                @if(config('company.country') === 'DE')
+                    <a href="{{ route('legal.imprint') }}" class="hover:underline">{{ __('Imprint') }}</a>
+                @endif
+            </nav>
         </div>
     </footer>
 

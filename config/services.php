@@ -61,7 +61,18 @@ return [
         'retry_delay' => env('LIKECARD_RETRY_DELAY', 10), // seconds
 
         // Default Margin (percentage to add to cost price)
-        'default_margin' => env('LIKECARD_DEFAULT_MARGIN', 10), 
+        'default_margin' => env('LIKECARD_DEFAULT_MARGIN', 10),
+    ],
+
+    'mazaya' => [
+        'base_url' => env('MAZAYA_BASE_URL', 'https://mazaya-online.com/api/v1'),
+        'username' => env('MAZAYA_USERNAME'),
+        'password' => env('MAZAYA_PASSWORD'),
+    ],
+
+    'exchangerate_api' => [
+        'key' => env('EXCHANGERATE_API_KEY'),
+        'base_url' => env('EXCHANGERATE_API_URL', 'https://v6.exchangerate-api.com/v6'),
     ],
 
     'postmark' => [

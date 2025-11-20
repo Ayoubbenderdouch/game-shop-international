@@ -27,7 +27,7 @@ class LocaleMiddleware
         }
         // Use browser language or default
         else {
-            $locale = $request->getPreferredLanguage(['en', 'ar', 'fr']);
+            $locale = $request->getPreferredLanguage(['en', 'ar']);
             App::setLocale($locale ?: config('app.locale'));
         }
 

@@ -126,12 +126,48 @@
                             </label>
 
                             <div class="space-y-2">
-                                <label class="flex items-center p-3 bg-slate-900 rounded-lg cursor-pointer hover:bg-slate-800 transition-colors">
-                                    <input type="radio" name="payment_method" value="stripe" checked
-                                           class="text-cyan-500 focus:ring-cyan-500">
-                                    <span class="ml-3 text-white">
-                                        Credit/Debit Card
-                                    </span>
+                                <!-- Wallet Payment Option -->
+                                <label class="flex items-center justify-between p-4 bg-slate-900 border-2 border-transparent rounded-lg cursor-pointer hover:border-primary-blue transition-all payment-method-option">
+                                    <div class="flex items-center">
+                                        <input type="radio" name="payment_method" value="wallet"
+                                               class="text-primary-blue focus:ring-primary-blue">
+                                        <div class="ml-3">
+                                            <span class="text-white font-bold block">Wallet Balance</span>
+                                            <span class="text-sm text-slate-400">
+                                                Available: ${{ number_format(auth()->user()->wallet_balance, 2) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <svg class="w-6 h-6 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                    </svg>
+                                </label>
+
+                                @if(auth()->user()->wallet_balance < $total)
+                                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                                    <p class="text-yellow-400 text-sm flex items-start gap-2">
+                                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        </svg>
+                                        <span>
+                                            Insufficient balance. 
+                                            <a href="{{ route('wallet.deposit') }}" class="underline font-bold">Add funds</a> to your wallet.
+                                        </span>
+                                    </p>
+                                </div>
+                                @endif
+
+                                <!-- Stripe Payment Option -->
+                                <label class="flex items-center justify-between p-4 bg-slate-900 border-2 border-transparent rounded-lg cursor-pointer hover:border-primary-blue transition-all payment-method-option">
+                                    <div class="flex items-center">
+                                        <input type="radio" name="payment_method" value="stripe" checked
+                                               class="text-primary-blue focus:ring-primary-blue">
+                                        <span class="ml-3 text-white font-bold">Credit/Debit Card</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" class="h-5 opacity-70">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-5 opacity-70">
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -190,15 +226,49 @@
 @push('scripts')
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    // Mock Stripe integration for demo
-    document.getElementById('payment-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Mock token generation
-        document.getElementById('stripeToken').value = 'tok_visa_' + Math.random().toString(36).substr(2, 9);
-
-        // Submit the form
-        this.submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('payment-form');
+        const paymentMethodOptions = document.querySelectorAll('.payment-method-option');
+        const walletBalance = {{ auth()->user()->wallet_balance }};
+        const orderTotal = {{ $total }};
+        
+        // Handle payment method selection visual feedback
+        paymentMethodOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                paymentMethodOptions.forEach(opt => {
+                    opt.classList.remove('border-primary-blue', 'bg-primary-blue/5');
+                });
+                this.classList.add('border-primary-blue', 'bg-primary-blue/5');
+            });
+        });
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            // Check wallet balance if wallet payment is selected
+            if (selectedPaymentMethod === 'wallet') {
+                if (walletBalance < orderTotal) {
+                    alert('Insufficient wallet balance. Please add funds or select another payment method.');
+                    return false;
+                }
+                
+                // Confirm wallet payment
+                if (!confirm('Pay $' + orderTotal.toFixed(2) + ' from your wallet balance?')) {
+                    return false;
+                }
+                
+                // No token needed for wallet payment
+                document.getElementById('stripeToken').value = '';
+                this.submit();
+            } else {
+                // Stripe payment - Mock token generation
+                document.getElementById('stripeToken').value = 'tok_visa_' + Math.random().toString(36).substr(2, 9);
+                this.submit();
+            }
+        });
     });
 </script>
 @endpush

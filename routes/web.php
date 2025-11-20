@@ -9,6 +9,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\MazayaController;
+use App\Http\Controllers\ProductSelectionController;
+use App\Http\Controllers\InternationalController;
+use App\Http\Controllers\GuestCheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,11 +25,52 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
 Route::get('/category/{slug}', [ShopController::class, 'category'])->name('category.show');
-Route::post('/set-locale', [HomeController::class, 'setLocale'])->name('set-locale');
+Route::get('/products/{slug}', [HomeController::class, 'showCategory'])->name('product.category');
+
+// International Routes - Language & Currency Switching
+Route::get('/language/{locale}', [InternationalController::class, 'switchLanguage'])->name('language.switch');
+Route::post('/currency/switch', [InternationalController::class, 'switchCurrency'])->name('currency.switch');
+Route::get('/currency/{currency}', [InternationalController::class, 'getCurrencyData'])->name('currency.data');
+Route::post('/currency/convert', [InternationalController::class, 'convertPrice'])->name('currency.convert');
+Route::get('/api/currencies', [InternationalController::class, 'getActiveCurrencies'])->name('api.currencies');
+
+// Legal pages (static)
+Route::name('legal.')->prefix('legal')->group(function () {
+    Route::view('/privacy', 'legal.privacy')->name('privacy');
+    Route::view('/terms', 'legal.terms')->name('terms');
+    Route::view('/refund', 'legal.refund')->name('refund');
+    Route::view('/contact', 'legal.contact')->name('contact');
+    Route::view('/imprint', 'legal.imprint')->name('imprint');
+});
+
+// Product Selection Flow - Country Selection (goes directly to product page)
+Route::get('/select/{product}/countries', [ProductSelectionController::class, 'selectCountry'])->name('product.select-country');
+// Note: Amount selection is now on the product page itself, so this route is not needed
+// Route::get('/select/{product}/country/{country}', [ProductSelectionController::class, 'selectAmount'])->name('product.select-amount');
+Route::get('/locale/{locale}', [HomeController::class, 'setLocale'])->name('locale.set');
 
 // Search and Filter Routes
 Route::get('/search', [ShopController::class, 'search'])->name('search');
 Route::get('/api/products/filter', [ShopController::class, 'filter'])->name('products.filter');
+
+// Mazaya Routes - Direct Top-Up
+Route::prefix('direct-topup')->name('mazaya.')->group(function () {
+    Route::get('/', [MazayaController::class, 'index'])->name('index');
+    Route::get('/{gameSlug}', [MazayaController::class, 'selectRegion'])->name('game-selection');
+    Route::get('/{gameSlug}/{regionSlug}', [MazayaController::class, 'selectAmount'])->name('region-selection');
+    Route::post('/order', [MazayaController::class, 'order'])->name('order');
+    Route::get('/order/{orderId}/status', [MazayaController::class, 'orderStatus'])->name('order.status');
+    Route::get('/order/{orderId}/check', [MazayaController::class, 'checkOrderStatus'])->name('order.check');
+});
+
+// Guest Checkout Routes - Allow purchases without registration
+Route::prefix('guest')->name('guest.')->group(function () {
+    Route::post('/cart/add', [GuestCheckoutController::class, 'addToCart'])->name('cart.add');
+    Route::get('/cart', [GuestCheckoutController::class, 'getCart'])->name('cart.get');
+    Route::get('/checkout', [GuestCheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [GuestCheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/success', [GuestCheckoutController::class, 'success'])->name('checkout.success');
+});
 
 // Include authentication routes from Breeze
 require __DIR__.'/auth.php';
@@ -81,6 +126,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Wallet Routes
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [App\Http\Controllers\WalletController::class, 'index'])->name('index');
+        Route::get('/deposit', [App\Http\Controllers\WalletController::class, 'deposit'])->name('deposit');
+        Route::post('/deposit/process', [App\Http\Controllers\WalletController::class, 'processDeposit'])->name('deposit.process');
+        Route::get('/deposit/success', [App\Http\Controllers\WalletController::class, 'depositSuccess'])->name('deposit.success');
+        Route::get('/deposit/cancel', [App\Http\Controllers\WalletController::class, 'depositCancel'])->name('deposit.cancel');
+        Route::get('/history', [App\Http\Controllers\WalletController::class, 'history'])->name('history');
+        Route::get('/balance', [App\Http\Controllers\WalletController::class, 'getBalance'])->name('balance');
+    });
+
+    // Mazaya - My Orders
+    Route::get('/my-direct-orders', [MazayaController::class, 'myOrders'])->name('mazaya.my-orders');
 });
 
 // Admin Routes - Require Admin Role
@@ -129,6 +188,14 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::post('/products', [App\Http\Controllers\Admin\ApiSyncController::class, 'syncProducts'])->name('products');
         Route::post('/full-sync', [App\Http\Controllers\Admin\ApiSyncController::class, 'fullSync'])->name('full-sync');
         Route::post('/settings', [App\Http\Controllers\Admin\ApiSyncController::class, 'saveSettings'])->name('settings');
+    });
+
+    // International Management Routes
+    Route::prefix('international')->name('international.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\InternationalSettingsController::class, 'index'])->name('index');
+        Route::post('/currencies/update-rates', [InternationalController::class, 'updateExchangeRates'])->name('currencies.update-rates');
+        Route::resource('currencies', App\Http\Controllers\Admin\CurrencyController::class);
+        Route::resource('countries', App\Http\Controllers\Admin\CountryController::class);
     });
 });
 

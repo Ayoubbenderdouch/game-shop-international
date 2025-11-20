@@ -59,7 +59,7 @@ class CheckoutController extends Controller implements HasMiddleware
     public function process(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|in:stripe',
+            'payment_method' => 'required|in:stripe,wallet',
             'stripeToken' => 'required_if:payment_method,stripe',
         ]);
 
@@ -116,9 +116,39 @@ class CheckoutController extends Controller implements HasMiddleware
                 ]);
             }
 
-            // Mock Stripe Payment Processing
-            // In production, you would use actual Stripe SDK here
-            $paymentSuccessful = $this->mockStripePayment($request->stripeToken, $total);
+            // Process payment based on method
+            $paymentSuccessful = false;
+            
+            if ($request->payment_method === 'wallet') {
+                // Wallet Payment
+                $user = auth()->user();
+                
+                // Check if user has sufficient balance
+                if (!$user->canAfford($total)) {
+                    DB::rollBack();
+                    return redirect()->route('checkout.index')
+                        ->with('error', __('Insufficient wallet balance. Please add funds to your wallet.'));
+                }
+                
+                try {
+                    // Deduct from wallet
+                    $user->deductFromWallet(
+                        $total,
+                        'Purchase - Order #' . $order->reference_id,
+                        $order->reference_id
+                    );
+                    
+                    $paymentSuccessful = true;
+                } catch (\Exception $e) {
+                    Log::error('Wallet payment error: ' . $e->getMessage());
+                    DB::rollBack();
+                    return redirect()->route('checkout.index')
+                        ->with('error', __('Wallet payment failed: ' . $e->getMessage()));
+                }
+            } else {
+                // Stripe Payment
+                $paymentSuccessful = $this->mockStripePayment($request->stripeToken, $total);
+            }
 
             if ($paymentSuccessful) {
                 // Mark order as paid

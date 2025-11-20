@@ -18,10 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => \App\Http\Middleware\LocaleMiddleware::class,
             'country.restriction' => \App\Http\Middleware\CheckCountryRestriction::class,
             'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
+            'international' => \App\Http\Middleware\SetInternationalPreferences::class,
         ]);
 
-        // Apply CSP middleware to web group
+        // Apply CSP, Locale and International middleware to web group
         $middleware->appendToGroup('web', \App\Http\Middleware\ContentSecurityPolicy::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\LocaleMiddleware::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\SetInternationalPreferences::class);
 
         // Set the authenticated redirect path
         $middleware->redirectGuestsTo('/login');

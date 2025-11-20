@@ -19,10 +19,10 @@
                     </div>
                 </a>
                 <h2 class="mt-6 text-3xl font-black text-white">
-                    Create Account
+                    {{ __('auth.create_account') }}
                 </h2>
                 <p class="mt-2 text-sm text-slate-400">
-                    Join us and start your journey today
+                    {{ __('auth.join_us_today') }}
                 </p>
             </div>
 
@@ -34,7 +34,7 @@
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Full Name') }}
+                            {{ __('auth.full_name') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -58,7 +58,7 @@
                     <!-- Email Address -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Email Address') }}
+                            {{ __('auth.email') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -82,7 +82,7 @@
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Password') }}
+                            {{ __('auth.password') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -122,7 +122,7 @@
                     <!-- Confirm Password -->
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Confirm Password') }}
+                            {{ __('auth.confirm_password') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -159,7 +159,7 @@
                     <!-- Submit Button -->
                     <button type="submit"
                             class="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900">
-                        {{ __('Create Account') }}
+                        {{ __('auth.create_account') }}
                     </button>
 
                     <!-- Divider -->
@@ -195,10 +195,10 @@
 
             <!-- Login Link -->
             <p class="mt-8 text-center text-sm text-slate-400">
-                Already have an account?
+                {{ __('auth.already_have_account') }}
                 <a href="{{ route('login') }}"
                    class="font-medium text-purple-400 hover:text-purple-300 transition-colors">
-                    Sign in instead
+                    {{ __('auth.sign_in') }}
                 </a>
             </p>
         </div>

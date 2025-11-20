@@ -98,7 +98,7 @@
                         @endforeach
                         <input type="text" name="search" placeholder="Search products..."
                                value="{{ request('search') }}"
-                               class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 pr-12 text-white placeholder-gray-500 focus:border-primary-blue focus:outline-none">
+                               class="search-bar-enhanced w-full px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none">
                         <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-blue transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -126,7 +126,7 @@
                 <!-- Products Grid -->
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @forelse($products as $product)
-                    <div class="product-card border border-slate-700 rounded-lg overflow-hidden bg-slate-800/50 backdrop-blur-sm hover:border-primary-blue transition-all duration-300">
+                    <div class="product-card-enhanced">
                         <a href="{{ route('product.show', $product->slug) }}" class="block">
                             <div class="relative h-48 bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center group overflow-hidden">
                                 @if($product->discount_percentage > 0 || ($product->original_price && $product->original_price > $product->selling_price))
@@ -200,12 +200,16 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     @if($product->original_price && $product->original_price > $product->selling_price)
-                                    <span class="text-gray-500 line-through text-sm">${{ number_format($product->original_price, 2) }}</span>
+                                    <span class="text-gray-500 line-through text-sm">
+                                        <x-price :price="$product->original_price" />
+                                    </span>
                                     <span class="text-primary-blue font-bold text-lg ml-2">
-                                        ${{ number_format($product->selling_price, 2) }}
+                                        <x-price :price="$product->selling_price" />
                                     </span>
                                     @else
-                                    <span class="text-primary-blue font-bold text-lg">${{ number_format($product->selling_price, 2) }}</span>
+                                    <span class="text-primary-blue font-bold text-lg">
+                                        <x-price :price="$product->selling_price" />
+                                    </span>
                                     @endif
                                 </div>
 

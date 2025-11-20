@@ -19,10 +19,10 @@
                     </div>
                 </a>
                 <h2 class="mt-6 text-3xl font-black text-white">
-                    Welcome Back
+                    {{ __('auth.welcome_back') }}
                 </h2>
                 <p class="mt-2 text-sm text-slate-400">
-                    Sign in to your account to continue
+                    {{ __('auth.sign_in_to_continue') }}
                 </p>
             </div>
 
@@ -37,7 +37,7 @@
                     <!-- Email Address -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Email Address') }}
+                            {{ __('auth.email') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -62,7 +62,7 @@
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
-                            {{ __('Password') }}
+                            {{ __('auth.password') }}
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -88,13 +88,13 @@
                                    type="checkbox"
                                    name="remember"
                                    class="w-4 h-4 bg-slate-800 border-slate-600 rounded text-cyan-500 focus:ring-cyan-500 focus:ring-offset-0 focus:ring-2 transition-colors">
-                            <span class="ml-2 text-sm text-slate-300">{{ __('Remember me') }}</span>
+                            <span class="ml-2 text-sm text-slate-300">{{ __('auth.remember_me') }}</span>
                         </label>
 
                         @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}"
                            class="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
-                            {{ __('Forgot password?') }}
+                            {{ __('auth.forgot_password') }}
                         </a>
                         @endif
                     </div>
@@ -102,7 +102,7 @@
                     <!-- Submit Button -->
                     <button type="submit"
                             class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-cyan-500/25 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-900">
-                        {{ __('Sign in') }}
+                        {{ __('auth.sign_in') }}
                     </button>
 
                     <!-- Divider -->
@@ -138,10 +138,10 @@
 
             <!-- Register Link -->
             <p class="mt-8 text-center text-sm text-slate-400">
-                Don't have an account?
+                {{ __('auth.no_account') }}
                 <a href="{{ route('register') }}"
                    class="font-medium text-cyan-400 hover:text-cyan-300 transition-colors">
-                    Create one now
+                    {{ __('auth.create_account') }}
                 </a>
             </p>
         </div>

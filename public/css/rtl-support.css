@@ -1,0 +1,185 @@
+/* ========================================
+   RTL Support for Arabic Language
+   ======================================== */
+
+/* Only apply RTL styles when html has dir="rtl" */
+html[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Navigation RTL Fixes */
+html[dir="rtl"] .nav-luxury nav {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .nav-luxury .flex.items-center.space-x-6 {
+    flex-direction: row-reverse;
+    gap: 1.5rem;
+}
+
+html[dir="rtl"] .nav-luxury .flex.items-center.space-x-6 > * {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+/* Dropdown positioning for RTL */
+html[dir="rtl"] .absolute.right-0 {
+    right: auto;
+    left: 0;
+}
+
+/* Container RTL */
+html[dir="rtl"] .container-abady {
+    direction: rtl;
+}
+
+/* Product Grid RTL */
+html[dir="rtl"] .products-grid-3col {
+    direction: rtl;
+}
+
+/* Card Back Content RTL */
+html[dir="rtl"] .card-back-content {
+    text-align: center;
+}
+
+/* CTA Section RTL */
+html[dir="rtl"] .cta-section {
+    direction: rtl;
+    text-align: center;
+}
+
+html[dir="rtl"] .cta-title {
+    text-align: center;
+}
+
+/* Reviews Section RTL */
+html[dir="rtl"] .reviews-section {
+    direction: rtl;
+}
+
+html[dir="rtl"] .review-card {
+    text-align: right;
+}
+
+html[dir="rtl"] .reviewer-name {
+    text-align: right;
+}
+
+/* Footer RTL */
+html[dir="rtl"] footer {
+    direction: rtl;
+    text-align: right;
+}
+
+html[dir="rtl"] .footer-content {
+    direction: rtl;
+}
+
+html[dir="rtl"] .footer-section a {
+    text-align: right;
+}
+
+html[dir="rtl"] .footer-bottom {
+    direction: rtl;
+    text-align: center;
+}
+
+/* Mobile Menu RTL */
+html[dir="rtl"] #mobile-menu {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Language Switcher RTL */
+html[dir="rtl"] .flex.items-center.gap-2 {
+    flex-direction: row-reverse;
+}
+
+/* Arabic Font Optimization */
+html[dir="rtl"] body {
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html[dir="rtl"] .nav-luxury nav a {
+    letter-spacing: 0;
+}
+
+/* Button RTL */
+html[dir="rtl"] .card-back-button,
+html[dir="rtl"] .cta-button {
+    text-align: center;
+}
+
+/* Spacing adjustments for RTL */
+html[dir="rtl"] .space-x-6 > * + * {
+    margin-left: 0;
+    margin-right: 1.5rem;
+}
+
+html[dir="rtl"] .space-x-8 > * + * {
+    margin-left: 0;
+    margin-right: 2rem;
+}
+
+/* Align mobile menu items to right in RTL */
+html[dir="rtl"] #mobile-menu a {
+    text-align: right;
+}
+
+/* User Dropdown RTL positioning */
+html[dir="rtl"] div[x-show="open"] {
+    right: auto !important;
+    left: 0 !important;
+}
+
+/* Transform RTL hover effects */
+html[dir="rtl"] .nav-luxury div[x-show="open"] a:hover {
+    transform: translateX(-5px);
+}
+
+html[dir="rtl"] #mobile-menu a:hover {
+    transform: translateX(-5px);
+}
+
+/* Fix navigation spacing in RTL */
+html[dir="rtl"] nav.hidden.lg\\:flex.items-center.space-x-8 {
+    gap: 2rem;
+}
+
+html[dir="rtl"] nav.hidden.lg\\:flex.items-center.space-x-8 > * {
+    margin: 0;
+}
+
+/* ========================================
+   MOBILE RTL SUPPORT
+   ======================================== */
+
+@media (max-width: 768px) {
+    html[dir="rtl"] .nav-luxury .flex.items-center.space-x-6 {
+        gap: 1rem;
+    }
+
+    html[dir="rtl"] .products-grid-3col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    html[dir="rtl"] .container-abady {
+        padding: 0 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    html[dir="rtl"] .products-grid-3col {
+        grid-template-columns: 1fr;
+    }
+
+    html[dir="rtl"] .cta-title {
+        font-size: 1.2rem;
+    }
+
+    html[dir="rtl"] .review-card {
+        text-align: right;
+    }
+}

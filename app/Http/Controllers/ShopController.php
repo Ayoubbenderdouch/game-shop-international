@@ -72,6 +72,13 @@ class ShopController extends Controller
             ->with(['category', 'reviews.user'])
             ->firstOrFail();
 
+        // Get amount variations (same category, different amounts) - ordered by price
+        $amountVariations = Product::where('category_id', $product->category_id)
+            ->active()
+            ->available()
+            ->orderBy('selling_price', 'asc')
+            ->get();
+
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->active()
@@ -90,7 +97,7 @@ class ShopController extends Controller
             $hasReviewed = $user->hasReviewed($product->id);
         }
 
-        return view('product', compact('product', 'relatedProducts', 'canReview', 'hasReviewed'));
+        return view('product', compact('product', 'amountVariations', 'relatedProducts', 'canReview', 'hasReviewed'));
     }
 
     /**

@@ -32,6 +32,22 @@
 
         <!-- Stats Grid -->
         <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <!-- Wallet Balance -->
+            <div class="bg-black border border-[#23262B] rounded-lg p-6 hover:border-primary-blue transition-all cursor-pointer" onclick="window.location='{{ route('wallet.index') }}'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-gray-400 text-sm">Wallet</span>
+                </div>
+                <p class="text-3xl font-bold text-white">
+                    ${{ number_format(Auth::user()->wallet_balance, 2) }}
+                </p>
+                <p class="text-gray-400 text-sm mt-1">Available Balance</p>
+            </div>
+            
             <!-- Total Orders -->
             <div class="bg-black border border-[#23262B] rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">

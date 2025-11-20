@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/macbook/Downloads/Game-shop/**)",
+      "Bash(php artisan migrate:*)",
+      "Bash(mysql:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(curl -s ifconfig.me)",
+      "Bash(mysql.server:*)",
+      "Bash(lsof:*)",
+      "WebFetch(domain:documenter.getpostman.com)",
+      "Bash(curl:*)",
+      "WebFetch(domain:mazaya-online.com)",
+      "Read(//Users/macbook/Desktop/**)",
+      "WebFetch(domain:abadystore.com)",
+      "Bash(php:*)",
+      "Bash(timeout 30 php artisan likecard:sync-products:*)",
+      "Bash(timeout 120 php artisan likecard:sync-products:*)",
+      "Read(//Users/macbook/Downloads/**)",
+      "Bash(TOKEN=\"3265517|EbWnzeX7vOMfB5wckjO5qN9HKCGjKiEFzqMymBs42b79917e\")",
+      "Bash(python3 -m json.tool:*)",
+      "Bash(xargs kill:*)",
+      "Bash(mkdir:*)",
+      "Bash(mysqldump:*)",
+      "Bash(~/Desktop/game_shop_backup.sql)",
+      "Bash(~/Desktop/game_shope_backup.sql)",
+      "Bash(tar:*)",
+      "Bash(zip -r:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

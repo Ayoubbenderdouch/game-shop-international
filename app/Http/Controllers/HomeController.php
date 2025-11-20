@@ -32,16 +32,9 @@ class HomeController extends Controller
         $featuredProducts = Cache::remember('featured_products', 1800, function () {
             return Product::where('is_active', true)
                 ->where('is_available', true)
-                ->where(function($query) {
-                    $query->whereNull('stock_quantity')
-                          ->orWhere('stock_quantity', '>', 0);
-                })
-                ->with(['category', 'reviews'])
-                ->withCount('reviews')
-                ->withAvg('reviews', 'rating')
-                ->orderByDesc('sales_count')
-                ->orderByDesc('reviews_avg_rating')
-                ->limit(12)
+                ->with(['category'])
+                ->inRandomOrder() // Show random products for now
+                ->limit(8)
                 ->get()
                 ->map(function ($product) {
                     // Calculate discount percentage if original price exists
@@ -66,14 +59,12 @@ class HomeController extends Controller
             ];
         });
 
-        return view('home', compact('categories', 'featuredProducts', 'stats', 'categorizedNav'));
+        return view('home-abady', compact('categories', 'featuredProducts', 'stats', 'categorizedNav'));
     }
 
-    public function setLocale(Request $request)
+    public function setLocale($locale)
     {
-        $locale = $request->input('locale', 'en');
-
-        if (in_array($locale, ['en', 'ar', 'fr'])) {
+        if (in_array($locale, ['en', 'ar'])) {
             session(['locale' => $locale]);
             app()->setLocale($locale);
 
@@ -102,5 +93,71 @@ class HomeController extends Controller
         }
 
         return redirect()->route('home')->with('success', 'Data refreshed successfully');
+    }
+
+    /**
+     * Show category page with products from LikeCard API
+     */
+    public function showCategory($slug)
+    {
+        // Redirect gift cards to country selection flow
+        $giftCardProducts = [
+            'google-play' => 'Google Play',
+            'itunes' => 'Apple Gift Card',
+            'playstation' => 'PlayStation',
+            'xbox' => 'XBOX',
+            'steam' => 'Steam',
+            'razer-gold' => 'Razer Gold',
+        ];
+
+        if (isset($giftCardProducts[$slug])) {
+            return redirect()->route('product.select-country', $slug);
+        }
+
+        // Map homepage slugs to LikeCard category API IDs
+        $likecardMapping = [
+            'free-fire' => 343,        // FreeFire
+            'free-fire-code' => 343,   // FreeFire
+            'pubg-mobile' => 201,      // PUBG
+            'pubg-code' => 201,        // PUBG
+            'genshin-impact' => 675,   // Genshin Impact
+            'yala-ludo' => null,       // Not available yet - will show "Coming Soon"
+        ];
+
+        // Check if it's a LikeCard game category
+        if (isset($likecardMapping[$slug])) {
+            $categoryApiId = $likecardMapping[$slug];
+
+            // If category API ID is null, show "Coming Soon"
+            if ($categoryApiId === null) {
+                // Get a nice name from slug
+                $categoryName = ucwords(str_replace('-', ' ', $slug));
+                return view('likecard.products', [
+                    'category' => $categoryName,
+                    'products' => collect([]), // Empty collection
+                    'slug' => $slug
+                ]);
+            }
+
+            // Get category from database
+            $category = Category::where('api_id', $categoryApiId)->first();
+
+            if ($category) {
+                // Get products from database only (no API sync for faster loading)
+                $products = Product::where('category_id', $category->id)
+                    ->where('is_active', true)
+                    ->where('is_available', true)
+                    ->get();
+
+                return view('likecard.products', [
+                    'category' => $category->name,
+                    'products' => $products,
+                    'slug' => $slug
+                ]);
+            }
+        }
+
+        // Not found
+        abort(404);
     }
 }
