@@ -1,0 +1,62 @@
+# Laravel Cloud Configuration
+name: game-shop-international
+
+# Build Configuration
+build:
+  assets:
+    enabled: true
+    command: npm run build
+
+  composer:
+    install: true
+    options: --optimize-autoloader --no-dev
+
+# Runtime Configuration
+runtime:
+  php: "8.3"
+  extensions:
+    - pdo_mysql
+    - mbstring
+    - exif
+    - pcntl
+    - bcmath
+    - gd
+    - zip
+    - intl
+    - redis
+
+# Deployment Hooks
+deploy:
+  before:
+    - php artisan config:clear
+    - php artisan cache:clear
+    - php artisan view:clear
+    - php artisan route:clear
+
+  after:
+    - php artisan config:cache
+    - php artisan route:cache
+    - php artisan view:cache
+    - php artisan migrate --force
+
+# Database
+database:
+  type: mysql
+  version: "8.0"
+
+# Cache & Queue
+cache:
+  driver: redis
+
+queue:
+  driver: redis
+  connections:
+    - default
+
+# Scheduler
+scheduler:
+  enabled: true
+
+# Environment
+environment:
+  production: true
